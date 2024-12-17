@@ -1,11 +1,7 @@
-
 using Ecommerce.Domain.Common.Models;
 
 public sealed class Price : ValueObject
 {
-    public decimal Amount { get; }
-    public string Currency { get; }
-
     public Price(decimal amount, string currency)
     {
         if (amount <= 0)
@@ -21,6 +17,9 @@ public sealed class Price : ValueObject
         Amount = amount;
         Currency = currency;
     }
+
+    public decimal Amount { get; }
+    public string Currency { get; }
 
     public override IEnumerable<object> GetEqualityComponents()
     {

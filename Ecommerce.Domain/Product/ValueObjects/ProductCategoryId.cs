@@ -1,6 +1,6 @@
-using Ecommerce.Domain.Common.Models;
-
 namespace Ecommerce.Domain.Product.ValueObjects;
+
+using Ecommerce.Domain.Common.Models;
 
 public sealed class ProductCategoryId : ValueObject
 {
@@ -11,10 +11,7 @@ public sealed class ProductCategoryId : ValueObject
 
     private Guid Value { get; }
 
-    public static ProductCategoryId Create()
-    {
-        return new ProductCategoryId(Guid.NewGuid());
-    }
+    public static ProductCategoryId Create() => new ProductCategoryId(Guid.NewGuid());
 
     public override IEnumerable<object> GetEqualityComponents()
     {

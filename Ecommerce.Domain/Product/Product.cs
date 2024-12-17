@@ -1,14 +1,13 @@
+namespace Ecommerce.Domain.Product;
+
 using Ecommerce.Domain.Common.Models;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.Product.Entities;
 using Ecommerce.Domain.Product.ValueObjects;
 
-namespace Ecommerce.Domain.Product;
-
 public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
 {
     private readonly List<ProductCategory> _categories;
-
 
     private Product(
         ProductId productId,
@@ -18,7 +17,10 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
         Stock stock,
         UserId sellerId,
         DateTime createdAt,
-        DateTime updatedAt, List<ProductCategory> categories) : base(productId)
+        DateTime updatedAt,
+        List<ProductCategory> categories
+    )
+        : base(productId)
     {
         Id = productId;
         Name = name;
@@ -41,9 +43,8 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
     public DateTime CreatedAt { get; }
     public DateTime UpdatedAt { get; }
 
-    public static Product Create(string name, string description, Price price, Stock stock)
-    {
-        return new Product(
+    public static Product Create(string name, string description, Price price, Stock stock) =>
+        new Product(
             ProductId.CreateUnique(),
             name,
             description,
@@ -54,17 +55,9 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
             DateTime.UtcNow,
             []
         );
-    }
 
     public override IEnumerable<object> GetEqualityComponents()
     {
         yield return Id;
-        yield return Name;
-        yield return Description;
-        yield return Price;
-        yield return Stock;
-        yield return SellerId;
-        yield return CreatedAt;
-        yield return UpdatedAt;
     }
 }
