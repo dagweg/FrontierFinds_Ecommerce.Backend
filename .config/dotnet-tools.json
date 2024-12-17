@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "csharpier": {
+      "version": "0.30.3",
+      "commands": [
+        "dotnet-csharpier"
+      ],
+      "rollForward": false
+    },
+    "dotnet-format": {
+      "version": "5.1.250801",
+      "commands": [
+        "dotnet-format"
+      ],
+      "rollForward": false
+    }
+  }
+}
