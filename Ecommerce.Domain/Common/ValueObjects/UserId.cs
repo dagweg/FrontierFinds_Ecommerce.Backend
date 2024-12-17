@@ -1,20 +1,17 @@
-using Ecommerce.Domain.Common.Models;
-
 namespace Ecommerce.Domain.Common.ValueObjects;
+
+using Ecommerce.Domain.Common.Models;
 
 public sealed class UserId : ValueObject
 {
-    public Guid Value { get; }
-
     private UserId(Guid value)
     {
         Value = value;
     }
 
-    public static UserId CreateUnique()
-    {
-        return new UserId(Guid.NewGuid());
-    }
+    public Guid Value { get; }
+
+    public static UserId CreateUnique() => new UserId(Guid.NewGuid());
 
     public override IEnumerable<object> GetEqualityComponents()
     {
