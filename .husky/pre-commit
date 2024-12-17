@@ -1,0 +1,13 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+
+echo "Husky.NET Started"
+echo "Running Pre-Commit Hook"
+
+dotnet tool run dotnet-csharpier ./Ecommerce.Application/ ./Ecommerce.Domain/ ./Ecommerce.Infrastructure/ ./Ecommerce.Presentation/Api/ ./Ecommerce.Presentation/Contracts/
+
+echo "Husky.NET Finished"
+
+
+
