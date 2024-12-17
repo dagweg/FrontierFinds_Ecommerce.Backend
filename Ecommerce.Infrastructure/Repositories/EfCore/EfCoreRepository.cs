@@ -3,7 +3,7 @@ namespace Ecommerce.Infrastructure.Repositories.EfCore;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 
 /// <summary>
-/// This class is used to define the basic CRUD operations for all ORM vendors.
+/// This class is used to implement the basic CRUD operations for EfCore.
 /// </summary>
 /// <typeparam name="TEntity">The Entity.</typeparam>
 /// <typeparam name="TId"></typeparam>
