@@ -1,0 +1,22 @@
+<Project>
+  <PropertyGroup>
+    <!-- Set common .NET version -->
+    <TargetFramework>net8.0</TargetFramework>
+
+    <!-- Enable nullable reference types -->
+    <Nullable>enable</Nullable>
+
+    <!-- Treat warnings as errors -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <!-- Define default output directory -->
+    <OutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)\</OutputPath>
+
+    <!-- Set versioning -->
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" /> -->
+  </ItemGroup>
+</Project>
