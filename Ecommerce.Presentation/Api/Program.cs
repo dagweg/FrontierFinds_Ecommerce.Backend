@@ -1,16 +1,34 @@
-var builder = WebApplication.CreateBuilder(args);
+namespace Api;
 
-builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
+using Ecommerce.Application;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
+public class Program
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+        {
+            builder.Services.AddControllers();
+            builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSingleton<ProblemDetailsFactory, CustomProblemDetailsFactory>();
+
+            builder.Services.AddApplication();
+        }
+
+        var app = builder.Build();
+        {
+            app.UseExceptionHandler("/error");
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.MapControllers();
+
+            app.Run();
+        }
+    }
 }
-
-app.MapControllers();
-
-app.Run();
