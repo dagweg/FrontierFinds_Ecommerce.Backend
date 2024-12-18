@@ -1,6 +1,7 @@
 namespace Api;
 
 using Ecommerce.Application;
+using Ecommerce.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 public class Program
@@ -15,6 +16,7 @@ public class Program
             builder.Services.AddSingleton<ProblemDetailsFactory, CustomProblemDetailsFactory>();
 
             builder.Services.AddApplication();
+            builder.Services.AddInfrastructure(builder.Configuration);
         }
 
         var app = builder.Build();
