@@ -1,11 +1,11 @@
+using Ecommerce.Domain.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Infrastructure.Repositories.EfCore;
 
-public class EfCoreContext : DbContext
+public class EfCoreContext(DbContextOptions<EfCoreContext> options) : DbContext(options)
 {
-    public EfCoreContext(DbContextOptions<EfCoreContext> options)
-        : base(options) { }
+    public DbSet<User> Users { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

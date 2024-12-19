@@ -11,10 +11,10 @@ namespace Ecommerce.Application.Common.Interfaces.Persistence;
 public interface IRepository<TEntity, TId>
     where TEntity : class
 {
-    Task<Result<TEntity>> GetByIdAsync(TId id);
-    Task<Result<IEnumerable<TEntity>>> GetAllAsync();
-    Task<Result> AddAsync(TEntity entity);
-    Task<Result> UpdateAsync(TEntity entity);
-    Task<Result> DeleteAsync(TEntity entity);
-    Task<Result> SaveChangesAsync();
+    Task<TEntity?> GetByIdAsync(TId id);
+    Task<IEnumerable<TEntity>> GetAllAsync();
+    Task AddAsync(TEntity entity);
+    Task UpdateAsync(TEntity entity);
+    Task DeleteAsync(TEntity entity);
+    Task SaveChangesAsync();
 }
