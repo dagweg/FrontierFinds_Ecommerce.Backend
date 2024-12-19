@@ -2,7 +2,7 @@ namespace Api;
 
 using Ecommerce.Application;
 using Ecommerce.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Ecommerce.Presentation.Api;
 
 public class Program
 {
@@ -10,11 +10,9 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         {
-            builder.Services.AddControllers();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddSingleton<ProblemDetailsFactory, CustomProblemDetailsFactory>();
-
+            builder.Services.AddApi();
             builder.Services.AddApplication();
             builder.Services.AddInfrastructure(builder.Configuration);
         }
@@ -22,6 +20,7 @@ public class Program
         var app = builder.Build();
         {
             app.UseExceptionHandler("/error");
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

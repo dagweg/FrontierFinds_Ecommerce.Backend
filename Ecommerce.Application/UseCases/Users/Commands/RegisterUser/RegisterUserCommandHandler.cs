@@ -1,6 +1,6 @@
-namespace Ecommerce.Application.UseCases.UserManagement.Authentication.Commands;
+namespace Ecommerce.Application.UseCases.Users.Commands.RegisterUser;
 
-using Ecommerce.Application.UseCases.UserManagement.Authentication.Common;
+using Ecommerce.Application.UseCases.Users.Common;
 using FluentResults;
 using MediatR;
 

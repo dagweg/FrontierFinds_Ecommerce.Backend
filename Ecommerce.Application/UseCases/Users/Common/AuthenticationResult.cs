@@ -1,4 +1,4 @@
-namespace Ecommerce.Application.UseCases.UserManagement.Authentication.Common;
+namespace Ecommerce.Application.UseCases.Users.Common;
 
 public class AuthenticationResult
 {
