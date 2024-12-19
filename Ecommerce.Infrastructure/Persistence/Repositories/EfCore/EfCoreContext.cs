@@ -1,7 +1,7 @@
 using Ecommerce.Domain.User;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ecommerce.Infrastructure.Repositories.EfCore;
+namespace Ecommerce.Infrastructure.Persistence.Repositories.EfCore;
 
 public class EfCoreContext(DbContextOptions<EfCoreContext> options) : DbContext(options)
 {

@@ -2,7 +2,7 @@ namespace Ecommerce.Infrastructure;
 
 using Ecommerce.Application.Common.Interfaces.Logging;
 using Ecommerce.Infrastructure.Logging;
-using Ecommerce.Infrastructure.Repositories.EfCore;
+using Ecommerce.Infrastructure.Persistence.Repositories.EfCore;
 using Ecommerce.Infrastructure.Repositories.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

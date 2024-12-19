@@ -1,4 +1,4 @@
-namespace Ecommerce.Infrastructure.Repositories.EfCore;
+namespace Ecommerce.Infrastructure.Persistence.Repositories.EfCore;
 
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Domain.Common.ValueObjects;
