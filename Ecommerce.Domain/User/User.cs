@@ -6,10 +6,13 @@ using Ecommerce.Domain.Common.ValueObjects;
 
 public class User : AggregateRoot<Guid>
 {
-    public Name FirstName { get; }
-    public Name LastName { get; }
-    public Email Email { get; }
-    public Password Password { get; }
+    public Name FirstName { get; private set; } = Name.Empty;
+    public Name LastName { get; private set; } = Name.Empty;
+    public Email Email { get; private set; } = Email.Empty;
+    public Password Password { get; private set; } = Password.Empty;
+
+    private User()
+        : base(Guid.NewGuid()) { }
 
     private User(Guid id, Name firstName, Name lastName, Email email, Password password)
         : base(id)
