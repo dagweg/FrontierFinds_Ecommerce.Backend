@@ -4,7 +4,7 @@ using Ecommerce.Application.Common.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 /// <summary>
-/// This class is used to implement the basic CRUD operations for EfCore.
+/// This repository is used to implement the basic CRUD operations for EfCore.
 /// </summary>
 /// <typeparam name="TEntity">The Entity.</typeparam>
 /// <typeparam name="TId"></typeparam>
@@ -16,13 +16,11 @@ public abstract class EfCoreRepository<TEntity, TId>(EfCoreContext context)
   public async Task AddAsync(TEntity entity)
   {
     await context.AddAsync(entity);
-    await SaveChangesAsync();
   }
 
-  public async Task DeleteAsync(TEntity entity)
+  public void Delete(TEntity entity)
   {
     context.Remove(entity);
-    await SaveChangesAsync();
   }
 
   public async Task<IEnumerable<TEntity>> GetAllAsync()
@@ -37,10 +35,9 @@ public abstract class EfCoreRepository<TEntity, TId>(EfCoreContext context)
     return entity;
   }
 
-  public async Task UpdateAsync(TEntity entity)
+  public void Update(TEntity entity)
   {
     context.Update(entity);
-    await SaveChangesAsync();
   }
 
   public async Task SaveChangesAsync()
