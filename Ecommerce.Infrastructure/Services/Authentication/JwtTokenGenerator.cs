@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Unicode;
+using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.UseCases.Users.Common;
 using Ecommerce.Domain.Common.ValueObjects;
@@ -15,10 +16,12 @@ namespace Ecommerce.Infrastructure.Services.Authentication;
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
   private readonly JwtSettings _jwtSettings;
+  private readonly IDateTimeProvider _dateTimeProvider;
 
-  public JwtTokenGenerator(IOptions<JwtSettings> jwtSettings)
+  public JwtTokenGenerator(IOptions<JwtSettings> jwtSettings, IDateTimeProvider dateTimeProvider)
   {
     _jwtSettings = jwtSettings.Value;
+    _dateTimeProvider = dateTimeProvider;
   }
 
   public string GenerateToken(UserId userId, Email email, Name firstName, Name lastName)
@@ -45,7 +48,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
       issuer: _jwtSettings.Issuer,
       claims: claims,
       signingCredentials: signingCredential,
-      expires: DateTime.Now.AddMinutes(_jwtSettings.ExpiryMinutes)
+      expires: _dateTimeProvider.Now.AddMinutes(_jwtSettings.ExpiryMinutes)
     );
 
     // Write the JwtSecurityToken into a String (Serialized form)
