@@ -48,7 +48,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
       issuer: _jwtSettings.Issuer,
       claims: claims,
       signingCredentials: signingCredential,
-      expires: _dateTimeProvider.Now.AddMinutes(_jwtSettings.ExpiryMinutes)
+      expires: _dateTimeProvider.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes)
     );
 
     // Write the JwtSecurityToken into a String (Serialized form)
