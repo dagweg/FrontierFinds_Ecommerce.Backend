@@ -5,5 +5,5 @@ using Ecommerce.Domain.User;
 
 public interface IUserRespository : IRepository<User, Guid>
 {
-    Task<User?> GetByEmailAsync(Email email);
+  Task<User?> GetByEmailAsync(Email email);
 }

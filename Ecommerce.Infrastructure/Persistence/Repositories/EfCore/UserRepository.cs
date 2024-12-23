@@ -6,13 +6,13 @@ using Ecommerce.Domain.User;
 using Microsoft.EntityFrameworkCore;
 
 public class UserRepository(EfCoreContext context)
-    : EfCoreRepository<User, Guid>(context),
-        IUserRespository
+  : EfCoreRepository<User, Guid>(context),
+    IUserRespository
 {
-    private readonly EfCoreContext context = context;
+  private readonly EfCoreContext context = context;
 
-    public async Task<User?> GetByEmailAsync(Email email)
-    {
-        return await context.Users.FirstOrDefaultAsync(u => u.Email == email);
-    }
+  public async Task<User?> GetByEmailAsync(Email email)
+  {
+    return await context.Users.FirstOrDefaultAsync(u => u.Email == email);
+  }
 }

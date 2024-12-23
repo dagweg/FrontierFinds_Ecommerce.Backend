@@ -5,10 +5,10 @@ using FluentResults;
 using MediatR;
 
 public record RegisterUserCommand(
-    string FirstName,
-    string LastName,
-    string Email,
-    string Password,
-    string PhoneNumber,
-    int CountryCode
+  string FirstName,
+  string LastName,
+  string Email,
+  string Password,
+  string PhoneNumber,
+  int CountryCode
 ) : IRequest<Result<AuthenticationResult>>;

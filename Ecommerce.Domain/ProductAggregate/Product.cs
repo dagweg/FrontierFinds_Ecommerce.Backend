@@ -7,57 +7,57 @@ using Ecommerce.Domain.Product.ValueObjects;
 
 public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
 {
-    private readonly List<ProductCategory> _categories;
+  private readonly List<ProductCategory> _categories;
 
-    private Product(
-        ProductId productId,
-        string name,
-        string description,
-        Price price,
-        Stock stock,
-        UserId sellerId,
-        DateTime createdAt,
-        DateTime updatedAt,
-        List<ProductCategory> categories
-    )
-        : base(productId)
-    {
-        Id = productId;
-        Name = name;
-        Description = description;
-        Price = price;
-        Stock = stock;
-        SellerId = sellerId;
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
-        _categories = categories;
-    }
+  private Product(
+    ProductId productId,
+    string name,
+    string description,
+    Price price,
+    Stock stock,
+    UserId sellerId,
+    DateTime createdAt,
+    DateTime updatedAt,
+    List<ProductCategory> categories
+  )
+    : base(productId)
+  {
+    Id = productId;
+    Name = name;
+    Description = description;
+    Price = price;
+    Stock = stock;
+    SellerId = sellerId;
+    CreatedAt = createdAt;
+    UpdatedAt = updatedAt;
+    _categories = categories;
+  }
 
-    public string Name { get; }
-    public string Description { get; }
-    public Price Price { get; }
-    public Stock Stock { get; }
-    public UserId SellerId { get; }
+  public string Name { get; }
+  public string Description { get; }
+  public Price Price { get; }
+  public Stock Stock { get; }
+  public UserId SellerId { get; }
 
-    public IReadOnlyList<ProductCategory> Categories => _categories.AsReadOnly();
-    public DateTime CreatedAt { get; }
-    public DateTime UpdatedAt { get; }
+  public IReadOnlyList<ProductCategory> Categories => _categories.AsReadOnly();
+  public DateTime CreatedAt { get; }
+  public DateTime UpdatedAt { get; }
 
-    public static Product Create(string name, string description, Price price, Stock stock) =>
-        new Product(
-            ProductId.CreateUnique(),
-            name,
-            description,
-            price,
-            stock,
-            UserId.CreateUnique(),
-            DateTime.UtcNow,
-            DateTime.UtcNow,
-            []
-        );
+  public static Product Create(string name, string description, Price price, Stock stock) =>
+    new Product(
+      ProductId.CreateUnique(),
+      name,
+      description,
+      price,
+      stock,
+      UserId.CreateUnique(),
+      DateTime.UtcNow,
+      DateTime.UtcNow,
+      []
+    );
 
-    public override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Id;
-    }
+  public override IEnumerable<object> GetEqualityComponents()
+  {
+    yield return Id;
+  }
 }
