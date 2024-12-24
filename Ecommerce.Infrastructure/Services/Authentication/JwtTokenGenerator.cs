@@ -28,7 +28,11 @@ public class JwtTokenGenerator : IJwtTokenGenerator
   {
     // Create a signing credential using HMACSHA256 algorithm and a Symmetric Security Key
     SigningCredentials signingCredential = new(
-      new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey)),
+      new SymmetricSecurityKey(
+        Encoding.UTF8.GetBytes(
+          _jwtSettings.SecretKey ?? throw new InvalidOperationException("Jwt Secret key is null!")
+        )
+      ),
       SecurityAlgorithms.HmacSha256
     );
 

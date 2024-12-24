@@ -110,6 +110,5 @@ public class CustomProblemDetailsFactory(
     }
 
     configure?.Invoke(new() { HttpContext = httpContext!, ProblemDetails = problemDetails });
-    problemDetails.Extensions.Add("customProperty", "My custom property value");
   }
 }

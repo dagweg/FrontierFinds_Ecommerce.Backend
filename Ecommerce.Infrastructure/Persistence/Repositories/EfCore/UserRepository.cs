@@ -6,13 +6,17 @@ using Ecommerce.Domain.User;
 using Microsoft.EntityFrameworkCore;
 
 public class UserRepository(EfCoreContext context)
-  : EfCoreRepository<User, Guid>(context),
-    IUserRespository
+  : EfCoreRepository<User, UserId>(context),
+    IUserRepository
 {
   private readonly EfCoreContext context = context;
 
   public async Task<User?> GetByEmailAsync(Email email)
   {
-    return await context.Users.FirstOrDefaultAsync(u => u.Email == email);
+    await Task.CompletedTask; // Don't foget to remove!!
+
+    return null;
+    // return User.Create(Name.Empty, Name.Empty, Email.Empty, Password.Empty);
+    // return await context.Users.FirstOrDefaultAsync(u => u.Email == email);
   }
 }

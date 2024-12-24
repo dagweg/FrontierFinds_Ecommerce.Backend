@@ -5,10 +5,10 @@
 namespace Api;
 
 using Ecommerce.Application;
+using Ecommerce.Application.Middlewares;
 using Ecommerce.Infrastructure;
 using Ecommerce.Presentation.Api;
 using Ecommerce.Presentation.Api.Mapping;
-using Serilog;
 
 public class Program
 {
@@ -34,6 +34,7 @@ public class Program
       var app = builder.Build();
       {
         app.UseExceptionHandler("/error");
+        app.UseMiddleware<ValidationExceptionHandlingMiddleware>();
 
         if (app.Environment.IsDevelopment())
         {
@@ -48,11 +49,7 @@ public class Program
     }
     catch (Exception ex)
     {
-      Log.Fatal(ex, "Server terminated unexpectedly.");
-    }
-    finally
-    {
-      Log.CloseAndFlush();
+      Console.WriteLine($"Server terminated unexpectedly. {ex}");
     }
   }
 }

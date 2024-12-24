@@ -41,11 +41,12 @@ public static class DependencyInjection
     );
 
     // Register Repositories
-    services.AddScoped<IUserRespository, UserRepository>();
+    services.AddScoped<IUserRepository, UserRepository>();
 
     // Register Utility Services
     services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
     services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+    services.AddScoped<IValidationMessageProvider, ValidationMessageProvider>();
 
     return services;
   }

@@ -2,8 +2,9 @@ POST http://localhost:5111/auth/register
 Content-Type:  application/json
 
 {
-  "firstName": "John",
-  "lastName": "Doe",
-  "email": "johndoe2@gmail.com",
-  "password": "password"
+  "firstName": "",
+  "lastName": "",
+  "email": "",
+  "password": "",
+  "phoneNumber": ""
 }

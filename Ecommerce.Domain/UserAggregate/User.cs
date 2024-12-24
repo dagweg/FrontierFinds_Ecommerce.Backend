@@ -22,8 +22,14 @@ public class User : AggregateRoot<UserId>
     Password = password;
   }
 
-  public static User Create(Name firstName, Name lastName, Email email, Password password) =>
-    new(UserId.CreateUnique(), firstName, lastName, email, password);
+  public static User Create(string firstName, string lastName, string email, string password) =>
+    new(
+      UserId.CreateUnique(),
+      Name.Create(firstName),
+      Name.Create(lastName),
+      Email.Create(email),
+      Password.Create(password)
+    );
 
   public override IEnumerable<object> GetEqualityComponents()
   {

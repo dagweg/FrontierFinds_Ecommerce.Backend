@@ -15,7 +15,8 @@ public abstract class EfCoreRepository<TEntity, TId>(EfCoreContext context)
 {
   public async Task AddAsync(TEntity entity)
   {
-    await context.AddAsync(entity);
+    // await context.AddAsync(entity);
+    await Task.FromResult(""); // Remove it
   }
 
   public void Delete(TEntity entity)
