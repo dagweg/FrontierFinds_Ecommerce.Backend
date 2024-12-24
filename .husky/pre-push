@@ -1,0 +1,17 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+
+echo "Husky.NET Started"
+echo "Running Pre-Push Hook"
+
+dotnet build
+if [ $? -ne 0 ]; then
+  echo "Build failed. Please fix the errors before pushing."
+  exit 1
+fi
+
+echo "Husky.NET Finished"
+
+
+

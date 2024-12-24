@@ -5,6 +5,7 @@
 echo "Husky.NET Started"
 echo "Running Pre-Commit Hook"
 
+dotnet build
 dotnet tool run dotnet-csharpier ./Ecommerce.Application/ ./Ecommerce.Domain/ ./Ecommerce.Infrastructure/ ./Ecommerce.Presentation/Api/ ./Ecommerce.Presentation/Contracts/ ./Ecommerce.Tests/
 
 echo "Husky.NET Finished"
