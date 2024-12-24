@@ -2,10 +2,17 @@ namespace Ecommerce.Domain.Common.ValueObjects;
 
 using Ecommerce.Domain.Common.Models;
 
-public class Email(string email) : ValueObject
+public class Email : ValueObject
 {
-  public string Value { get; set; } = email;
-  public static Email Empty { get; } = new Email(string.Empty);
+  public string Value { get; set; }
+  public static Email Empty => new(string.Empty);
+
+  private Email(string email)
+  {
+    Value = email;
+  }
+
+  public static Email Create(string email) => new(email);
 
   public override IEnumerable<object> GetEqualityComponents()
   {
