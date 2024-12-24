@@ -7,6 +7,7 @@ namespace Api;
 using Ecommerce.Application;
 using Ecommerce.Infrastructure;
 using Ecommerce.Presentation.Api;
+using Ecommerce.Presentation.Api.Mapping;
 using Serilog;
 
 public class Program
@@ -23,14 +24,11 @@ public class Program
         // Swagger Api Documentation Generator
         builder.Services.AddSwaggerGen();
 
-        // Api
-        builder.Services.AddApi();
-
-        // Application
-        builder.Services.AddApplication();
-
-        // Infrastructure
-        builder.Services.AddInfrastructure(builder.Configuration);
+        builder
+          .Services.ConfigureAutomapper()
+          .AddApi()
+          .AddApplication()
+          .AddInfrastructure(builder.Configuration);
       }
 
       var app = builder.Build();
