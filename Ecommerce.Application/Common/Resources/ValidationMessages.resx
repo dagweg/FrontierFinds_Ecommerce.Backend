@@ -149,4 +149,8 @@
     <value>Country code is required.</value>
     <comment/>
   </data>
+  <data name="EmailInvalidFormat" xml:space="preserve">
+    <value>Email must be a valid format.</value>
+    <comment/>
+  </data>
 </root>

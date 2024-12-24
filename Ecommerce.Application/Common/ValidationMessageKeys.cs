@@ -10,6 +10,7 @@ namespace Ecommerce.Application.Common;
 public static class ValidationMessageKeys
 {
   public const string EmailRequired = "EmailRequired";
+  public const string EmailInvalidFormat = "EmailInvalidFormat";
   public const string PasswordRequired = "PasswordRequired";
   public const string NameRequired = "NameRequired";
   public const string FirstNameRequired = "FirstNameRequired";
