@@ -2,9 +2,9 @@ namespace Ecommerce.Application.UseCases.Users.Common;
 
 public class AuthenticationResult
 {
-  public required string Id { get; init; }
-  public required string FirstName { get; init; }
-  public required string LastName { get; init; }
-  public required string Email { get; init; }
-  public required string Token { get; init; }
+  public required string Id { get; set; }
+  public required string FirstName { get; set; }
+  public required string LastName { get; set; }
+  public required string Email { get; set; }
+  public required string Token { get; set; }
 }
