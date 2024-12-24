@@ -1,3 +1,4 @@
+using AutoMapper;
 using Ecommerce.Application.Common.Errors;
 using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.Common.Interfaces.Persistence;
@@ -14,16 +15,19 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, Result<Auth
   private readonly IUserRepository _userRepository;
   private readonly ILogger<LoginUserQueryHandler> _logger;
   private readonly IJwtTokenGenerator _jwtTokenGenerator;
+  private readonly IPublisher _mapper;
 
   public LoginUserQueryHandler(
     IUserRepository userRespository,
     IJwtTokenGenerator jwtTokenGenerator,
-    ILogger<LoginUserQueryHandler> logger
+    ILogger<LoginUserQueryHandler> logger,
+    IMapper mapper
   )
   {
     _userRepository = userRespository;
     _logger = logger;
     _jwtTokenGenerator = jwtTokenGenerator;
+    _mapper = mapper;
   }
 
   public async Task<Result<AuthenticationResult>> Handle(
@@ -54,14 +58,9 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, Result<Auth
       );
 
       // 4. Return the user's information and the token
-      var result = new AuthenticationResult
-      {
-        Id = user.Id,
-        FirstName = user.FirstName,
-        Email = user.Email,
-        LastName = user.LastName,
-        Token = token,
-      };
+      var result = _mapper.Map<AuthenticationResult>(user);
+      result.Token = token;
+
       return Result.Ok(result);
     }
     catch (Exception ex)
