@@ -1,44 +1,62 @@
 namespace Ecommerce.Application.UseCases.Users.Commands.RegisterUser;
 
+using Ecommerce.Application.Common.Errors;
+using Ecommerce.Application.Common.Interfaces.Authentication;
+using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.UseCases.Users.Common;
+using Ecommerce.Domain.Common.ValueObjects;
+using Ecommerce.Domain.User;
 using FluentResults;
 using MediatR;
 
 public class RegisterUserCommandHandler
-    : IRequestHandler<RegisterUserCommand, Result<AuthenticationResult>>
+  : IRequestHandler<RegisterUserCommand, Result<AuthenticationResult>>
 {
-    // Repository Injection
+  // Repository Injection
+  private readonly IUserRepository _userRepository;
+  private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
-    // TokenGenerator INjection
+  public RegisterUserCommandHandler(
+    IUserRepository userRespository,
+    IJwtTokenGenerator jwtTokenGenerator
+  )
+  {
+    _userRepository = userRespository;
+    _jwtTokenGenerator = jwtTokenGenerator;
+  }
 
-    public Task<Result<AuthenticationResult>> Handle(
-        RegisterUserCommand command,
-        CancellationToken cancellationToken
-    )
+  public async Task<Result<AuthenticationResult>> Handle(
+    RegisterUserCommand command,
+    CancellationToken cancellationToken
+  )
+  {
+    User? user = await _userRepository.GetByEmailAsync(Email.Create(command.Email));
+    // 1. Check if the User Exists
+    if (user is not null)
+      return Result.Fail(EmailAlreadyExistsException.DefaultMessage);
+
+    // 2. Create the User
+    user = User.Create(command.FirstName, command.LastName, command.Email, command.Password);
+
+    // 3. Persist to the Database
+    await _userRepository.AddAsync(user);
+
+    // 4. Generate the Token
+    string token = _jwtTokenGenerator.GenerateToken(
+      user.Id,
+      user.Email,
+      user.FirstName,
+      user.LastName
+    );
+
+    // 5. Return the Authentication Result
+    return new AuthenticationResult()
     {
-        // 1. Check if the User Exists
-
-
-        // 2. Create the User
-        Console.WriteLine($"Text");
-
-        // 3. Persist to the Database
-
-
-        // 4. Generate the Token
-
-
-        // 5. Return the Authentication Result
-        return Task.FromResult<Result<AuthenticationResult>>(
-            Result.Ok(
-                new AuthenticationResult
-                {
-                    FirstName = command.FirstName,
-                    LastName = command.LastName,
-                    Email = command.Email,
-                    Token = "token",
-                }
-            )
-        );
-    }
+      Id = user.Id,
+      Email = user.Email,
+      FirstName = user.FirstName,
+      LastName = user.FirstName,
+      Token = token,
+    };
+  }
 }
