@@ -15,7 +15,7 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, Result<Auth
   private readonly IUserRepository _userRepository;
   private readonly ILogger<LoginUserQueryHandler> _logger;
   private readonly IJwtTokenGenerator _jwtTokenGenerator;
-  private readonly IPublisher _mapper;
+  private readonly IMapper _mapper;
 
   public LoginUserQueryHandler(
     IUserRepository userRespository,
