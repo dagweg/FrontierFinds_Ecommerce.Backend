@@ -1,4 +1,4 @@
-namespace Ecommerce.Infrastructure.Persistence.Repositories.EfCore;
+namespace Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +15,7 @@ public abstract class EfCoreRepository<TEntity, TId>(EfCoreContext context)
 {
   public async Task AddAsync(TEntity entity)
   {
-    // await context.AddAsync(entity);
-    await Task.FromResult(""); // Remove it
+    await context.AddAsync(entity);
   }
 
   public void Delete(TEntity entity)

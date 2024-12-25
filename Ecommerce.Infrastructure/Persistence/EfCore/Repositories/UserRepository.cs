@@ -1,9 +1,8 @@
-namespace Ecommerce.Infrastructure.Persistence.Repositories.EfCore;
+namespace Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.User;
-using Microsoft.EntityFrameworkCore;
 
 public class UserRepository(EfCoreContext context)
   : EfCoreRepository<User, UserId>(context),

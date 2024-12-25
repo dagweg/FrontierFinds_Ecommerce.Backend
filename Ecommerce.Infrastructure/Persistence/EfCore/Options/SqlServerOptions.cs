@@ -1,4 +1,4 @@
-namespace Ecommerce.Infrastructure.Repositories.Options;
+namespace Ecommerce.Infrastructure.Persistence.EfCore.Options;
 
 /// <summary>
 /// Represents the options for the SQL Server.
