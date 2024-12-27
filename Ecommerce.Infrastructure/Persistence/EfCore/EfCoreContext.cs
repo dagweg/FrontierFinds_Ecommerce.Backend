@@ -1,12 +1,15 @@
-using Ecommerce.Domain.User;
+using Ecommerce.Domain.UserAggregate;
 using Ecommerce.Infrastructure.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Infrastructure.Persistence.EfCore;
 
-public partial class EfCoreContext(DbContextOptions<EfCoreContext> options) : DbContext(options)
+public class EfCoreContext : DbContext
 {
   public DbSet<User> Users { get; set; } = null!;
+
+  public EfCoreContext(DbContextOptions<EfCoreContext> options)
+    : base(options) { }
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
