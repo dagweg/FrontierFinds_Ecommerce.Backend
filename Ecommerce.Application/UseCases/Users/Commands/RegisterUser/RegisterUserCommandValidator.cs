@@ -30,6 +30,12 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
       .NotEmpty()
       .WithMessage(_messages.GetMessage(ValidationMessageKeys.PasswordRequired));
 
+    RuleFor(x => x.ConfirmPassword)
+      .NotEmpty()
+      .WithMessage(_messages.GetMessage(ValidationMessageKeys.ConfirmPasswordRequired))
+      .Equal(y => y.Password)
+      .WithMessage(_messages.GetMessage(ValidationMessageKeys.PasswordsDoNotMatch));
+
     RuleFor(x => x.CountryCode)
       .NotEmpty()
       .WithMessage(_messages.GetMessage(ValidationMessageKeys.CountryCodeRequired));
