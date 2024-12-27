@@ -1,18 +1,28 @@
-namespace Ecommerce.Domain.Product;
+namespace Ecommerce.Domain.ProductAggregate;
 
 using Ecommerce.Domain.Common.Models;
-using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.Product.Entities;
-using Ecommerce.Domain.Product.ValueObjects;
+using Ecommerce.Domain.ProductAggregate.ValueObjects;
+using Ecommerce.Domain.UserAggregate.ValueObjects;
 
 public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
 {
+  public ProductName Name { get; private set; }
+  public ProductDescription Description { get; private set; }
+  public Price Price { get; private set; }
+  public Stock Stock { get; private set; }
+  public UserId SellerId { get; private set; }
+
+  public IReadOnlyList<ProductCategory> Categories => _categories.AsReadOnly();
+  public DateTime CreatedAt { get; private set; }
+  public DateTime UpdatedAt { get; private set; }
+
   private readonly List<ProductCategory> _categories;
 
   private Product(
     ProductId productId,
-    string name,
-    string description,
+    ProductName name,
+    ProductDescription description,
     Price price,
     Stock stock,
     UserId sellerId,
@@ -33,31 +43,39 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
     _categories = categories;
   }
 
-  public string Name { get; }
-  public string Description { get; }
-  public Price Price { get; }
-  public Stock Stock { get; }
-  public UserId SellerId { get; }
-
-  public IReadOnlyList<ProductCategory> Categories => _categories.AsReadOnly();
-  public DateTime CreatedAt { get; }
-  public DateTime UpdatedAt { get; }
-
-  public static Product Create(string name, string description, Price price, Stock stock) =>
-    new Product(
+  public static Product Create(
+    ProductName name,
+    ProductDescription description,
+    Price price,
+    Stock stock,
+    UserId sellerId
+  ) =>
+    new(
       ProductId.CreateUnique(),
       name,
       description,
       price,
       stock,
-      UserId.CreateUnique(),
+      sellerId,
       DateTime.UtcNow,
       DateTime.UtcNow,
       []
     );
 
+  public void UpdateName(ProductName name) => Name = name;
+
+  public void UpdateDescription(ProductDescription description) => Description = description;
+
+  public void UpdatePrice(Price price) => Price = price;
+
+  public void UpdateStock(Stock stock) => Stock = stock;
+
+  public void UpdateStockQuantity(Quantity quantity) => Stock.UpdateQuantity(quantity);
+
+  public void UpdateStockReserved(int reserved) => Stock.UpdateReserved(reserved);
+
   public override IEnumerable<object> GetEqualityComponents()
   {
-    yield return Id;
+    yield return Id; // since its unique product, id will suffice
   }
 }

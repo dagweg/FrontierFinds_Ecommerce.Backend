@@ -2,10 +2,13 @@ namespace Ecommerce.Domain.Common.ValueObjects;
 
 using Ecommerce.Domain.Common.Models;
 
-public class Email : ValueObject
+public sealed class Email : ValueObject
 {
-  public string Value { get; set; }
+  public string Value { get; set; } = Empty;
+
   public static Email Empty => new(string.Empty);
+
+  private Email() { }
 
   private Email(string email)
   {

@@ -2,10 +2,13 @@ namespace Ecommerce.Domain.Common.ValueObjects;
 
 using Ecommerce.Domain.Common.Models;
 
-public class Password : ValueObject
+public sealed class Password : ValueObject
 {
-  public string Value { get; set; }
+  public string Value { get; set; } = Empty;
+
   public static Password Empty => new(string.Empty);
+
+  public Password() { }
 
   private Password(string password)
   {
