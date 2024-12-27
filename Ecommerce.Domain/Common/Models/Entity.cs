@@ -1,5 +1,11 @@
 namespace Ecommerce.Domain.Common.Models;
 
+/// <summary>
+/// Base class for all entity classes that have
+/// an identity, events, etc..
+/// </summary>
+/// <typeparam name="TId"></typeparam>
+/// <param name="id"></param>
 public abstract class Entity<TId>(TId id) : IEquatable<Entity<TId>>, IHasDomainEvent
 {
   public TId Id { get; protected set; } = id;

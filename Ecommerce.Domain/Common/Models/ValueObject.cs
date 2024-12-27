@@ -1,5 +1,10 @@
 namespace Ecommerce.Domain.Common.Models;
 
+/// <summary>
+/// It is the base class for all our Value Objects
+/// (i.e. all objects which don't classify as Entities
+/// but are part of them)
+/// </summary>
 public abstract class ValueObject : IEquatable<ValueObject>
 {
   public bool Equals(ValueObject? other) => other is not null && Equals((object)other);
