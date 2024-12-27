@@ -125,6 +125,14 @@
     <value>Password is required.</value>
     <comment/>
   </data>
+  <data name="ConfirmPasswordRequired" xml:space="preserve">
+    <value>Confirmation password is required.</value>
+    <comment/>
+  </data>
+  <data name="PasswordsDoNotMatch" xml:space="preserve">
+    <value>Passwords do not match.</value>
+    <comment/>
+  </data>
   <data name="NameRequired" xml:space="preserve">
     <value>Name is required.</value>
     <comment/>

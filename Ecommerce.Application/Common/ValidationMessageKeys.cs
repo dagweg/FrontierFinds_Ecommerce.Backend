@@ -12,6 +12,8 @@ public static class ValidationMessageKeys
   public const string EmailRequired = "EmailRequired";
   public const string EmailInvalidFormat = "EmailInvalidFormat";
   public const string PasswordRequired = "PasswordRequired";
+  public const string ConfirmPasswordRequired = "ConfirmPasswordRequired";
+  public const string PasswordsDoNotMatch = "PasswordsDoNotMatch";
   public const string NameRequired = "NameRequired";
   public const string FirstNameRequired = "FirstNameRequired";
   public const string MiddleNameRequired = "MiddleNameRequired";
