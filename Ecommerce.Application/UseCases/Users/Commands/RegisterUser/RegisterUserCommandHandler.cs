@@ -5,7 +5,7 @@ using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.UseCases.Users.Common;
 using Ecommerce.Domain.Common.ValueObjects;
-using Ecommerce.Domain.User;
+using Ecommerce.Domain.UserAggregate;
 using FluentResults;
 using MediatR;
 
@@ -36,7 +36,13 @@ public class RegisterUserCommandHandler
       return Result.Fail(EmailAlreadyExistsException.DefaultMessage);
 
     // 2. Create the User
-    user = User.Create(command.FirstName, command.LastName, command.Email, command.Password);
+    user = User.Create(
+      Name.Create(command.FirstName),
+      Name.Create(command.LastName),
+      Email.Create(command.Email),
+      Password.Create(command.Password),
+      PhoneNumber.Create(command.Password)
+    );
 
     // 3. Persist to the Database
     await _userRepository.AddAsync(user);
