@@ -2,10 +2,11 @@ POST http://localhost:5111/auth/register
 Content-Type:  application/json
 
 {
-  "firstName": "",
-  "lastName": "",
-  "email": "",
-  "password": "",
-  "phoneNumber": "",
-  "countryCode":""
+  "firstName": "hello",
+  "lastName": "olleh",
+  "email": "elio@.",
+  "password": "melio",
+  "confirmPassword": "melio", 
+  "phoneNumber": "oilem",
+  "countryCode": 12
 }

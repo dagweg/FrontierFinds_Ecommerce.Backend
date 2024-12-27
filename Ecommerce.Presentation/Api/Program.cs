@@ -34,7 +34,8 @@ public class Program
       var app = builder.Build();
       {
         app.UseExceptionHandler("/error");
-        app.UseMiddleware<ValidationExceptionHandlingMiddleware>();
+        app.UseMiddleware<ExceptionHandlingMiddleware>()
+          .UseMiddleware<ValidationExceptionHandlingMiddleware>();
 
         if (app.Environment.IsDevelopment())
         {
