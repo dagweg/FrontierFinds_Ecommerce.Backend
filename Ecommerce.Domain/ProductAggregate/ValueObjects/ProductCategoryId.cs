@@ -11,7 +11,7 @@ public sealed class ProductCategoryId : ValueObject
 
   private Guid Value { get; }
 
-  public static ProductCategoryId Create() => new ProductCategoryId(Guid.NewGuid());
+  public static ProductCategoryId CreateUnique() => new(Guid.NewGuid());
 
   public override IEnumerable<object> GetEqualityComponents()
   {

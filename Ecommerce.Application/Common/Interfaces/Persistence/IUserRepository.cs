@@ -1,7 +1,7 @@
 namespace Ecommerce.Application.Common.Interfaces.Persistence;
 
 using Ecommerce.Domain.Common.ValueObjects;
-using Ecommerce.Domain.User;
+using Ecommerce.Domain.UserAggregate;
 
 public interface IUserRepository : IRepository<User, UserId>
 {
