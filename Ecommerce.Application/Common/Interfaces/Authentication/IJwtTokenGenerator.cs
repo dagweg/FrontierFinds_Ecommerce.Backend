@@ -1,5 +1,5 @@
-using Ecommerce.Application.UseCases.Users.Common;
 using Ecommerce.Domain.Common.ValueObjects;
+using Ecommerce.Domain.UserAggregate.ValueObjects;
 
 namespace Ecommerce.Application.Common.Interfaces.Authentication;
 

@@ -6,6 +6,7 @@ using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.UseCases.Users.Common;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
+using Ecommerce.Domain.UserAggregate.ValueObjects;
 using FluentResults;
 using MediatR;
 
