@@ -9,6 +9,7 @@ public record RegisterUserCommand(
   string LastName,
   string Email,
   string Password,
+  string ConfirmPassword,
   string PhoneNumber,
   int CountryCode
 ) : IRequest<Result<AuthenticationResult>>;
