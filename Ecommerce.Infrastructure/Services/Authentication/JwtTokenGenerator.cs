@@ -1,13 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
-using System.Text.Unicode;
 using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Application.Common.Interfaces.Authentication;
-using Ecommerce.Application.UseCases.Users.Common;
 using Ecommerce.Domain.Common.ValueObjects;
+using Ecommerce.Domain.UserAggregate.ValueObjects;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 

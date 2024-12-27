@@ -4,10 +4,11 @@ using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Infrastructure.Common;
-using Ecommerce.Infrastructure.Persistence.Repositories.EfCore;
-using Ecommerce.Infrastructure.Repositories.Options;
+using Ecommerce.Infrastructure.Persistence.EfCore;
+using Ecommerce.Infrastructure.Persistence.EfCore.Interceptors;
+using Ecommerce.Infrastructure.Persistence.EfCore.Options;
+using Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 using Ecommerce.Infrastructure.Services.Authentication;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,31 +24,41 @@ public static class DependencyInjection
     IConfigurationManager configuration
   )
   {
+    services.AddScoped<PublishDomainEventsInterceptor>();
+
+    services.AddPersistence(configuration);
+
     // Load settings from appsettings.json to appropriate classes
-    services.Configure<SqlServerOptions>(configuration.GetSection(SqlServerOptions.SectionName));
     services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
-
-    services.AddDbContextPool<EfCoreContext>(
-      (serviceProvider, options) =>
-      {
-        // Get the connection string from the previously configured SqlServerOptions.
-        var connStr = serviceProvider
-          .GetRequiredService<IOptions<SqlServerOptions>>()
-          .Value.ConnectionString;
-
-        // Connect to SqlServer using the connection string.
-        options.UseSqlServer(connStr);
-      }
-    );
-
-    // Register Repositories
-    services.AddScoped<IUserRepository, UserRepository>();
 
     // Register Utility Services
     services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
     services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
     services.AddScoped<IValidationMessageProvider, ValidationMessageProvider>();
 
+    return services;
+  }
+
+  public static IServiceCollection AddPersistence(
+    this IServiceCollection services,
+    IConfigurationManager configuration
+  )
+  {
+    // load in sql server configurations
+    services.Configure<SqlServerOptions>(configuration.GetSection(SqlServerOptions.SectionName));
+
+    services.AddDbContextPool<EfCoreContext>(
+      (sp, options) =>
+      {
+        // Connect to SqlServer using the connection string.
+        options
+          .UseSqlServer(sp.GetRequiredService<IOptions<SqlServerOptions>>().Value.ConnectionString)
+          .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>());
+      }
+    );
+
+    // Register Repositories
+    services.AddScoped<IUserRepository, UserRepository>();
     return services;
   }
 
