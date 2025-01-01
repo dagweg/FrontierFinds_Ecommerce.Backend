@@ -5,6 +5,6 @@ namespace Ecommerce.Domain.Common.Models;
 /// </summary>
 public interface ITimeStamped
 {
-  DateTime CreatedAt { get; }
-  DateTime UpdatedAt { get; }
+  DateTime CreatedAt { get; set; }
+  DateTime UpdatedAt { get; set; }
 }
