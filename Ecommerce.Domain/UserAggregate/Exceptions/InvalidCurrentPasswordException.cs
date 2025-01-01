@@ -1,6 +1,6 @@
-using Ecommerce.Domain.Common.Exceptions;
-
 namespace Ecommerce.Domain.UserAggregate.Exceptions;
+
+using Ecommerce.Domain.Common.Exceptions;
 
 public class InvalidCurrentPasswordException : DomainException
 {
