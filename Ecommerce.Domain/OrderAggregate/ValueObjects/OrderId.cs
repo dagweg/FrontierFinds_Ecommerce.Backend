@@ -15,6 +15,8 @@ public sealed class OrderId : ValueObject
 
   public static OrderId CreateUnique() => new(Guid.NewGuid());
 
+  public static OrderId Convert(Guid value) => new(value);
+
   public static implicit operator Guid(OrderId self) => self.Value;
 
   public override IEnumerable<object> GetEqualityComponents()

@@ -8,40 +8,38 @@ namespace Ecommerce.Domain.OrderAggregate;
 
 public sealed class Order : AggregateRoot<OrderId>
 {
+  public DateTime OrderDate { get; private set; }
   public UserId UserId { get; private set; } = UserId.Empty;
-  private List<OrderItem> _orderItems = [];
-  public IReadOnlyList<OrderItem> OrderItems => _orderItems.AsReadOnly();
-
-  public OrderStatus Status { get; private set; } = OrderStatus.None;
-
-  public OrderTotal Total { get; private set; } = OrderTotal.Empty;
+  public OrderTotal Total { get; private set; }
   public ShippingAddress ShippingAddress { get; private set; }
   public BillingAddress BillingAddress { get; private set; }
+  public OrderStatus Status { get; private set; } = OrderStatus.None;
 
-  public DateTime CreatedAt { get; private set; }
-  public DateTime UpdatedAt { get; private set; }
+  private List<OrderItem> _orderItems = [];
+  public IReadOnlyList<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
   private Order(
     OrderId orderId,
     OrderStatus status,
+    OrderTotal total,
     ShippingAddress shippingAddress,
     BillingAddress billingAddress,
     List<OrderItem> orderItems,
-    DateTime createdAt,
-    DateTime updatedAt
+    DateTime orderDate
   )
     : base(orderId)
   {
     Status = status;
+    Total = total;
     ShippingAddress = shippingAddress;
     BillingAddress = billingAddress;
     _orderItems = orderItems;
-    CreatedAt = createdAt;
-    UpdatedAt = updatedAt;
+    OrderDate = orderDate;
   }
 
   public static Order Create(
     OrderStatus status,
+    OrderTotal total,
     ShippingAddress shippingAddress,
     BillingAddress billingAddress,
     List<OrderItem> orderItems
@@ -49,10 +47,10 @@ public sealed class Order : AggregateRoot<OrderId>
     new(
       OrderId.CreateUnique(),
       status,
+      total,
       shippingAddress,
       billingAddress,
       orderItems,
-      DateTime.UtcNow,
       DateTime.UtcNow
     );
 
