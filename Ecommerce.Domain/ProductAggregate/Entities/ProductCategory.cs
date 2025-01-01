@@ -1,16 +1,16 @@
-namespace Ecommerce.Domain.Product.Entities;
+namespace Ecommerce.Domain.ProductAggregate.Entities;
 
 using Ecommerce.Domain.Common.Models;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 
-public sealed class ProductCategory : AggregateRoot<ProductCategoryId>, ITimeStamped
+public sealed class ProductCategory : Entity<Guid>
 {
-  public ProductCategoryName Name { get; private set; }
+  public ProductCategoryName Name { get; private set; } = ProductCategoryName.Empty;
 
-  public DateTime CreatedAt => DateTime.UtcNow;
-  public DateTime UpdatedAt => DateTime.UtcNow;
+  private ProductCategory()
+    : base(Guid.Empty) { }
 
-  private ProductCategory(ProductCategoryId id, ProductCategoryName name)
+  private ProductCategory(Guid id, ProductCategoryName name)
     : base(id)
   {
     Name = name;
@@ -18,8 +18,10 @@ public sealed class ProductCategory : AggregateRoot<ProductCategoryId>, ITimeSta
 
   public static ProductCategory Create(ProductCategoryName name)
   {
-    return new ProductCategory(ProductCategoryId.CreateUnique(), name);
+    return new ProductCategory(Guid.NewGuid(), name);
   }
+
+  public static implicit operator string(ProductCategory category) => category.Name;
 
   public override IEnumerable<object> GetEqualityComponents()
   {

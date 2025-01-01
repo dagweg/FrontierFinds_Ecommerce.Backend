@@ -1,23 +1,35 @@
 namespace Ecommerce.Domain.ProductAggregate;
 
+using Ecommerce.Domain.Common.Entities;
 using Ecommerce.Domain.Common.Models;
-using Ecommerce.Domain.Product.Entities;
+using Ecommerce.Domain.Common.ValueObjects;
+using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
 
 public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
 {
-  public ProductName Name { get; private set; }
-  public ProductDescription Description { get; private set; }
-  public Price Price { get; private set; }
-  public Stock Stock { get; private set; }
-  public UserId SellerId { get; private set; }
+  public ProductName Name { get; private set; } = ProductName.Empty;
+  public ProductDescription Description { get; private set; } = ProductDescription.Empty;
+  public Price Price { get; private set; } = Price.Empty;
+  public Stock Stock { get; private set; } = Stock.Empty;
+  public UserId SellerId { get; private set; } = UserId.Empty;
+
+  private readonly List<ProductCategory> _categories = [];
+  private readonly List<ProductTag> _tags = [];
+  private readonly List<ProductReview> _reviews = [];
 
   public IReadOnlyList<ProductCategory> Categories => _categories.AsReadOnly();
-  public DateTime CreatedAt { get; private set; }
-  public DateTime UpdatedAt { get; private set; }
+  public IReadOnlyList<ProductTag> Tags => _tags.AsReadOnly();
+  public IReadOnlyList<ProductReview> Reviews => _reviews.AsReadOnly();
 
-  private readonly List<ProductCategory> _categories;
+  public ProductImage Thumbnail { get; private set; }
+  public ProductImages Images { get; private set; }
+  public Rating AverageRating { get; private set; }
+  public Promotion Promotion { get; private set; }
+
+  public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+  public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
   private Product(
     ProductId productId,
@@ -26,9 +38,15 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
     Price price,
     Stock stock,
     UserId sellerId,
+    IList<ProductCategory> categories,
+    IList<ProductTag> tags,
+    IList<ProductReview> reviews,
+    ProductImage thumbnail,
+    ProductImages productImages,
+    Rating averageRating,
+    Promotion promotion,
     DateTime createdAt,
-    DateTime updatedAt,
-    List<ProductCategory> categories
+    DateTime updatedAt
   )
     : base(productId)
   {
@@ -40,7 +58,15 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
     SellerId = sellerId;
     CreatedAt = createdAt;
     UpdatedAt = updatedAt;
-    _categories = categories;
+
+    _categories = [.. categories];
+    _tags = [.. tags];
+    _reviews = [.. reviews];
+
+    Thumbnail = thumbnail;
+    Images = productImages;
+    AverageRating = averageRating;
+    Promotion = promotion;
   }
 
   public static Product Create(
@@ -48,7 +74,14 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
     ProductDescription description,
     Price price,
     Stock stock,
-    UserId sellerId
+    UserId sellerId,
+    IList<ProductCategory> categories,
+    IList<ProductTag> tags,
+    IList<ProductReview> reviews,
+    ProductImage thumbnail,
+    ProductImages productImages,
+    Rating averageRating,
+    Promotion promotion
   ) =>
     new(
       ProductId.CreateUnique(),
@@ -57,9 +90,15 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
       price,
       stock,
       sellerId,
+      categories,
+      tags,
+      reviews,
+      thumbnail,
+      productImages,
+      averageRating,
+      promotion,
       DateTime.UtcNow,
-      DateTime.UtcNow,
-      []
+      DateTime.UtcNow
     );
 
   public void UpdateName(ProductName name) => Name = name;
@@ -78,4 +117,9 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
   {
     yield return Id; // since its unique product, id will suffice
   }
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+  private Product()
+    : base(ProductId.Empty) { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 }

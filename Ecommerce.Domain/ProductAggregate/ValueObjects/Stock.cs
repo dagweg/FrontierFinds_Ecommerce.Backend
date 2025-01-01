@@ -8,6 +8,8 @@ public sealed class Stock : ValueObject
   public Quantity Quantity { get; private set; } = Quantity.Empty;
   public int Reserved { get; private set; } = 0;
 
+  public static Stock Empty => new(Quantity.Empty, 0);
+
   private Stock() { }
 
   private Stock(Quantity quantity, int reserved)

@@ -8,12 +8,16 @@ public sealed class ProductId : ValueObject
 
   public static ProductId Empty => new(Guid.Empty);
 
+  private ProductId() { }
+
   private ProductId(Guid value)
   {
     Value = value;
   }
 
   public static ProductId CreateUnique() => new(Guid.NewGuid());
+
+  public static ProductId Convert(Guid value) => new(value);
 
   public static implicit operator Guid(ProductId id) => id.Value;
 
