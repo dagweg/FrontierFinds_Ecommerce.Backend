@@ -6,6 +6,7 @@ using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.UseCases.Users.Common;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
+using Ecommerce.Domain.UserAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
 using FluentResults;
 using MediatR;
@@ -42,7 +43,9 @@ public class RegisterUserCommandHandler
       Name.Create(command.LastName),
       Email.Create(command.Email),
       Password.Create(command.Password),
-      PhoneNumber.Create(command.Password)
+      PhoneNumber.Create(command.Password),
+      "REPLACE_ME",
+      UserAddress.Create("REPLACE_ME", "REPLACE_ME", "REPLACE_ME", "REPLACE_ME", "REPLACE_MEe")
     );
 
     // 3. Persist to the Database
