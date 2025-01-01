@@ -38,9 +38,9 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
     Price price,
     Stock stock,
     UserId sellerId,
-    IList<ProductCategory> categories,
-    IList<ProductTag> tags,
-    IList<ProductReview> reviews,
+    List<ProductCategory> categories,
+    List<ProductTag> tags,
+    List<ProductReview> reviews,
     ProductImage thumbnail,
     ProductImages productImages,
     Rating averageRating,
@@ -59,9 +59,9 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
     CreatedAt = createdAt;
     UpdatedAt = updatedAt;
 
-    _categories = [.. categories];
-    _tags = [.. tags];
-    _reviews = [.. reviews];
+    _categories = categories;
+    _tags = tags;
+    _reviews = reviews;
 
     Thumbnail = thumbnail;
     Images = productImages;
@@ -75,9 +75,9 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
     Price price,
     Stock stock,
     UserId sellerId,
-    IList<ProductCategory> categories,
-    IList<ProductTag> tags,
-    IList<ProductReview> reviews,
+    List<ProductCategory> categories,
+    List<ProductTag> tags,
+    List<ProductReview> reviews,
     ProductImage thumbnail,
     ProductImages productImages,
     Rating averageRating,
