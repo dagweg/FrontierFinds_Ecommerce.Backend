@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Ecommerce.Infrastructure.Persistence.EfCore;
 
-public class EfCoreContextFactory : IDesignTimeDbContextFactory<EfCoreContext>
+public class EfCoreContextDesignTimeFactory : IDesignTimeDbContextFactory<EfCoreContext>
 {
   public EfCoreContext CreateDbContext(string[] args)
   {

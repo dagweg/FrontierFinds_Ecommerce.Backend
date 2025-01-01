@@ -1,4 +1,4 @@
-using Ecommerce.Domain.Common.ValueObjects;
+using Ecommerce.Domain.OrderAggregate;
 using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.UserAggregate;
@@ -13,6 +13,7 @@ public class EfCoreContext : DbContext
   public DbSet<Product> Products { get; set; } = null!;
   public DbSet<ProductCategory> ProductCategories { get; set; } = null!;
   public DbSet<Promotion> Promotions { get; set; } = null!;
+  public DbSet<Order> Orders { get; set; } = null!;
 
   public EfCoreContext() { }
 
