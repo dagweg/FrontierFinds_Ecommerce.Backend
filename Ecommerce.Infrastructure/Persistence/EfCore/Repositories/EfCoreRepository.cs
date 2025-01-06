@@ -1,5 +1,8 @@
 namespace Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 

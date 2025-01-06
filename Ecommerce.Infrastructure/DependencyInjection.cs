@@ -47,13 +47,16 @@ public static class DependencyInjection
     // load in sql server configurations
     services.Configure<SqlServerOptions>(configuration.GetSection(SqlServerOptions.SectionName));
 
-    services.AddDbContextPool<EfCoreContext>(
+    services.AddDbContext<EfCoreContext>(
       (sp, options) =>
       {
         // Connect to SqlServer using the connection string.
         options
-          .UseSqlServer(sp.GetRequiredService<IOptions<SqlServerOptions>>().Value.ConnectionString)
-          .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>());
+          .UseSqlServer(
+            "Server=EVOO-EG-LP7\\SQLEXPRESS;Database=ecommerce;Trusted_Connection=True;TrustServerCertificate=True;"
+          )
+          .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>())
+          .EnableDetailedErrors(true);
       }
     );
 

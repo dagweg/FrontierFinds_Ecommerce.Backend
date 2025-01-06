@@ -28,10 +28,6 @@ namespace Ecommerce.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("NotificationId");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("UserId");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -58,7 +54,11 @@ namespace Ecommerce.Infrastructure.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("Title");
 
-                    b.HasKey("Id", "UserId");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
@@ -140,6 +140,12 @@ namespace Ecommerce.Infrastructure.Migrations
                         .HasColumnType("nvarchar(3)")
                         .HasDefaultValue("251")
                         .HasColumnName("CountryCode");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("Email");
 
                     b.HasKey("Id");
 
@@ -739,25 +745,6 @@ namespace Ecommerce.Infrastructure.Migrations
 
             modelBuilder.Entity("Ecommerce.Domain.UserAggregate.User", b =>
                 {
-                    b.OwnsOne("Ecommerce.Domain.Common.ValueObjects.Email", "Email", b1 =>
-                        {
-                            b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(255)
-                                .HasColumnType("nvarchar(255)")
-                                .HasColumnName("Email");
-
-                            b1.HasKey("UserId");
-
-                            b1.ToTable("Users");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
                     b.OwnsOne("Ecommerce.Domain.Common.ValueObjects.Password", "Password", b1 =>
                         {
                             b1.Property<Guid>("UserId")
@@ -992,9 +979,6 @@ namespace Ecommerce.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Cart");
-
-                    b.Navigation("Email")
-                        .IsRequired();
 
                     b.Navigation("FirstName")
                         .IsRequired();

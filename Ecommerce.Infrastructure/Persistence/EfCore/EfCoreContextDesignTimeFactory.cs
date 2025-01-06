@@ -8,11 +8,11 @@ namespace Ecommerce.Infrastructure.Persistence.EfCore;
 
 public class EfCoreContextDesignTimeFactory : IDesignTimeDbContextFactory<EfCoreContext>
 {
+  public EfCoreContextDesignTimeFactory() { }
+
   public EfCoreContext CreateDbContext(string[] args)
   {
     var optionsBuilder = new DbContextOptionsBuilder<EfCoreContext>();
-
-    var configuration = new ConfigurationBuilder().Build();
 
     optionsBuilder.UseSqlServer(
       "Server=EVOO-EG-LP7\\SQLEXPRESS;Database=ecommerce;Trusted_Connection=True;TrustServerCertificate=True;"

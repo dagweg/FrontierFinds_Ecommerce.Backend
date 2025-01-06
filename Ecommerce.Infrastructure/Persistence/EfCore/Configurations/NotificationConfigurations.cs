@@ -13,7 +13,7 @@ public class NotificationConfigurations : IEntityTypeConfiguration<Notification>
   {
     builder.ToTable("Notifications");
 
-    builder.HasKey(nameof(Notification.Id), "UserId");
+    builder.HasKey(n => n.Id);
 
     builder.Property(n => n.Id).ValueGeneratedNever().HasColumnName("NotificationId").IsRequired();
 

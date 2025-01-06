@@ -1,5 +1,6 @@
 using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Domain.Common.Enums;
+using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.NotificationAggregate;
 using Ecommerce.Domain.NotificationAggregate.Enums;
 using Ecommerce.Domain.OrderAggregate;
@@ -28,13 +29,12 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
       .HasConversion(id => id.Value, value => UserId.Convert(value))
       .IsRequired();
 
-    builder.OwnsOne(
-      u => u.Email,
-      ob =>
-      {
-        ob.Property(e => e.Value).HasColumnName("Email").IsRequired().HasMaxLength(255);
-      }
-    );
+    builder
+      .Property(u => u.Email)
+      .HasConversion(e => e.Value, v => Email.Create(v))
+      .HasColumnName("Email")
+      .IsRequired()
+      .HasMaxLength(255);
 
     builder.OwnsOne(
       u => u.FirstName,
@@ -154,7 +154,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         wb.ToTable("Wishlists");
         wb.HasKey(nameof(Wishlist.Id));
         wb.WithOwner().HasForeignKey("UserId");
-        wb.Property(w => w.Id).HasColumnName("WishlistId").IsRequired();
+        wb.Property(w => w.Id).HasColumnName("WishlistId");
         wb.OwnsMany(
           w => w.ProductIds,
           wpb =>
@@ -165,10 +165,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             wpb.Property(pi => pi.Value).HasColumnName("ProductId").IsRequired();
 
             // relationship with Product entity
-            wpb.HasOne<Product>()
-              .WithMany()
-              .HasForeignKey("ProductId")
-              .OnDelete(DeleteBehavior.Restrict);
+            wpb.HasOne<Product>().WithMany().OnDelete(DeleteBehavior.Restrict);
           }
         );
       }
