@@ -6,10 +6,10 @@ namespace Ecommerce.Domain.ProductAggregate.Entities;
 
 public sealed class ProductImages : Entity<Guid>
 {
-  public string? LeftImageUrl { get; private set; }
-  public string? RightImageUrl { get; private set; }
-  public string? FrontImageUrl { get; private set; }
-  public string? BackImageUrl { get; private set; }
+  public string? LeftImageUrl { get; set; }
+  public string? RightImageUrl { get; set; }
+  public string? FrontImageUrl { get; set; }
+  public string? BackImageUrl { get; set; }
 
   private ProductImages(
     Guid id,

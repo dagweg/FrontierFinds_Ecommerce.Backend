@@ -4,9 +4,9 @@ namespace Ecommerce.Domain.ProductAggregate.Entities;
 
 public sealed class Promotion : Entity<Guid>
 {
-  public int DiscountPercentage { get; private set; }
-  public DateTime StartDate { get; private set; }
-  public DateTime EndDate { get; private set; }
+  public int DiscountPercentage { get; set; }
+  public DateTime StartDate { get; set; }
+  public DateTime EndDate { get; set; }
 
   private Promotion()
     : base(Guid.NewGuid()) { }

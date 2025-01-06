@@ -4,7 +4,7 @@ namespace Ecommerce.Domain.OrderAggregate.ValueObjects;
 
 public sealed class OrderId : ValueObject
 {
-  public Guid Value { get; } = Empty;
+  public Guid Value { get; }
 
   public static OrderId Empty => new();
 

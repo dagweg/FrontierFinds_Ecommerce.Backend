@@ -5,8 +5,8 @@ namespace Ecommerce.Domain.OrderAggregate.ValueObjects;
 
 public sealed class OrderTotal : ValueObject
 {
-  public decimal Value { get; private set; }
-  public Currency Currency { get; private set; }
+  public decimal Value { get; set; }
+  public Currency Currency { get; set; }
 
   public static OrderTotal Empty => new(0);
 

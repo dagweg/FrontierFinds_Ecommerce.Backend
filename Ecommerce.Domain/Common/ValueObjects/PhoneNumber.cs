@@ -4,7 +4,7 @@ namespace Ecommerce.Domain.Common.ValueObjects;
 
 public sealed class PhoneNumber : ValueObject
 {
-  public string Value { get; private set; } = Empty;
+  public string Value { get; set; }
   public static PhoneNumber Empty => new(string.Empty);
 
   private PhoneNumber(string value)

@@ -4,7 +4,7 @@ namespace Ecommerce.Domain.UserAggregate.ValueObjects;
 
 public sealed class CartId : ValueObject
 {
-  public Guid Value { get; } = Empty;
+  public Guid Value { get; }
 
   public static CartId Empty => new(Guid.Empty);
 

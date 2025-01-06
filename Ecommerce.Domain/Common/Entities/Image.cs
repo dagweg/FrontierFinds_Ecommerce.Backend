@@ -4,10 +4,10 @@ namespace Ecommerce.Domain.Common.Entities;
 
 public class Image : Entity<Guid>
 {
-  public string Url { get; protected set; }
-  public string? FileType { get; protected set; }
-  public string? FileName { get; protected set; }
-  public long? FileSize { get; protected set; }
+  public string Url { get; set; }
+  public string? FileType { get; set; }
+  public string? FileName { get; set; }
+  public long? FileSize { get; set; }
 
   protected Image(Guid id, string url, string? fileType, string? fileName, long? fileSize)
     : base(id)

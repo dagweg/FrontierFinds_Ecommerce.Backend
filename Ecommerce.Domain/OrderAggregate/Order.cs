@@ -8,12 +8,12 @@ namespace Ecommerce.Domain.OrderAggregate;
 
 public sealed class Order : AggregateRoot<OrderId>
 {
-  public DateTime OrderDate { get; private set; }
-  public UserId UserId { get; private set; } = UserId.Empty;
-  public OrderTotal Total { get; private set; }
-  public ShippingAddress ShippingAddress { get; private set; }
-  public BillingAddress BillingAddress { get; private set; }
-  public OrderStatus Status { get; private set; } = OrderStatus.None;
+  public DateTime OrderDate { get; set; }
+  public UserId UserId { get; set; } = UserId.Empty;
+  public OrderTotal Total { get; set; }
+  public ShippingAddress ShippingAddress { get; set; }
+  public BillingAddress BillingAddress { get; set; }
+  public OrderStatus Status { get; set; } = OrderStatus.None;
 
   private List<OrderItem> _orderItems = [];
   public IReadOnlyList<OrderItem> OrderItems => _orderItems.AsReadOnly();

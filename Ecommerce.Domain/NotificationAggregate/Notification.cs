@@ -6,11 +6,11 @@ namespace Ecommerce.Domain.NotificationAggregate;
 
 public class Notification : AggregateRoot<Guid>
 {
-  public UserId UserId { get; private set; }
-  public string Title { get; private set; }
-  public string Description { get; private set; }
-  public NotificationType NotificationType { get; private set; }
-  public NotificationStatus NotificationStatus { get; private set; }
+  public UserId UserId { get; set; }
+  public string Title { get; set; }
+  public string Description { get; set; }
+  public NotificationType NotificationType { get; set; }
+  public NotificationStatus NotificationStatus { get; set; }
   public DateTime? ReadAt { get; } = null;
 
   private List<NotificationAction> _actions = [];

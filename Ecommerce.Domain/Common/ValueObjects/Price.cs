@@ -5,7 +5,7 @@ using Ecommerce.Domain.Common.Models;
 
 public sealed class Price : ValueObject
 {
-  public decimal Value { get; } = Empty;
+  public decimal Value { get; }
 
   public static Price Empty => new(decimal.Zero, 0);
 

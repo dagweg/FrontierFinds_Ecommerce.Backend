@@ -4,7 +4,7 @@ using Ecommerce.Domain.Common.Models;
 
 public sealed class UserId : ValueObject
 {
-  public Guid Value { get; } = Empty;
+  public Guid Value { get; }
 
   public static UserId Empty => new(Guid.Empty);
 

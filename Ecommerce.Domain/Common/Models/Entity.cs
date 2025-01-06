@@ -8,7 +8,7 @@ namespace Ecommerce.Domain.Common.Models;
 /// <param name="id"></param>
 public abstract class Entity<TId>(TId id) : IEquatable<Entity<TId>>, IHasDomainEvent
 {
-  public TId Id { get; protected set; } = id;
+  public TId Id { get; set; } = id;
 
   private readonly List<IDomainEvent> _domainEvents = [];
 

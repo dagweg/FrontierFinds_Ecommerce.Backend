@@ -4,7 +4,7 @@ namespace Ecommerce.Domain.ProductAggregate.Entities;
 
 public sealed class ProductTag : Entity<Guid>
 {
-  public string Name { get; private set; } = string.Empty;
+  public string Name { get; set; } = string.Empty;
 
   private ProductTag(Guid id, string name)
     : base(id)

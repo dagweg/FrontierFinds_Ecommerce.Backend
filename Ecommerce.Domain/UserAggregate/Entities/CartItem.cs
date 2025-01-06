@@ -7,9 +7,9 @@ using Ecommerce.Domain.UserAggregate.ValueObjects;
 
 public sealed class CartItem : Entity<CartItemId>
 {
-  public int Quantity { get; private set; }
+  public int Quantity { get; set; }
 
-  public ProductId ProductId { get; private set; }
+  public ProductId ProductId { get; set; }
 
   private CartItem(CartItemId id, ProductId productId, int quantity)
     : base(id)

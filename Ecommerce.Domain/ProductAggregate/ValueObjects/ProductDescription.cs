@@ -4,7 +4,7 @@ using Ecommerce.Domain.Common.Models;
 
 public sealed class ProductDescription : ValueObject
 {
-  public string Value { get; private set; } = Empty;
+  public string Value { get; set; }
 
   public static ProductDescription Empty => new(string.Empty);
 

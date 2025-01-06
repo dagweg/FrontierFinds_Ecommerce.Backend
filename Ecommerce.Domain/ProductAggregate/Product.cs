@@ -9,11 +9,11 @@ using Ecommerce.Domain.UserAggregate.ValueObjects;
 
 public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
 {
-  public ProductName Name { get; private set; } = ProductName.Empty;
-  public ProductDescription Description { get; private set; } = ProductDescription.Empty;
-  public Price Price { get; private set; } = Price.Empty;
-  public Stock Stock { get; private set; } = Stock.Empty;
-  public UserId SellerId { get; private set; } = UserId.Empty;
+  public ProductName Name { get; set; } = ProductName.Empty;
+  public ProductDescription Description { get; set; } = ProductDescription.Empty;
+  public Price Price { get; set; } = Price.Empty;
+  public Stock Stock { get; set; } = Stock.Empty;
+  public UserId SellerId { get; set; } = UserId.Empty;
 
   private readonly List<ProductCategory> _categories = [];
   private readonly List<ProductTag> _tags = [];
@@ -23,10 +23,10 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
   public IReadOnlyList<ProductTag> Tags => _tags.AsReadOnly();
   public IReadOnlyList<ProductReview> Reviews => _reviews.AsReadOnly();
 
-  public ProductImage Thumbnail { get; private set; }
-  public ProductImages Images { get; private set; }
-  public Rating AverageRating { get; private set; }
-  public Promotion Promotion { get; private set; }
+  public ProductImage Thumbnail { get; set; }
+  public ProductImages Images { get; set; }
+  public Rating AverageRating { get; set; }
+  public Promotion Promotion { get; set; }
 
   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
   public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

@@ -7,9 +7,9 @@ namespace Ecommerce.Domain.OrderAggregate.Entities;
 
 public sealed class OrderItem : Entity<OrderItemId>
 {
-  public ProductId ProductId { get; private set; }
-  public int Quantity { get; private set; }
-  public Price Price { get; private set; }
+  public ProductId ProductId { get; set; }
+  public int Quantity { get; set; }
+  public Price Price { get; set; }
 
   private OrderItem(OrderItemId orderItemId, ProductId productId, int quantity, Price price)
     : base(orderItemId)

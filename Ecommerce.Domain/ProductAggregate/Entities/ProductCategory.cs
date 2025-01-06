@@ -5,7 +5,7 @@ using Ecommerce.Domain.ProductAggregate.ValueObjects;
 
 public sealed class ProductCategory : Entity<Guid>
 {
-  public ProductCategoryName Name { get; private set; } = ProductCategoryName.Empty;
+  public ProductCategoryName Name { get; set; } = ProductCategoryName.Empty;
 
   private ProductCategory()
     : base(Guid.Empty) { }

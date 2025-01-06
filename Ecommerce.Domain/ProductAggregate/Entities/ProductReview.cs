@@ -6,9 +6,9 @@ namespace Ecommerce.Domain.ProductAggregate.Entities;
 
 public sealed class ProductReview : Entity<Guid>
 {
-  public UserId AuthorId { get; private set; }
-  public string Description { get; private set; }
-  public Rating Rating { get; private set; }
+  public UserId AuthorId { get; set; }
+  public string Description { get; set; }
+  public Rating Rating { get; set; }
 
   private ProductReview(Guid id, UserId authorId, string description, Rating rating)
     : base(id)

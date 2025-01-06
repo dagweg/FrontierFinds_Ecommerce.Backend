@@ -4,7 +4,7 @@ namespace Ecommerce.Domain.ProductAggregate.ValueObjects;
 
 public sealed class Rating : ValueObject
 {
-  public decimal Value { get; private set; } = Empty;
+  public decimal Value { get; set; }
 
   public static Rating Empty => new(0);
 

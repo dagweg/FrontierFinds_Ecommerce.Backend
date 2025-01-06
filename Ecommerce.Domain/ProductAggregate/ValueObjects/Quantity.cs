@@ -4,7 +4,7 @@ namespace Ecommerce.Domain.ProductAggregate.ValueObjects;
 
 public sealed class Quantity : ValueObject
 {
-  public int Value { get; private set; } = Empty;
+  public int Value { get; set; }
 
   public static Quantity Empty => new(0);
 

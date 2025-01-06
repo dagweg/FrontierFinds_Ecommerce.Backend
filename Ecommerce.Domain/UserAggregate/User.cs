@@ -12,14 +12,14 @@ using Ecommerce.Domain.UserAggregate.ValueObjects;
 
 public class User : AggregateRoot<UserId>
 {
-  public Name FirstName { get; private set; }
-  public Name LastName { get; private set; }
-  public Email Email { get; private set; }
-  public Password Password { get; private set; }
-  public PhoneNumber PhoneNumber { get; private set; }
-  public string CountryCode { get; private set; }
-  public UserAddress Address { get; private set; }
-  public Wishlist Wishlist { get; private set; }
+  public Name FirstName { get; set; }
+  public Name LastName { get; set; }
+  public Email Email { get; set; }
+  public Password Password { get; set; }
+  public PhoneNumber PhoneNumber { get; set; }
+  public string CountryCode { get; set; }
+  public UserAddress Address { get; set; }
+  public Wishlist Wishlist { get; set; }
 
   private List<Cart> _cart = [];
   private List<Order> _orders = [];
@@ -44,7 +44,6 @@ public class User : AggregateRoot<UserId>
     List<Cart> cart,
     List<Order> orders,
     List<Product> products,
-    List<Product> wishlists,
     List<Notification> notifications
   )
     : base(id)
@@ -70,12 +69,11 @@ public class User : AggregateRoot<UserId>
     Password password,
     PhoneNumber phoneNumber,
     string countryCode,
-    UserAddress address,
+    UserAddress? address = null,
     Wishlist? wishlist = null,
     List<Cart>? cart = null,
     List<Order>? orders = null,
     List<Product>? products = null,
-    List<Product>? wishlists = null,
     List<Notification>? notifications = null
   )
   {
@@ -87,12 +85,11 @@ public class User : AggregateRoot<UserId>
       password,
       phoneNumber,
       countryCode,
-      address,
+      address ?? UserAddress.Create("", "", "", "", ""),
       wishlist ?? Wishlist.Create(),
       cart ?? [],
       orders ?? [],
       products ?? [],
-      wishlists ?? [],
       notifications ?? []
     );
 
