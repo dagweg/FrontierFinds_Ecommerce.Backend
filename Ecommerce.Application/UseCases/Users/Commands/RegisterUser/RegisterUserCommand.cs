@@ -11,5 +11,5 @@ public record RegisterUserCommand(
   string Password,
   string ConfirmPassword,
   string PhoneNumber,
-  int CountryCode
+  string CountryCode
 ) : IRequest<Result<AuthenticationResult>>;

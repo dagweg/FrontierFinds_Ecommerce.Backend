@@ -33,23 +33,25 @@ public class RegisterUserCommandHandler
   )
   {
     User? user = await _userRepository.GetByEmailAsync(Email.Create(command.Email));
+
     // 1. Check if the User Exists
     if (user is not null)
       return Result.Fail(EmailAlreadyExistsException.DefaultMessage);
 
     // 2. Create the User
     user = User.Create(
-      Name.Create(command.FirstName),
-      Name.Create(command.LastName),
-      Email.Create(command.Email),
-      Password.Create(command.Password),
-      PhoneNumber.Create(command.Password),
-      "REPLACE_ME",
-      UserAddress.Create("REPLACE_ME", "REPLACE_ME", "REPLACE_ME", "REPLACE_ME", "REPLACE_MEe")
+      firstName: Name.Create(command.FirstName),
+      lastName: Name.Create(command.LastName),
+      email: Email.Create(command.Email),
+      password: Password.Create(command.Password),
+      phoneNumber: PhoneNumber.Create(command.Password),
+      countryCode: command.CountryCode
     );
 
     // 3. Persist to the Database
     await _userRepository.AddAsync(user);
+
+    await _userRepository.SaveChangesAsync();
 
     // 4. Generate the Token
     string token = _jwtTokenGenerator.GenerateToken(
