@@ -1,4 +1,4 @@
-namespace Ecommerce.Application.Common.Interfaces;
+namespace Ecommerce.Application.Common.Interfaces.Providers.Date;
 
 public interface IDateTimeProvider
 {
