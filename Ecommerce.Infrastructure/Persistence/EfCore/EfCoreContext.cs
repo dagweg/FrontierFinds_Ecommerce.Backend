@@ -3,6 +3,7 @@ using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.UserAggregate;
 using Ecommerce.Infrastructure.Common;
+using Ecommerce.Infrastructure.Common.Providers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Infrastructure.Persistence.EfCore;

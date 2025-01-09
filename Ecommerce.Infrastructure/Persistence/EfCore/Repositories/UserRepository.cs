@@ -17,4 +17,9 @@ public class UserRepository(EfCoreContext context)
   {
     return await context.Users.FirstOrDefaultAsync(u => u.Email == email);
   }
+
+  public async Task<User?> GetByPhoneNumberAsync(PhoneNumber phoneNumber)
+  {
+    return await context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
+  }
 }

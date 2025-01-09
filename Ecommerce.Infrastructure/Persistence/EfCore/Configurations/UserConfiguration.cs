@@ -25,64 +25,49 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
     builder
       .Property(u => u.Id)
-      .HasColumnName("Id")
       .HasConversion(id => id.Value, value => UserId.Convert(value))
       .IsRequired();
 
     builder
       .Property(u => u.Email)
       .HasConversion(e => e.Value, v => Email.Create(v))
-      .HasColumnName("Email")
       .IsRequired()
       .HasMaxLength(255);
 
-    builder.OwnsOne(
-      u => u.FirstName,
-      ob =>
-      {
-        ob.Property(fn => fn.Value).HasColumnName("FirstName").IsRequired().HasMaxLength(100);
-      }
-    );
-
-    builder.OwnsOne(
-      u => u.LastName,
-      ob =>
-      {
-        ob.Property(ln => ln.Value).HasColumnName("LastName").IsRequired().HasMaxLength(100);
-      }
-    );
-
-    builder.OwnsOne(
-      u => u.Password,
-      ob =>
-      {
-        ob.Property(p => p.Value).HasColumnName("Password").IsRequired().HasMaxLength(512);
-      }
-    );
-
-    builder.OwnsOne(
-      u => u.PhoneNumber,
-      ob =>
-      {
-        ob.Property(p => p.Value).HasColumnName("PhoneNumber").IsRequired().HasMaxLength(15);
-      }
-    );
+    builder
+      .Property(u => u.FirstName)
+      .HasConversion(f => f.Value, v => Name.Create(v))
+      .IsRequired()
+      .HasMaxLength(100);
 
     builder
-      .Property(u => u.CountryCode)
-      .HasColumnName("CountryCode")
+      .Property(u => u.LastName)
+      .HasConversion(l => l.Value, v => Name.Create(v))
       .IsRequired()
-      .HasMaxLength(3)
-      .HasDefaultValue("251");
+      .HasMaxLength(100);
+
+    builder
+      .Property(u => u.Password)
+      .IsRequired()
+      .HasConversion(p => p.Value, v => Password.Create(v))
+      .HasMaxLength(255);
+
+    builder
+      .Property(u => u.PhoneNumber)
+      .HasConversion(pn => pn.Value, v => PhoneNumber.Create(v))
+      .IsRequired()
+      .HasMaxLength(50);
+
+    builder.Property(u => u.CountryCode).IsRequired().HasMaxLength(3).HasDefaultValue("251");
 
     builder.OwnsOne(
       u => u.Address,
       ob =>
       {
-        ob.Property(a => a.City).HasColumnName("City").IsRequired().HasMaxLength(100);
-        ob.Property(a => a.State).HasColumnName("State").IsRequired().HasMaxLength(100);
-        ob.Property(a => a.Street).HasColumnName("Street").IsRequired().HasMaxLength(255);
-        ob.Property(a => a.ZipCode).HasColumnName("ZipCode").IsRequired().HasMaxLength(10);
+        ob.Property(a => a.City).IsRequired().HasMaxLength(100);
+        ob.Property(a => a.State).IsRequired().HasMaxLength(100);
+        ob.Property(a => a.Street).IsRequired().HasMaxLength(255);
+        ob.Property(a => a.ZipCode).IsRequired().HasMaxLength(10);
       }
     );
 
