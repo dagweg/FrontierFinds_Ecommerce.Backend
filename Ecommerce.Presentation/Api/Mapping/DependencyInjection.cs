@@ -7,8 +7,8 @@ public static class DependencyInjection
     services.AddAutoMapper(
       (cfg) =>
       {
-        cfg.AddMaps(typeof(Application.DependencyInjection).Assembly);
         cfg.AddMaps(typeof(Api.DependencyInjection).Assembly);
+        cfg.AddMaps(typeof(Application.DependencyInjection).Assembly);
       }
     );
     return services;

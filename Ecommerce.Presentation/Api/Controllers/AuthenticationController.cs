@@ -27,7 +27,9 @@ public class AuthenticationController : ControllerBase
 
     var result = await _mediator.Send(command);
 
-    return Ok(_mapper.Map<AuthenticationResponse>(result.Value));
+    return result.IsFailed
+      ? new ObjectResult(result)
+      : Ok(_mapper.Map<AuthenticationResponse>(result.Value));
   }
 
   [HttpPost("login")]
@@ -37,6 +39,8 @@ public class AuthenticationController : ControllerBase
 
     var result = await _mediator.Send(loginQuery);
 
-    return Ok(_mapper.Map<AuthenticationResponse>(result.Value));
+    return result.IsFailed
+      ? new ObjectResult(result)
+      : Ok(_mapper.Map<AuthenticationResponse>(result.Value));
   }
 }

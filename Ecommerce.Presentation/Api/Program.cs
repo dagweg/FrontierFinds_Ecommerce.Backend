@@ -5,10 +5,10 @@
 namespace Api;
 
 using Ecommerce.Application;
-using Ecommerce.Application.Middlewares;
 using Ecommerce.Infrastructure;
 using Ecommerce.Presentation.Api;
 using Ecommerce.Presentation.Api.Mapping;
+using Ecommerce.Presentation.Api.Middlewares;
 
 public class Program
 {
@@ -33,9 +33,10 @@ public class Program
 
       var app = builder.Build();
       {
-        app.UseExceptionHandler("/error");
+        app.UseAuthentication().UseAuthorization();
+
         app.UseMiddleware<ExceptionHandlingMiddleware>()
-          .UseMiddleware<ValidationExceptionHandlingMiddleware>();
+          .UseMiddleware<FluentValidationExceptionHandlingMiddleware>();
 
         if (app.Environment.IsDevelopment())
         {

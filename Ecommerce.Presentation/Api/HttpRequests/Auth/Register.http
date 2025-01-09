@@ -4,9 +4,9 @@ Content-Type:  application/json
 {
   "firstName": "hello",
   "lastName": "olleh",
-  "email": "elio@.",
+  "email": "elio@.gm0",
   "password": "melio",
   "confirmPassword": "melio", 
-  "phoneNumber": "oilem",
+  "phoneNumber": "melio2",
   "countryCode": 12
 }
