@@ -3,6 +3,8 @@ namespace Ecommerce.Application.UseCases.Users.Commands.RegisterUser;
 using Ecommerce.Application.Common.Errors;
 using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.Common.Interfaces.Persistence;
+using Ecommerce.Application.Common.Interfaces.Providers.Localization;
+using Ecommerce.Application.Common.Interfaces.Validation;
 using Ecommerce.Application.UseCases.Users.Common;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
@@ -17,14 +19,20 @@ public class RegisterUserCommandHandler
   // Repository Injection
   private readonly IUserRepository _userRepository;
   private readonly IJwtTokenGenerator _jwtTokenGenerator;
+  private readonly IAuthenticationMessages _authValidationMessages;
+  private readonly IUserValidationService _userValidationService;
 
   public RegisterUserCommandHandler(
     IUserRepository userRespository,
-    IJwtTokenGenerator jwtTokenGenerator
+    IJwtTokenGenerator jwtTokenGenerator,
+    IAuthenticationMessages authValidationMessages,
+    IUserValidationService userValidationService
   )
   {
     _userRepository = userRespository;
     _jwtTokenGenerator = jwtTokenGenerator;
+    _authValidationMessages = authValidationMessages;
+    _userValidationService = userValidationService;
   }
 
   public async Task<Result<AuthenticationResult>> Handle(
@@ -32,14 +40,18 @@ public class RegisterUserCommandHandler
     CancellationToken cancellationToken
   )
   {
-    User? user = await _userRepository.GetByEmailAsync(Email.Create(command.Email));
+    var email = Email.Create(command.Email);
+    var emailResult = await _userValidationService.CheckIfUserAlreadyExistsAsync(email);
+    if (emailResult.IsFailed)
+      return emailResult;
 
-    // 1. Check if the User Exists
-    if (user is not null)
-      return Result.Fail(EmailAlreadyExistsException.DefaultMessage);
+    var phoneNumber = PhoneNumber.Create(command.PhoneNumber);
+    var phoneResult = await _userValidationService.CheckIfUserAlreadyExistsAsync(phoneNumber);
+    if (phoneResult.IsFailed)
+      return phoneResult;
 
     // 2. Create the User
-    user = User.Create(
+    var user = User.Create(
       firstName: Name.Create(command.FirstName),
       lastName: Name.Create(command.LastName),
       email: Email.Create(command.Email),

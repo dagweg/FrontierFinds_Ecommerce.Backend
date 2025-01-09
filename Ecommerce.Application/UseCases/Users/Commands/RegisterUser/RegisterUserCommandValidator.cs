@@ -1,47 +1,37 @@
 using Ecommerce.Application.Common;
-using Ecommerce.Application.Common.Interfaces;
+using Ecommerce.Application.Common.Interfaces.Providers.Localization;
 using FluentValidation;
 
 namespace Ecommerce.Application.UseCases.Users.Commands.RegisterUser;
 
 public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {
-  private readonly IValidationMessageProvider _messages;
+  private readonly IValidationMessages _messages;
 
-  public RegisterUserCommandValidator(IValidationMessageProvider messages)
+  public RegisterUserCommandValidator(IValidationMessages messages)
   {
     _messages = messages;
 
-    RuleFor(x => x.FirstName)
-      .NotEmpty()
-      .WithMessage(_messages.GetMessage(ValidationMessageKeys.FirstNameRequired));
+    RuleFor(x => x.FirstName).NotEmpty().WithMessage(_messages.FirstNameRequired);
 
-    RuleFor(x => x.LastName)
-      .NotEmpty()
-      .WithMessage(_messages.GetMessage(ValidationMessageKeys.LastNameRequired));
+    RuleFor(x => x.LastName).NotEmpty().WithMessage(_messages.LastNameRequired);
 
     RuleFor(x => x.Email)
       .NotEmpty()
-      .WithMessage(_messages.GetMessage(ValidationMessageKeys.EmailRequired))
+      .WithMessage(_messages.EmailRequired)
       .EmailAddress()
-      .WithMessage(_messages.GetMessage(ValidationMessageKeys.EmailInvalidFormat));
+      .WithMessage(_messages.EmailInvalidFormat);
 
-    RuleFor(x => x.Password)
-      .NotEmpty()
-      .WithMessage(_messages.GetMessage(ValidationMessageKeys.PasswordRequired));
+    RuleFor(x => x.Password).NotEmpty().WithMessage(_messages.PasswordRequired);
 
     RuleFor(x => x.ConfirmPassword)
       .NotEmpty()
-      .WithMessage(_messages.GetMessage(ValidationMessageKeys.ConfirmPasswordRequired))
+      .WithMessage(_messages.ConfirmPasswordRequired)
       .Equal(y => y.Password)
-      .WithMessage(_messages.GetMessage(ValidationMessageKeys.PasswordsDoNotMatch));
+      .WithMessage(_messages.PasswordsDoNotMatch);
 
-    RuleFor(x => x.CountryCode)
-      .NotEmpty()
-      .WithMessage(_messages.GetMessage(ValidationMessageKeys.CountryCodeRequired));
+    RuleFor(x => x.CountryCode).NotEmpty().WithMessage(_messages.CountryCodeRequired);
 
-    RuleFor(x => x.PhoneNumber)
-      .NotEmpty()
-      .WithMessage(_messages.GetMessage(ValidationMessageKeys.PhoneRequired));
+    RuleFor(x => x.PhoneNumber).NotEmpty().WithMessage(_messages.PhoneRequired);
   }
 }
