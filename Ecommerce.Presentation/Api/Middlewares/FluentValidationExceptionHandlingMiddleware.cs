@@ -2,13 +2,13 @@ using Ecommerce.Application.Common.Errors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Ecommerce.Application.Middlewares;
+namespace Ecommerce.Presentation.Api.Middlewares;
 
-public class ValidationExceptionHandlingMiddleware
+public class FluentValidationExceptionHandlingMiddleware
 {
   private readonly RequestDelegate _next;
 
-  public ValidationExceptionHandlingMiddleware(RequestDelegate next)
+  public FluentValidationExceptionHandlingMiddleware(RequestDelegate next)
   {
     _next = next;
   }

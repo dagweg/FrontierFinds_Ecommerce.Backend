@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace Ecommerce.Application.Middlewares;
+namespace Ecommerce.Presentation.Api.Middlewares;
 
 public class ExceptionHandlingMiddleware
 {
@@ -31,7 +31,7 @@ public class ExceptionHandlingMiddleware
         Status = StatusCodes.Status500InternalServerError,
         Type = "InternalServerFaliure",
         Title = "Internal Server Error",
-        Detail = "An internal server error has occured.",
+        Detail = ex.Message,
       };
 
       context.Response.StatusCode = StatusCodes.Status500InternalServerError;
