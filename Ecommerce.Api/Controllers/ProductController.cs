@@ -2,10 +2,12 @@ using AutoMapper;
 using Ecommerce.Application.UseCases.Products.Commands;
 using Ecommerce.Contracts.Product;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("products")]
 public class ProductController : ControllerBase
