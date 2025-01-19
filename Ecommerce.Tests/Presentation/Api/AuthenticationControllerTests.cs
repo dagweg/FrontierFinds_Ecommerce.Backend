@@ -1,7 +1,7 @@
 namespace Ecommerce.Tests.Presentation.Api;
 
-using Ecommerce.Presentation.Api.Controllers;
-using Ecommerce.Presentation.Contracts.Authentication;
+using Ecommerce.Api.Controllers;
+using Ecommerce.Contracts.Authentication;
 using Xunit.Abstractions;
 
 public class AuthenticationControllerTests(
