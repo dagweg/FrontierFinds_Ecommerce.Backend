@@ -4,6 +4,6 @@ namespace Ecommerce.Domain.UserAggregate.Exceptions;
 
 public class QuantityBelowZeroException : DomainException
 {
-  public QuantityBelowZeroException(Exception? ex = null)
-    : base("QuantityBelowZero", ex) { }
+  public QuantityBelowZeroException()
+    : base("Product quantity should be more than 0.") { }
 }

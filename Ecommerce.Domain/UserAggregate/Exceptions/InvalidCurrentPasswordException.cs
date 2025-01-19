@@ -4,6 +4,6 @@ using Ecommerce.Domain.Common.Exceptions;
 
 public class InvalidCurrentPasswordException : DomainException
 {
-  public InvalidCurrentPasswordException(Exception? ex = null)
-    : base("InvalidCurrentPassword", ex) { }
+  public InvalidCurrentPasswordException()
+    : base("The current password provided isn't correct.") { }
 }

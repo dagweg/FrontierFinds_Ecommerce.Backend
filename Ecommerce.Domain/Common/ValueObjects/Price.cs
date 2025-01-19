@@ -1,6 +1,8 @@
 namespace Ecommerce.Domain.Common.ValueObjects;
 
+using System.Collections.Concurrent;
 using Ecommerce.Domain.Common.Enums;
+using Ecommerce.Domain.Common.Exceptions;
 using Ecommerce.Domain.Common.Models;
 
 public sealed class Price : ValueObject
@@ -25,6 +27,21 @@ public sealed class Price : ValueObject
   }
 
   public static implicit operator decimal(Price price) => price.Value;
+
+  public static bool IsValidCurrency(string currency)
+  {
+    return Enum.TryParse<Currency>(currency, out _);
+  }
+
+  public static Currency ToCurrency(string currency)
+  {
+    if (Enum.TryParse<Currency>(currency, true, out var result))
+    {
+      return result;
+    }
+
+    throw new InvalidCurrencyException(currency);
+  }
 
   public override IEnumerable<object> GetEqualityComponents()
   {
