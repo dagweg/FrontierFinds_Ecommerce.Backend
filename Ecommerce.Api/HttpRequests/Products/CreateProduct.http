@@ -1,0 +1,17 @@
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "productName": "Product 1",
+  "productDescription": "Product 1 description",
+  "priceValue": 10,
+  "stockQuantity": 1,
+  "priceCurrency": "ab",
+  "thumbnail": {
+    "base64":"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABaElEQVQ4jZ2TTUvDQBDGn3F3",
+    "fileType":"image/png"
+  }
+}
+
+
+            
