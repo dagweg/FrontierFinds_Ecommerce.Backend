@@ -1,5 +1,5 @@
 using Ecommerce.Application.Common;
-using Ecommerce.Application.Common.Interfaces;
+using Ecommerce.Application.Common.Interfaces.Providers.Localization;
 using FluentValidation;
 
 namespace Ecommerce.Application.UseCases.Users.Queries.LoginUser;
@@ -9,20 +9,18 @@ namespace Ecommerce.Application.UseCases.Users.Queries.LoginUser;
 /// </summary>
 public class LoginUserQueryValidator : AbstractValidator<LoginUserQuery>
 {
-  private readonly IValidationMessageProvider _messages;
+  private readonly IValidationMessages _messages;
 
-  public LoginUserQueryValidator(IValidationMessageProvider messages)
+  public LoginUserQueryValidator(IValidationMessages messages)
   {
     _messages = messages;
 
     RuleFor(x => x.Email)
       .NotEmpty()
-      .WithMessage(_messages.GetMessage(ValidationMessageKeys.EmailRequired))
+      .WithMessage(_messages.EmailRequired)
       .EmailAddress()
-      .WithMessage(_messages.GetMessage(ValidationMessageKeys.EmailInvalidFormat));
+      .WithMessage(_messages.EmailInvalidFormat);
 
-    RuleFor(x => x.Password)
-      .NotEmpty()
-      .WithMessage(_messages.GetMessage(ValidationMessageKeys.PasswordRequired));
+    RuleFor(x => x.Password).NotEmpty().WithMessage(_messages.PasswordRequired);
   }
 }

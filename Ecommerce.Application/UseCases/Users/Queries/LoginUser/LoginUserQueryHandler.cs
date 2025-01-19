@@ -1,11 +1,14 @@
 using AutoMapper;
 using Ecommerce.Application.Common.Errors;
+using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.Common.Interfaces.Persistence;
+using Ecommerce.Application.Common.Interfaces.Providers.Localization;
 using Ecommerce.Application.UseCases.Users.Common;
 using Ecommerce.Domain.Common.ValueObjects;
 using FluentResults;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Ecommerce.Application.UseCases.Users.Queries.LoginUser;
@@ -16,18 +19,21 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, Result<Auth
   private readonly ILogger<LoginUserQueryHandler> _logger;
   private readonly IJwtTokenGenerator _jwtTokenGenerator;
   private readonly IMapper _mapper;
+  private readonly IAuthenticationMessages _authValidationMessages;
 
   public LoginUserQueryHandler(
     IUserRepository userRespository,
     IJwtTokenGenerator jwtTokenGenerator,
     ILogger<LoginUserQueryHandler> logger,
-    IMapper mapper
+    IMapper mapper,
+    IAuthenticationMessages authValidationMessages
   )
   {
     _userRepository = userRespository;
     _logger = logger;
     _jwtTokenGenerator = jwtTokenGenerator;
     _mapper = mapper;
+    _authValidationMessages = authValidationMessages;
   }
 
   public async Task<Result<AuthenticationResult>> Handle(
@@ -41,13 +47,25 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, Result<Auth
       var user = await _userRepository.GetByEmailAsync(Email.Create(query.Email));
 
       if (user is null)
-        return Result.Fail(UserNotFoundException.DefaultMessage);
+        return Result.Fail(
+          new AuthenticationError(
+            nameof(query.Email),
+            _authValidationMessages.EmailOrPasswordIncorrect
+          )
+        );
 
       // 2. Check if the password is correct
       // Note: use bcrypt hash for comparing the password in production,
       // it's okay to compare literal passwords in dev envrionment
       if (!user.Password.Value.Equals(query.Password))
-        return Result.Fail(PasswordIncorrectException.DefaultMessage);
+      {
+        return Result.Fail(
+          new AuthenticationError(
+            nameof(query.Password),
+            _authValidationMessages.EmailOrPasswordIncorrect
+          )
+        );
+      }
 
       // 3. Generate a JWT token
       var token = _jwtTokenGenerator.GenerateToken(

@@ -31,8 +31,9 @@ public class UserValidationService : IUserValidationService
     // if so return an error
     if (user is not null)
     {
-      return Result.Fail(
-        new AlreadyExistsError(nameof(email), _authValidationMessages.UserAlreadyExists)
+      return ValidationErrors.AlreadyExists(
+        nameof(email),
+        _authValidationMessages.UserAlreadyExists
       );
     }
 
@@ -45,8 +46,9 @@ public class UserValidationService : IUserValidationService
 
     if (user is not null)
     {
-      return Result.Fail(
-        new AlreadyExistsError(nameof(phoneNumber), _authValidationMessages.UserAlreadyExists)
+      return ValidationErrors.AlreadyExists(
+        nameof(phoneNumber),
+        _authValidationMessages.UserAlreadyExists
       );
     }
 

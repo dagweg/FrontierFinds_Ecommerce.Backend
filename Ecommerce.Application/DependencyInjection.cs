@@ -4,6 +4,7 @@ using Ecommerce.Application.Behaviors;
 using Ecommerce.Application.Common;
 using Ecommerce.Application.Common.Interfaces.Validation;
 using Ecommerce.Application.Services.Validation;
+using Ecommerce.Application.UseCases.Images.Commands;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,8 @@ public static class DependencyInjection
 
     // Register All Fluent Validation Models
     services.AddValidatorsFromAssembly(ApplicationAssembly.Assembly);
+
+    services.AddTransient<IValidator<CreateImageCommand>, CreateImageCommandValidator>();
 
     services.AddScoped<IUserValidationService, UserValidationService>();
 
