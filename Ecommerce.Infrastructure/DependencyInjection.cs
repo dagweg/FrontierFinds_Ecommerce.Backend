@@ -1,12 +1,15 @@
 namespace Ecommerce.Infrastructure;
 
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Security.Claims;
 using System.Text;
 using Ecommerce.Application.Common;
 using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Providers.Date;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
+using Ecommerce.Infrastructure.Common;
 using Ecommerce.Infrastructure.Common.Providers;
 using Ecommerce.Infrastructure.Common.Providers.Localization;
 using Ecommerce.Infrastructure.Persistence.EfCore;
@@ -14,8 +17,14 @@ using Ecommerce.Infrastructure.Persistence.EfCore.Interceptors;
 using Ecommerce.Infrastructure.Persistence.EfCore.Options;
 using Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 using Ecommerce.Infrastructure.Services.Authentication;
+using IdentityModel;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -41,6 +50,7 @@ public static class DependencyInjection
 
     // Load settings from appsettings.json to appropriate classes
     services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+    services.Configure<CookieSettings>(configuration.GetSection(CookieSettings.SectionName));
 
     // Register Utility Services
     services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
@@ -106,8 +116,16 @@ public static class DependencyInjection
     IConfigurationManager configuration
   )
   {
+    var cookieSettings =
+      configuration.GetSection(CookieSettings.SectionName).Get<CookieSettings>()
+      ?? throw new InvalidOperationException("Cookie settings are null!");
+
+    var jwtSettings =
+      configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
+      ?? throw new InvalidOperationException("Jwt settings are null!");
+
     services
-      .AddAuthentication("Bearer")
+      .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
       .AddJwtBearer(options =>
       {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -116,16 +134,31 @@ public static class DependencyInjection
           ValidateAudience = true,
           ValidateLifetime = true,
           ValidateIssuerSigningKey = true,
-          ValidIssuer = configuration[$"{JwtSettings.SectionName}:{nameof(JwtSettings.Issuer)}"],
-          ValidAudience = configuration[
-            $"{JwtSettings.SectionName}:{nameof(JwtSettings.Audience)}"
-          ],
+          ValidIssuer = jwtSettings.Issuer,
+          ValidAudience = jwtSettings.Audience,
           IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(
-              configuration[$"{JwtSettings.SectionName}:{nameof(JwtSettings.SecretKey)}"]
+              jwtSettings.SecretKey
                 ?? throw new InvalidOperationException("Jwt Secret key is null!")
             )
           ),
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+          OnMessageReceived = context =>
+          {
+            context.HttpContext.Request.Cookies.TryGetValue(
+              cookieSettings.CookieKey,
+              out var token
+            );
+            if (!string.IsNullOrEmpty(token))
+            {
+              context.Token = token;
+            }
+
+            return Task.CompletedTask;
+          },
         };
       });
     return services;
