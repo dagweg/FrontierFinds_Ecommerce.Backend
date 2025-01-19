@@ -40,6 +40,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     {
       new Claim(JwtRegisteredClaimNames.Sub, userId),
       new Claim(JwtRegisteredClaimNames.Iss, _jwtSettings.Issuer),
+      new Claim(JwtRegisteredClaimNames.Aud, _jwtSettings.Audience),
       new Claim(JwtRegisteredClaimNames.GivenName, firstName),
       new Claim(JwtRegisteredClaimNames.FamilyName, lastName),
       new Claim(JwtRegisteredClaimNames.Email, email),
