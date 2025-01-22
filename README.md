@@ -16,6 +16,8 @@
 ## Overview
 
 An Ecommerce WebService built with .NET Core following Clean Architecture, DDD, CQRS and SOLID principles.
+![image](https://github.com/user-attachments/assets/4df82ff1-acc2-4c54-9da4-eef30079d942)
+
 
 ## Getting Started
 
