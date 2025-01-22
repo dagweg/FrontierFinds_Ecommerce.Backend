@@ -67,6 +67,8 @@ public static class DependencyInjection
     // load in sql server configurations
     services.Configure<SqlServerOptions>(configuration.GetSection(SqlServerOptions.SectionName));
 
+    services.AddScoped<IUnitOfWork, UnitOfWork>();
+
     services.AddDbContext<EfCoreContext>(
       (sp, options) =>
       {
@@ -80,6 +82,8 @@ public static class DependencyInjection
 
     // Register Repositories
     services.AddScoped<IUserRepository, UserRepository>();
+    services.AddScoped<IProductRepository, ProductRepository>();
+
     return services;
   }
 

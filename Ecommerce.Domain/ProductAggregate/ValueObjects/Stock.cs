@@ -18,7 +18,7 @@ public sealed class Stock : ValueObject
     Reserved = reserved;
   }
 
-  public static Stock Create(Quantity quantity, int reserved)
+  public static Stock Create(Quantity quantity, int reserved = 0)
   {
     return new(quantity, reserved);
   }
