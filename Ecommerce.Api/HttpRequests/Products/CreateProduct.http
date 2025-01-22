@@ -1,12 +1,13 @@
 POST {{baseUrl}}/products
 Content-Type: application/json
+Cookie: Access-Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiOTJiN2MwOS1mNTIzLTQwNjYtYjgxMS0yNTRlZTE4NmRjZTgiLCJpc3MiOiJFY29tbWVyY2UiLCJhdWQiOiJFY29tbWVyY2UiLCJnaXZlbl9uYW1lIjoiaGVsbG8iLCJmYW1pbHlfbmFtZSI6Im9sbGVoIiwiZW1haWwiOiJlbGlvQC4iLCJqdGkiOiI3ZjIzMmZiZi1hYmZhLTQ1YTItOTBjNy0zNzViYWVhNzk4ZDkiLCJleHAiOjE3Mzc2NTM3OTd9.XstpFnU3K3fVqV7_OVBKjFYqhmarYPSTJQIjhrWxOsg; expires=Thu, 23 Jan 2025 17:36:37 GMT; path=/; samesite=none; httponly
 
 {
-  "productName": "Product 1",
-  "productDescription": "Product 1 description",
+  "productName": "Acer Predator Helios 300",
+  "productDescription": "Acer Predator Helios 300 Gaming Laptop, Intel i7-10750H, NVIDIA GeForce RTX 2060 6GB, 15.6 Full HD 144Hz 3ms IPS Display, 16GB Dual-Channel DDR4, 512GB NVMe SSD, Wi-Fi 6, RGB Keyboard, PH315-53-72XD",
   "priceValue": 10,
-  "stockQuantity": 1,
-  "priceCurrency": "ab",
+  "stockQuantity": 1, 
+  "priceCurrency": "USD",
   "thumbnail": {
     "base64":"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABaElEQVQ4jZ2TTUvDQBDGn3F3",
     "fileType":"image/png"
