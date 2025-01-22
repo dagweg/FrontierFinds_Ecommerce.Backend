@@ -42,9 +42,4 @@ public abstract class EfCoreRepository<TEntity, TId>(EfCoreContext context)
   {
     context.Update(entity);
   }
-
-  public async Task SaveChangesAsync()
-  {
-    await context.SaveChangesAsync();
-  }
 }
