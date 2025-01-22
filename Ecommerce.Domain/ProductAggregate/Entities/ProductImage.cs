@@ -11,7 +11,7 @@ public sealed class ProductImage : Image
     Url = url;
   }
 
-  public static Image Create(string url)
+  public static ProductImage Create(string url)
   {
     return new ProductImage(Guid.NewGuid(), url);
   }
