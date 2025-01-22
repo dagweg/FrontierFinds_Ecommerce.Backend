@@ -1,3 +1,4 @@
+using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Domain.Common.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,14 +33,16 @@ public class ExceptionHandlingMiddleware
         Status = StatusCodes.Status500InternalServerError,
         Type = "InternalServerFaliure",
         Title = "Internal Server Error",
-        Detail = ex.Message,
+        Detail = "An internal server error has occured. Please try again later or contact support.",
+        Extensions = { { "traceId", context.TraceIdentifier } },
       };
 
       context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+      context.Response.Headers.Add("X-Trace-ID", context.TraceIdentifier);
 
       await context.Response.WriteAsJsonAsync(problemDetails);
 
-      _logger.LogError("An internal server error has occured. {@ex}", ex);
+      _logger.LogFormattedError(ex, context.TraceIdentifier);
     }
   }
 }
