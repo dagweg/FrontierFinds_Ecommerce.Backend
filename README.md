@@ -23,32 +23,52 @@ An Ecommerce WebService built with .NET Core following Clean Architecture, DDD, 
 
 ### Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet) installed.
-- Database: Ensure you have [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) running locally.
+- [.NET 9 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) installed.
+- [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) running locally. 
 
 ### Installation
 
 1. Clone the repository
 
-```bash
+```ps1
 git clone https://github.com/dagweg/Ecommerce_Platform.NET.git
 ```
 
 2. Install dependencies
 
-```bash
+```ps1
 dotnet restore .\Ecommerce.Presentation\Api\Ecommerce.Api.csproj
 dotnet tool restore
 ```
 
-3. Run the Tests
+3. Install EfCore globally/locally
+```ps1
+dotnet tool install --global dotnet-ef --version 9.0.0
+```
 
-```bash
+4. Configure `appsettings.json` to suit your environment and sync migrations with db by:
+```ps1
+dotnet ef database update --project .\Ecommerce.Infrastructure\Ecommerce.Infrastructure.csproj
+```
+
+5. Run the Tests
+```ps1
 dotnet test .\Ecommerce.Tests\Ecommerce.Tests.csproj
 ```
 
-4. Run the Api
+6. Run the Api
 
-```bash
-dotnet run --project .\Ecommerce.Presentation\Api\Ecommerce.Api.csproj
+```ps1
+dotnet run --project .\Ecommerce.Api\Ecommerce.Api.csproj
 ```
+
+7. Test the endpoints! You can use RestClient and the pre-written http test requests in `.\Ecommerce.Api\HttpRequests\`.
+
+### Additional Note:
+Incase you get unexpected errors like `codeananlysis error` please use the script found in `Scripts` to remove all intermediary `obj` and `bin` files. Just like so:
+```ps1
+.\Scripts\cbf # Clean Build Files
+```
+
+## License
+MIT
