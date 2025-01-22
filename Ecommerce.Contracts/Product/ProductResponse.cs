@@ -1,4 +1,5 @@
 using Ecommerce.Contracts.Image;
+using Ecommerce.Contracts.Product.Common;
 
 namespace Ecommerce.Contracts.Product;
 
@@ -12,5 +13,5 @@ public class ProductResponse
   public required string PriceCurrency { get; set; }
   public required ImageResponse Thumbnail { get; set; }
   public ProductImagesResponse? Images { get; set; }
-  public List<string>? Tags { get; set; }
+  public List<TagResponse>? Tags { get; set; }
 }
