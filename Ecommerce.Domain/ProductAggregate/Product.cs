@@ -7,13 +7,14 @@ using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
 
-public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
+public sealed class Product : AggregateRoot<ProductId>
 {
-  public ProductName Name { get; set; } = ProductName.Empty;
-  public ProductDescription Description { get; set; } = ProductDescription.Empty;
-  public Price Price { get; set; } = Price.Empty;
-  public Stock Stock { get; set; } = Stock.Empty;
-  public UserId SellerId { get; set; } = UserId.Empty;
+  public ProductName Name { get; private set; } = ProductName.Empty;
+  public ProductDescription Description { get; private set; } = ProductDescription.Empty;
+  public Price Price { get; private set; } = Price.Empty;
+  public Stock Stock { get; private set; } = Stock.Empty;
+  public UserId SellerId { get; private set; } = UserId.Empty;
+  public ProductImage Thumbnail { get; private set; }
 
   private readonly List<ProductCategory> _categories = [];
   private readonly List<ProductTag> _tags = [];
@@ -23,13 +24,9 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
   public IReadOnlyList<ProductTag> Tags => _tags.AsReadOnly();
   public IReadOnlyList<ProductReview> Reviews => _reviews.AsReadOnly();
 
-  public ProductImage Thumbnail { get; set; }
-  public ProductImages Images { get; set; }
-  public Rating AverageRating { get; set; }
-  public Promotion Promotion { get; set; }
-
-  public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-  public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+  public ProductImages Images { get; private set; }
+  public Rating AverageRating { get; private set; }
+  public Promotion Promotion { get; private set; }
 
   private Product(
     ProductId productId,
@@ -38,13 +35,7 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
     Price price,
     Stock stock,
     UserId sellerId,
-    List<ProductCategory> categories,
-    List<ProductTag> tags,
-    List<ProductReview> reviews,
     ProductImage thumbnail,
-    ProductImages productImages,
-    Rating averageRating,
-    Promotion promotion,
     DateTime createdAt,
     DateTime updatedAt
   )
@@ -56,17 +47,10 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
     Price = price;
     Stock = stock;
     SellerId = sellerId;
-    CreatedAt = createdAt;
-    UpdatedAt = updatedAt;
-
-    _categories = categories;
-    _tags = tags;
-    _reviews = reviews;
-
     Thumbnail = thumbnail;
-    Images = productImages;
-    AverageRating = averageRating;
-    Promotion = promotion;
+    Promotion = Promotion.Create(0, DateTime.Now, DateTime.Now);
+    Images = ProductImages.Create();
+    AverageRating = Rating.Empty;
   }
 
   public static Product Create(
@@ -75,13 +59,7 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
     Price price,
     Stock stock,
     UserId sellerId,
-    List<ProductCategory> categories,
-    List<ProductTag> tags,
-    List<ProductReview> reviews,
-    ProductImage thumbnail,
-    ProductImages productImages,
-    Rating averageRating,
-    Promotion promotion
+    ProductImage thumbnail
   ) =>
     new(
       ProductId.CreateUnique(),
@@ -90,16 +68,46 @@ public sealed class Product : AggregateRoot<ProductId>, ITimeStamped
       price,
       stock,
       sellerId,
-      categories,
-      tags,
-      reviews,
       thumbnail,
-      productImages,
-      averageRating,
-      promotion,
       DateTime.UtcNow,
       DateTime.UtcNow
     );
+
+  public Product WithCategories(List<ProductCategory> categories)
+  {
+    _categories.AddRange(categories);
+    return this;
+  }
+
+  public Product WithTags(List<ProductTag> tags)
+  {
+    _tags.AddRange(tags);
+    return this;
+  }
+
+  public Product WithReviews(List<ProductReview> reviews)
+  {
+    _reviews.AddRange(reviews);
+    return this;
+  }
+
+  public Product WithAverageRating(Rating averageRating)
+  {
+    AverageRating = averageRating;
+    return this;
+  }
+
+  public Product WithPromotion(Promotion promotion)
+  {
+    Promotion = promotion;
+    return this;
+  }
+
+  public Product WithImages(ProductImages images)
+  {
+    Images = images;
+    return this;
+  }
 
   public void UpdateName(ProductName name) => Name = name;
 
