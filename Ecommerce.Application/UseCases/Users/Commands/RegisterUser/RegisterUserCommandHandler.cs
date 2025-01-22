@@ -17,6 +17,7 @@ public class RegisterUserCommandHandler
   : IRequestHandler<RegisterUserCommand, Result<AuthenticationResult>>
 {
   // Repository Injection
+  private readonly IUnitOfWork _unitOfWork;
   private readonly IUserRepository _userRepository;
   private readonly IJwtTokenGenerator _jwtTokenGenerator;
   private readonly IAuthenticationMessages _authValidationMessages;
@@ -26,13 +27,15 @@ public class RegisterUserCommandHandler
     IUserRepository userRespository,
     IJwtTokenGenerator jwtTokenGenerator,
     IAuthenticationMessages authValidationMessages,
-    IUserValidationService userValidationService
+    IUserValidationService userValidationService,
+    IUnitOfWork unitOfWork
   )
   {
     _userRepository = userRespository;
     _jwtTokenGenerator = jwtTokenGenerator;
     _authValidationMessages = authValidationMessages;
     _userValidationService = userValidationService;
+    _unitOfWork = unitOfWork;
   }
 
   public async Task<Result<AuthenticationResult>> Handle(
@@ -60,10 +63,11 @@ public class RegisterUserCommandHandler
       countryCode: command.CountryCode
     );
 
-    // 3. Persist to the Database
+    // 3. Make Changes to User Repository
     await _userRepository.AddAsync(user);
 
-    await _userRepository.SaveChangesAsync();
+    // 4. Persist the Changes
+    await _unitOfWork.SaveChangesAsync();
 
     // 4. Generate the Token
     string token = _jwtTokenGenerator.GenerateToken(
