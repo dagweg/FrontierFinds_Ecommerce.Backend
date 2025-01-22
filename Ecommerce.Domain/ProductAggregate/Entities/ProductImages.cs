@@ -11,27 +11,34 @@ public sealed class ProductImages : Entity<Guid>
   public string? FrontImageUrl { get; set; }
   public string? BackImageUrl { get; set; }
 
-  private ProductImages(
-    Guid id,
-    string leftImageUrl,
-    string rightImageUrl,
-    string frontImageUrl,
-    string backImageUrl
-  )
-    : base(id)
+  private ProductImages(Guid id)
+    : base(id) { }
+
+  public static ProductImages Create() => new(Guid.NewGuid());
+
+  public ProductImages WithLeftImage(string leftImageUrl)
   {
     LeftImageUrl = leftImageUrl;
-    RightImageUrl = rightImageUrl;
-    FrontImageUrl = frontImageUrl;
-    BackImageUrl = backImageUrl;
+    return this;
   }
 
-  public static ProductImages Create(
-    string leftImageUrl,
-    string rightImageUrl,
-    string frontImageUrl,
-    string backImageUrl
-  ) => new(Guid.NewGuid(), leftImageUrl, rightImageUrl, frontImageUrl, backImageUrl);
+  public ProductImages WithRightImage(string rightImageUrl)
+  {
+    RightImageUrl = rightImageUrl;
+    return this;
+  }
+
+  public ProductImages WithFrontImage(string frontImageUrl)
+  {
+    FrontImageUrl = frontImageUrl;
+    return this;
+  }
+
+  public ProductImages WithBackImage(string backImageUrl)
+  {
+    BackImageUrl = backImageUrl;
+    return this;
+  }
 
   public override IEnumerable<object> GetEqualityComponents()
   {
