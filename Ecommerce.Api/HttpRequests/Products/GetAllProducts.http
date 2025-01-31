@@ -1,0 +1,1 @@
+GET http://localhost:5111/products?pageNumber=2&pageSize=3

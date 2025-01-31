@@ -26,9 +26,14 @@ public abstract class EfCoreRepository<TEntity, TId>(EfCoreContext context)
     context.Remove(entity);
   }
 
-  public async Task<IEnumerable<TEntity>> GetAllAsync()
+  public async Task<IEnumerable<TEntity>> GetAllAsync(int pageNumber, int pageSize)
   {
-    var entities = await context.Set<TEntity>().ToListAsync();
+    var entities = await context
+      .Set<TEntity>()
+      .Skip((pageNumber - 1) * pageSize)
+      .Take(pageSize)
+      .ToListAsync();
+
     return entities.AsEnumerable();
   }
 

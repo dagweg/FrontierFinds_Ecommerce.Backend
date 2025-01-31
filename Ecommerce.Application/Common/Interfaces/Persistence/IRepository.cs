@@ -10,7 +10,7 @@ public interface IRepository<TEntity, TId>
   where TEntity : class
 {
   Task<TEntity?> GetByIdAsync(TId id);
-  Task<IEnumerable<TEntity>> GetAllAsync();
+  Task<IEnumerable<TEntity>> GetAllAsync(int pageNumber, int pageSize);
   Task AddAsync(TEntity entity);
   void Update(TEntity entity);
   void Delete(TEntity entity);

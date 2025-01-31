@@ -1,5 +1,9 @@
 using AutoMapper;
-using Ecommerce.Application.UseCases.Products.Commands;
+using Ecommerce.Application.UseCases.Products.Commands.AddToCart;
+using Ecommerce.Application.UseCases.Products.CreateUser.Commands;
+using Ecommerce.Application.UseCases.Products.Queries.GetAllProducts;
+using Ecommerce.Contracts.Cart;
+using Ecommerce.Contracts.Common;
 using Ecommerce.Contracts.Product;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -35,5 +39,21 @@ public class ProductController : ControllerBase
       return new ObjectResult(result);
     }
     return Ok(_mapper.Map<ProductResponse>(result.Value));
+  }
+
+  [HttpGet]
+  public async Task<IActionResult> GetProducts([FromQuery] PaginationParams paginationParams)
+  {
+    var result = await _mediator.Send(
+      new GetAllProductsQuery(paginationParams.PageNumber, paginationParams.PageSize)
+    );
+
+    if (result.IsFailed)
+    {
+      _logger.LogError("Failed to get all products: {@result}", result);
+      return new ObjectResult(result);
+    }
+
+    return Ok(_mapper.Map<ProductsResponse>(result.Value));
   }
 }
