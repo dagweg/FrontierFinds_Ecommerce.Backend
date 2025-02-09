@@ -33,6 +33,11 @@ public sealed class CartItem : Entity<CartItemId>
     Quantity -= quantity;
   }
 
+  public void SetQuantity(int quantity)
+  {
+    Quantity = quantity;
+  }
+
   public override IEnumerable<object> GetEqualityComponents()
   {
     yield return Id;

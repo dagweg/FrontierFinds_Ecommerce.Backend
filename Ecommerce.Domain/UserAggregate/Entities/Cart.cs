@@ -15,9 +15,29 @@ public class Cart : Entity<CartId>
   private Cart(CartId cartId)
     : base(cartId) { }
 
-  public static Cart Create(CartId cartId)
+  public static Cart Create()
   {
-    return new Cart(cartId);
+    return new Cart(CartId.CreateUnique());
+  }
+
+  public void AddItem(CartItem cartItem)
+  {
+    _items.Add(cartItem);
+  }
+
+  public void RemoveItems(HashSet<CartItemId> cartItemIds)
+  {
+    _items.RemoveAll(item => cartItemIds.Contains(item.Id));
+  }
+
+  public void ClearCart()
+  {
+    _items.Clear();
+  }
+
+  public void AddItemsRange(List<CartItem> cartItems)
+  {
+    _items.AddRange(cartItems);
   }
 
   public override IEnumerable<object> GetEqualityComponents()
