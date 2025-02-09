@@ -48,7 +48,7 @@ public sealed class Product : AggregateRoot<ProductId>
     Stock = stock;
     SellerId = sellerId;
     Thumbnail = thumbnail;
-    Promotion = Promotion.Create(0, DateTime.Now, DateTime.Now);
+    Promotion = Promotion.CreateEmpty();
     Images = ProductImages.Create();
     AverageRating = Rating.Empty;
   }

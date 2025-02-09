@@ -1,7 +1,8 @@
 namespace Ecommerce.Domain.ProductAggregate.ValueObjects;
 
+using Ecommerce.Domain.Common.Errors;
 using Ecommerce.Domain.Common.Models;
-using Ecommerce.Domain.UserAggregate.Exceptions;
+using FluentResults;
 
 public sealed class Stock : ValueObject
 {
@@ -25,11 +26,13 @@ public sealed class Stock : ValueObject
 
   public void UpdateQuantity(Quantity quantity) => Quantity = quantity;
 
-  public void UpdateReserved(int reserved)
+  public Result<Stock> UpdateReserved(int reserved)
   {
     if (reserved < 0)
-      throw new ReservedBelowZeroException();
+      return BelowZeroError.GetResult(nameof(reserved), "Cannot be less than 0.");
     Reserved = reserved;
+
+    return Result.Ok(this);
   }
 
   public override IEnumerable<object> GetEqualityComponents()
