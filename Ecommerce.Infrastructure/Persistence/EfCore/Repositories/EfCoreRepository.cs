@@ -3,8 +3,11 @@ namespace Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Application.Common.Interfaces.Persistence;
+using Ecommerce.Application.Common.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 /// <summary>
 /// This repository is used to implement the basic CRUD operations for EfCore.
@@ -16,35 +19,49 @@ public abstract class EfCoreRepository<TEntity, TId>(EfCoreContext context)
   : IRepository<TEntity, TId>
   where TEntity : class
 {
-  public async Task AddAsync(TEntity entity)
+  public async Task<bool> AddAsync(TEntity entity)
   {
-    await context.AddAsync(entity);
+    var entityEntry = await context.AddAsync(entity);
+    return entityEntry != null;
   }
 
-  public void Delete(TEntity entity)
+  public async Task<GetAllResult<TEntity>> GetAllAsync(PaginationParameters pagination)
   {
-    context.Remove(entity);
-  }
+    var query = context.Set<TEntity>().AsQueryable();
 
-  public async Task<IEnumerable<TEntity>> GetAllAsync(int pageNumber, int pageSize)
-  {
-    var entities = await context
-      .Set<TEntity>()
-      .Skip((pageNumber - 1) * pageSize)
-      .Take(pageSize)
-      .ToListAsync();
+    var totalCount = query.Count();
+    var entities = await query.Paginate(pagination).ToListAsync();
 
-    return entities.AsEnumerable();
+    return new GetAllResult<TEntity>
+    {
+      Items = entities,
+      TotalItems = totalCount,
+      TotalItemsFetched = entities.Count,
+    };
   }
 
   public async Task<TEntity?> GetByIdAsync(TId id)
   {
     var entity = await context.FindAsync<TEntity>(id);
+
     return entity;
   }
 
-  public void Update(TEntity entity)
+  public bool Update(TEntity entity)
   {
-    context.Update(entity);
+    var updated = context.Update(entity);
+    return updated != null;
+  }
+
+  public bool Delete(TEntity entity)
+  {
+    var deleted = context.Remove(entity);
+    return deleted != null;
+  }
+
+  public async Task<bool> AnyAsync(TId id)
+  {
+    var entity = await context.FindAsync<TEntity>(id); // Try to find by ID
+    return entity != null;
   }
 }
