@@ -1,6 +1,7 @@
 using Ecommerce.Application.Common.Errors;
+using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.UseCases.Users.Common;
-using Ecommerce.Domain.Common.Exceptions;
+using Ecommerce.Domain.Common.Errors;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -22,8 +23,9 @@ public class FluentResultsActionFilter : IActionFilter
         var errorName = error.GetType().Name;
         var problemDetails = new ProblemDetails
         {
-          Type = errorName.Replace("Error", "Failure"),
-          Title = errorName.Replace("Error", " Error"), // e.g. "AuthenticationError", "ValidationError" etc.
+          Title = ConversionUtility.PascalToSpacedPascal(errorName),
+          Detail = error.Message,
+          Status = StatusCodes.Status500InternalServerError,
         };
 
         if (error is FluentErrorBase fluentError)
@@ -36,14 +38,24 @@ public class FluentResultsActionFilter : IActionFilter
 
           switch (fluentError)
           {
-            case AuthenticationError authError:
+            case AuthenticationError:
               status = StatusCodes.Status401Unauthorized;
               break;
-            case ValidationError validationError:
+            case ValidationError:
+            case LengthError:
+            case BelowZeroError:
+            case InvalidCurrencyError:
+            case InvalidDateRangeError:
+            case PasswordMatchError:
+            case IncorrectCurrentPasswordError:
+            case ExpiryError:
               status = StatusCodes.Status400BadRequest;
               break;
-            case AlreadyExistsError alreadyExistsError:
+            case AlreadyExistsError:
               status = StatusCodes.Status409Conflict;
+              break;
+            case NotFoundError:
+              status = StatusCodes.Status404NotFound;
               break;
             default:
               status = StatusCodes.Status500InternalServerError;
