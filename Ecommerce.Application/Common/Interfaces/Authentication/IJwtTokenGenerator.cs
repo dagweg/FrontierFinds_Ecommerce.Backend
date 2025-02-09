@@ -1,5 +1,6 @@
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using FluentResults;
 
 namespace Ecommerce.Application.Common.Interfaces.Authentication;
 
@@ -13,5 +14,5 @@ public interface IJwtTokenGenerator
   /// <param name="firstName"></param>
   /// <param name="lastName"></param>
   /// <returns></returns>
-  string GenerateToken(UserId userId, Email email, Name firstName, Name lastName);
+  Result<string> GenerateToken(UserId userId, Email email, Name firstName, Name lastName);
 }
