@@ -1,5 +1,6 @@
 namespace Ecommerce.Domain.UserAggregate;
 
+using Ecommerce.Domain.Common.Errors;
 using Ecommerce.Domain.Common.Models;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.NotificationAggregate;
@@ -7,29 +8,31 @@ using Ecommerce.Domain.OrderAggregate;
 using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.UserAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.Events;
-using Ecommerce.Domain.UserAggregate.Exceptions;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using FluentResults;
 
 public class User : AggregateRoot<UserId>
 {
-  public Name FirstName { get; set; }
-  public Name LastName { get; set; }
-  public Email Email { get; set; }
-  public Password Password { get; set; }
-  public PhoneNumber PhoneNumber { get; set; }
-  public string CountryCode { get; set; }
-  public UserAddress Address { get; set; }
-  public Wishlist Wishlist { get; set; }
+  public Name FirstName { get; private set; }
+  public Name LastName { get; private set; }
+  public Email Email { get; private set; }
+  public Password Password { get; private set; }
+  public PhoneNumber PhoneNumber { get; private set; }
+  public string CountryCode { get; private set; }
+  public UserAddress? Address { get; private set; }
+  public Wishlist Wishlist { get; private set; }
+  public Cart Cart { get; private set; }
 
-  private List<Cart> _cart = [];
   private List<Order> _orders = [];
   private List<Product> _products = [];
   private List<Notification> _notifications = [];
 
-  public IReadOnlyCollection<Cart> Cart => _cart.AsReadOnly();
   public IReadOnlyCollection<Order> Orders => _orders.AsReadOnly();
   public IReadOnlyCollection<Product> Products => _products.AsReadOnly();
   public IReadOnlyCollection<Notification> Notifications => _notifications.AsReadOnly();
+
+  public OneTimePassword? EmailVerificationOtp { get; private set; }
+  public OneTimePassword? PasswordResetOtp { get; private set; }
 
   private User(
     UserId id,
@@ -38,13 +41,7 @@ public class User : AggregateRoot<UserId>
     Email email,
     Password password,
     PhoneNumber phoneNumber,
-    string countryCode,
-    UserAddress address,
-    Wishlist wishlist,
-    List<Cart> cart,
-    List<Order> orders,
-    List<Product> products,
-    List<Notification> notifications
+    string countryCode
   )
     : base(id)
   {
@@ -54,12 +51,8 @@ public class User : AggregateRoot<UserId>
     Password = password;
     PhoneNumber = phoneNumber;
     CountryCode = countryCode;
-    Address = address;
-    Wishlist = wishlist;
-    _cart = cart;
-    _orders = orders;
-    _products = products;
-    _notifications = notifications;
+    Cart = Cart.Create();
+    Wishlist = Wishlist.Create();
   }
 
   public static User Create(
@@ -68,13 +61,7 @@ public class User : AggregateRoot<UserId>
     Email email,
     Password password,
     PhoneNumber phoneNumber,
-    string countryCode,
-    UserAddress? address = null,
-    Wishlist? wishlist = null,
-    List<Cart>? cart = null,
-    List<Order>? orders = null,
-    List<Product>? products = null,
-    List<Notification>? notifications = null
+    string countryCode
   )
   {
     var user = new User(
@@ -84,13 +71,7 @@ public class User : AggregateRoot<UserId>
       email,
       password,
       phoneNumber,
-      countryCode,
-      address ?? UserAddress.Create("", "", "", "", ""),
-      wishlist ?? Wishlist.Create(),
-      cart ?? [],
-      orders ?? [],
-      products ?? [],
-      notifications ?? []
+      countryCode
     );
 
     user.AddDomainEvent(new UserCreatedDomainEvent(user));
@@ -98,12 +79,95 @@ public class User : AggregateRoot<UserId>
     return user;
   }
 
-  public void ChangePassword(Password newPassword, Password currentPassword)
+  public User WithAddress(UserAddress address)
   {
-    if (!Password.Equals(currentPassword))
-      throw new InvalidCurrentPasswordException();
+    Address = address;
+    return this;
+  }
 
+  public User WithWishlist(Wishlist wishlist)
+  {
+    Wishlist = wishlist;
+    return this;
+  }
+
+  public User WithCart(Cart cart)
+  {
+    Cart = cart;
+    return this;
+  }
+
+  public User WithOrders(List<Order> orders)
+  {
+    _orders = orders;
+    return this;
+  }
+
+  public User WithProducts(List<Product> products)
+  {
+    _products = products;
+    return this;
+  }
+
+  public User WithNotifications(List<Notification> notifications)
+  {
+    _notifications = notifications;
+    return this;
+  }
+
+  public void ChangePassword(Password newPassword)
+  {
     Password = newPassword;
+  }
+
+  /// <summary>
+  /// Sets the email verification OTP for the user. Pass in null to revoke otp.
+  /// </summary>
+  /// <param name="oneTimePassword"></param>
+  public void SetEmailVerificationOtp(OneTimePassword? oneTimePassword)
+  {
+    EmailVerificationOtp = oneTimePassword;
+  }
+
+  /// <summary>
+  /// Sets the password reset OTP for the user. Pass in null to revoke otp.
+  /// </summary>
+  /// <param name="oneTimePassword"></param>
+  public void SetPasswordResetOtp(OneTimePassword? oneTimePassword)
+  {
+    PasswordResetOtp = oneTimePassword;
+  }
+
+  public Result VerifyEmail(OneTimePassword otp)
+  {
+    if (EmailVerificationOtp is null)
+    {
+      return InvalidOtpError.GetResult(nameof(otp), "OTP is not issued");
+    }
+
+    var result = EmailVerificationOtp.Validate(otp);
+
+    if (result.IsFailed)
+      return result;
+
+    EmailVerificationOtp = null;
+    return Result.Ok();
+  }
+
+  public Result VerifyPasswordResetOtp(OneTimePassword otp)
+  {
+    if (PasswordResetOtp is null)
+    {
+      return InvalidOtpError.GetResult(nameof(otp), "Otp not issued");
+    }
+
+    var result = PasswordResetOtp.Validate(otp);
+
+    if (result.IsFailed)
+      return result;
+
+    PasswordResetOtp = null;
+    return Result.Ok();
   }
 
   public override IEnumerable<object> GetEqualityComponents()
