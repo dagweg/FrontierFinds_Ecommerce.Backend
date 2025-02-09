@@ -14,4 +14,6 @@ public class AuthenticationMessageProvider : LocalizedMessageProvider, IAuthenti
   public string EmailOrPasswordIncorrect => GetMessage("EmailOrPasswordIncorrect");
 
   public string UserAlreadyExists => GetMessage("UserAlreadyExists");
+
+  public string UserNotFound => GetMessage("UserNotFound");
 }

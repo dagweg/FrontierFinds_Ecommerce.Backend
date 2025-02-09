@@ -10,27 +10,29 @@ public class ValidationMessageProvider : LocalizedMessageProvider, IValidationMe
   public ValidationMessageProvider(string resourcePath, Assembly assembly)
     : base(resourcePath, assembly) { }
 
-  public string PasswordIncorrect => GetMessage("PasswordIncorrect");
+  public string PasswordIncorrect => GetMessage(nameof(PasswordIncorrect));
 
-  public string EmailRequired => GetMessage("EmailRequired");
+  public string EmailRequired => GetMessage(nameof(EmailRequired));
 
-  public string EmailInvalidFormat => GetMessage("EmailInvalidFormat");
+  public string EmailInvalidFormat => GetMessage(nameof(EmailInvalidFormat));
 
-  public string PasswordRequired => GetMessage("PasswordRequired");
+  public string PasswordRequired => GetMessage(nameof(PasswordRequired));
 
-  public string ConfirmPasswordRequired => GetMessage("ConfirmPasswordRequired");
+  public string ConfirmPasswordRequired => GetMessage(nameof(ConfirmPasswordRequired));
 
-  public string PasswordsDoNotMatch => GetMessage("PasswordsDoNotMatch");
+  public string PasswordsDoNotMatch => GetMessage(nameof(PasswordsDoNotMatch));
 
-  public string NameRequired => GetMessage("NameRequired");
+  public string NameRequired => GetMessage(nameof(NameRequired));
 
-  public string FirstNameRequired => GetMessage("FirstNameRequired");
+  public string FirstNameRequired => GetMessage(nameof(FirstNameRequired));
 
-  public string MiddleNameRequired => GetMessage("MiddleNameRequired");
+  public string MiddleNameRequired => GetMessage(nameof(MiddleNameRequired));
 
-  public string LastNameRequired => GetMessage("LastNameRequired");
+  public string LastNameRequired => GetMessage(nameof(LastNameRequired));
 
-  public string PhoneRequired => GetMessage("PhoneRequired");
+  public string PhoneRequired => GetMessage(nameof(PhoneRequired));
 
-  public string CountryCodeRequired => GetMessage("CountryCodeRequired");
+  public string CountryCodeRequired => GetMessage(nameof(CountryCodeRequired));
+
+  public string ProductNotFound => GetMessage(nameof(ProductNotFound));
 }

@@ -161,4 +161,8 @@
     <value>Email must be a valid format.</value>
     <comment/>
   </data>
+  <data name="ProductNotFound" xml:space="preserve">
+    <value>Product with the specified id couldn't be found.</value>
+    <comment/>
+  </data>
 </root>

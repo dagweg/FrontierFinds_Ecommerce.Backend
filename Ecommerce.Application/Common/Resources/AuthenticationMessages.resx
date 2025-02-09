@@ -125,4 +125,8 @@
     <value>User with the specified credentials already exists.</value>
     <comment/>
   </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>User with the specified credentials wasn't found.</value>
+    <comment/>
+  </data>
 </root>
