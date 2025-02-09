@@ -1,6 +1,5 @@
 POST {{baseUrl}}/products
 Content-Type: application/json
-Cookie: {{accessToken}}
 
 {
   "productName": "Acer Predator Helios 300",
