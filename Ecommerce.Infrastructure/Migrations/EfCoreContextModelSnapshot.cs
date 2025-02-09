@@ -756,7 +756,7 @@ namespace Ecommerce.Infrastructure.Migrations
 
             modelBuilder.Entity("Ecommerce.Domain.UserAggregate.User", b =>
                 {
-                    b.OwnsMany("Ecommerce.Domain.UserAggregate.Entities.Cart", "Cart", b1 =>
+                    b.OwnsOne("Ecommerce.Domain.UserAggregate.Entities.Cart", "Cart", b1 =>
                         {
                             b1.Property<Guid>("Id")
                                 .HasColumnType("uniqueidentifier")
@@ -767,7 +767,8 @@ namespace Ecommerce.Infrastructure.Migrations
 
                             b1.HasKey("Id");
 
-                            b1.HasIndex("UserId");
+                            b1.HasIndex("UserId")
+                                .IsUnique();
 
                             b1.ToTable("UserCarts", (string)null);
 
@@ -869,6 +870,46 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.Navigation("ProductIds");
                         });
 
+                    b.OwnsOne("Ecommerce.Domain.Common.ValueObjects.OneTimePassword", "EmailVerificationOtp", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTime>("Expiry")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.OwnsOne("Ecommerce.Domain.Common.ValueObjects.OneTimePassword", "PasswordResetOtp", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTime>("Expiry")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
                     b.OwnsOne("Ecommerce.Domain.UserAggregate.ValueObjects.UserAddress", "Address", b1 =>
                         {
                             b1.Property<Guid>("UserId")
@@ -906,10 +947,14 @@ namespace Ecommerce.Infrastructure.Migrations
                                 .HasForeignKey("UserId");
                         });
 
-                    b.Navigation("Address")
+                    b.Navigation("Address");
+
+                    b.Navigation("Cart")
                         .IsRequired();
 
-                    b.Navigation("Cart");
+                    b.Navigation("EmailVerificationOtp");
+
+                    b.Navigation("PasswordResetOtp");
 
                     b.Navigation("Wishlist")
                         .IsRequired();
