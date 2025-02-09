@@ -1,5 +1,6 @@
 using AutoMapper;
 using Ecommerce.Application.Common.Interfaces.Persistence;
+using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.UseCases.Products.Common;
 using FluentResults;
 using MediatR;
@@ -7,7 +8,7 @@ using MediatR;
 namespace Ecommerce.Application.UseCases.Products.Queries.GetAllProducts;
 
 public class GetAllProductsQueryHandler
-  : IRequestHandler<GetAllProductsQuery, Result<IEnumerable<ProductResult>>>
+  : IRequestHandler<GetAllProductsQuery, Result<ProductsResult>>
 {
   private readonly IProductRepository _productRepository;
   private readonly IMapper _mapper;
@@ -18,14 +19,22 @@ public class GetAllProductsQueryHandler
     _mapper = mapper;
   }
 
-  public async Task<Result<IEnumerable<ProductResult>>> Handle(
+  public async Task<Result<ProductsResult>> Handle(
     GetAllProductsQuery request,
     CancellationToken cancellationToken
   )
   {
-    var products = await _productRepository.GetAllAsync(request.PageNumber, request.PageSize);
+    var products = await _productRepository.GetAllAsync(
+      new PaginationParameters(request.PageNumber, request.PageSize)
+    );
 
-    var productResults = products.Select(p => _mapper.Map<ProductResult>(p));
-    return Result.Ok(productResults);
+    var result = new ProductsResult
+    {
+      Products = products.Items.Select(p => _mapper.Map<ProductResult>(p)),
+      TotalCount = products.TotalItems,
+      TotalFetchedCount = products.TotalItemsFetched,
+    };
+
+    return Result.Ok(result);
   }
 }

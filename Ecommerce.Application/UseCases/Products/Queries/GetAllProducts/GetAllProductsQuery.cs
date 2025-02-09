@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Ecommerce.Application.UseCases.Products.Queries.GetAllProducts;
 
-public class GetAllProductsQuery : IPaginated, IRequest<Result<IEnumerable<ProductResult>>>
+public class GetAllProductsQuery : IPaginated, IRequest<Result<ProductsResult>>
 {
   public int PageNumber { get; init; }
 
