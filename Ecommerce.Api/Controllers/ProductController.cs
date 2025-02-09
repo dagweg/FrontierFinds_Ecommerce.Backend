@@ -1,7 +1,8 @@
 using AutoMapper;
-using Ecommerce.Application.UseCases.Products.Commands.AddToCart;
+using Ecommerce.Application.UseCases.Products.Commands.DeleteProduct;
 using Ecommerce.Application.UseCases.Products.CreateUser.Commands;
 using Ecommerce.Application.UseCases.Products.Queries.GetAllProducts;
+using Ecommerce.Application.UseCases.Users.Commands.AddToCart;
 using Ecommerce.Contracts.Cart;
 using Ecommerce.Contracts.Common;
 using Ecommerce.Contracts.Product;
@@ -38,7 +39,7 @@ public class ProductController : ControllerBase
       _logger.LogError("Failed to create product: {@result}", result);
       return new ObjectResult(result);
     }
-    return Ok(_mapper.Map<ProductResponse>(result.Value));
+    return Created();
   }
 
   [HttpGet]
@@ -55,5 +56,17 @@ public class ProductController : ControllerBase
     }
 
     return Ok(_mapper.Map<ProductsResponse>(result.Value));
+  }
+
+  [HttpDelete("{productId}")]
+  public async Task<IActionResult> DeleteProduct(string productId)
+  {
+    var result = await _mediator.Send(new DeleteProductCommand(productId));
+    if (result.IsFailed)
+    {
+      _logger.LogError("Failed to delete product: {@result}", result);
+      return new ObjectResult(result);
+    }
+    return NoContent();
   }
 }
