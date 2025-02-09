@@ -12,6 +12,7 @@ using Ecommerce.Domain.UserAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
 using FluentResults;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
 public class RegisterUserCommandHandler
   : IRequestHandler<RegisterUserCommand, Result<AuthenticationResult>>
@@ -22,13 +23,15 @@ public class RegisterUserCommandHandler
   private readonly IJwtTokenGenerator _jwtTokenGenerator;
   private readonly IAuthenticationMessages _authValidationMessages;
   private readonly IUserValidationService _userValidationService;
+  private readonly IPasswordHasher<User> _passwordHasher;
 
   public RegisterUserCommandHandler(
     IUserRepository userRespository,
     IJwtTokenGenerator jwtTokenGenerator,
     IAuthenticationMessages authValidationMessages,
     IUserValidationService userValidationService,
-    IUnitOfWork unitOfWork
+    IUnitOfWork unitOfWork,
+    IPasswordHasher<User> passwordHasher
   )
   {
     _userRepository = userRespository;
@@ -36,6 +39,7 @@ public class RegisterUserCommandHandler
     _authValidationMessages = authValidationMessages;
     _userValidationService = userValidationService;
     _unitOfWork = unitOfWork;
+    _passwordHasher = passwordHasher;
   }
 
   public async Task<Result<AuthenticationResult>> Handle(
@@ -57,11 +61,22 @@ public class RegisterUserCommandHandler
     var user = User.Create(
       firstName: Name.Create(command.FirstName),
       lastName: Name.Create(command.LastName),
-      email: Email.Create(command.Email),
-      password: Password.Create(command.Password),
-      phoneNumber: PhoneNumber.Create(command.Password),
+      email: email,
+      password: Password.CreateRandom(),
+      phoneNumber: PhoneNumber.Create(command.PhoneNumber),
       countryCode: command.CountryCode
     );
+
+    // hash the password using the user object as salt
+    var hashedPassword = _passwordHasher.HashPassword(user, command.Password);
+
+    var passwordResult = Password.Create(hashedPassword, command.Password);
+
+    if (passwordResult.IsFailed)
+      return passwordResult.ToResult();
+
+    // make the hashed password the new password
+    user.ChangePassword(passwordResult.Value);
 
     // 3. Make Changes to User Repository
     await _userRepository.AddAsync(user);
@@ -70,12 +85,15 @@ public class RegisterUserCommandHandler
     await _unitOfWork.SaveChangesAsync();
 
     // 4. Generate the Token
-    string token = _jwtTokenGenerator.GenerateToken(
+    var tokenResult = _jwtTokenGenerator.GenerateToken(
       user.Id,
       user.Email,
       user.FirstName,
       user.LastName
     );
+
+    if (tokenResult.IsFailed)
+      return tokenResult.ToResult();
 
     // 5. Return the Authentication Result
     return new AuthenticationResult()
@@ -84,7 +102,7 @@ public class RegisterUserCommandHandler
       Email = user.Email,
       FirstName = user.FirstName,
       LastName = user.FirstName,
-      Token = token,
+      Token = tokenResult.Value,
     };
   }
 }
