@@ -152,11 +152,12 @@ public static class DependencyInjection
         {
           OnMessageReceived = context =>
           {
-            context.HttpContext.Request.Cookies.TryGetValue(
-              cookieSettings.CookieKey,
-              out var token
-            );
-            if (!string.IsNullOrEmpty(token))
+            if (
+              context.HttpContext.Request.Cookies.TryGetValue(
+                cookieSettings.CookieKey,
+                out var token
+              ) && !string.IsNullOrEmpty(token)
+            )
             {
               context.Token = token;
             }

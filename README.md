@@ -53,7 +53,6 @@ dotnet ef database update --project .\Ecommerce.Infrastructure\Ecommerce.Infrast
 
 # Setup Secrets
 dotnet user-secrets set "JwtSettings:SecretKey" "SECRETKEY_HERE" --project .\Ecommerce.Api
-dotnet user-secrets set "EmailSettings:UserName" "USERNAME_HERE" --project .\Ecommerce.Api
 dotnet user-secrets set "EmailSettings:Password" "PASSWORD_HERE" --project .\Ecommerce.Api
 ```
 
