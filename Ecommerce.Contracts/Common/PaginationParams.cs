@@ -1,3 +1,8 @@
 namespace Ecommerce.Contracts.Common;
 
-public record PaginationParams(int PageNumber, int PageSize);
+/// <summary>
+/// Pagination parameters
+/// </summary>
+/// <param name="PageNumber"></param>
+/// <param name="PageSize"></param>
+public record PaginationParams(int PageNumber = 1, int PageSize = 10);
