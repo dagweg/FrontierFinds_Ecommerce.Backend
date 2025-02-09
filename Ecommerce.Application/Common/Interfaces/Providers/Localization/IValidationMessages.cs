@@ -17,4 +17,5 @@ public interface IValidationMessages
   string LastNameRequired { get; }
   string PhoneRequired { get; }
   string CountryCodeRequired { get; }
+  string ProductNotFound { get; }
 }

@@ -7,4 +7,5 @@ public interface IAuthenticationMessages
 {
   string EmailOrPasswordIncorrect { get; }
   string UserAlreadyExists { get; }
+  string UserNotFound { get; }
 }
