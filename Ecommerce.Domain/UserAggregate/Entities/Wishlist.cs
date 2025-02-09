@@ -21,6 +21,17 @@ public sealed class Wishlist : Entity<Guid>
     return new Wishlist(Guid.NewGuid(), productIds ?? []);
   }
 
+  public void AddProductsRange(List<ProductId> productIds)
+  {
+    _productIds.AddRange(productIds);
+    _productIds = _productIds.Distinct().ToList();
+  }
+
+  public void RemoveProductsRange(HashSet<ProductId> productIds)
+  {
+    _productIds.RemoveAll(p => productIds.Contains(p));
+  }
+
   public override IEnumerable<object> GetEqualityComponents()
   {
     yield return Id;
