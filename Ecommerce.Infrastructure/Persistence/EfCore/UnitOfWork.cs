@@ -1,6 +1,5 @@
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Utilities;
-using Ecommerce.Domain.Common.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -17,18 +16,25 @@ public class UnitOfWork : IUnitOfWork
     _logger = logger;
   }
 
-  public async Task<int> SaveChangesAsync()
+  /// <summary>
+  /// Save changes to the database
+  /// </summary>
+  /// <returns>
+  ///   The number of state entries written to the database. Otherwise null if an error occurred while saving changes
+  /// </returns>
+  /// <exception cref="DbUpdateException"></exception>
+  public async Task<int?> SaveChangesAsync(CancellationToken cancellationToken = default)
   {
     try
     {
-      return await _context.SaveChangesAsync();
+      return await _context.SaveChangesAsync(cancellationToken);
     }
     catch (DbUpdateException dbEx)
     {
       // Log the exception
       // You can inspect dbEx to see if it's a constraint violation or something specific
       _logger.LogFormattedError(dbEx, dbEx.StackTrace ?? "No stack trace available");
-      throw new DbUpdateException("An error occurred while saving changes.", dbEx);
+      return null;
     }
   }
 }
