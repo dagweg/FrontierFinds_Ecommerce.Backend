@@ -1,4 +1,5 @@
 using Ecommerce.Application.Common.Extensions;
+using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Domain.Common.Enums;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.NotificationAggregate;
@@ -46,11 +47,13 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
       .IsRequired()
       .HasMaxLength(100);
 
+#pragma warning disable CS0618 // Type or member is obsolete
     builder
       .Property(u => u.Password)
       .IsRequired()
-      .HasConversion(p => p.Value, v => Password.Create(v))
+      .HasConversion(p => p.ValueHash, v => Password.Create(v))
       .HasMaxLength(255);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     builder
       .Property(u => u.PhoneNumber)
@@ -71,8 +74,30 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
       }
     );
 
+    builder.OwnsOne(
+      u => u.PasswordResetOtp,
+      ob =>
+      {
+        ob.Property(a => a.Value)
+          .HasConversion(v => string.Join("", v), s => ConversionUtility.ToIntArray(s).Value)
+          .IsRequired();
+        ob.Property(a => a.Expiry).IsRequired();
+      }
+    );
+
+    builder.OwnsOne(
+      u => u.EmailVerificationOtp,
+      ob =>
+      {
+        ob.Property(a => a.Value)
+          .HasConversion(v => string.Join("", v), s => ConversionUtility.ToIntArray(s).Value)
+          .IsRequired();
+        ob.Property(a => a.Expiry).IsRequired();
+      }
+    );
+
     builder
-      .OwnsMany(
+      .OwnsOne(
         u => u.Cart,
         cb =>
         {
