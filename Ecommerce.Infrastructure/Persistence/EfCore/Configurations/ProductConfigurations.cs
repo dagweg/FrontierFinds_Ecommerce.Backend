@@ -117,7 +117,7 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
             {
               rb.Property(r => r.Value)
                 .HasColumnName("Rating")
-                .HasConversion(r => r, r => Rating.Create(r))
+                .HasConversion(r => r, r => Rating.Create(r).Value)
                 .IsRequired();
             }
           );
@@ -159,7 +159,7 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
     builder
       .OwnsOne(p => p.AverageRating)
       .Property(r => r.Value)
-      .HasConversion(r => r, r => Rating.Create(r))
+      .HasConversion(r => r, r => Rating.Create(r).Value)
       .HasColumnName("AverageRating")
       .HasDefaultValue(0);
 
