@@ -1,4 +1,5 @@
 using Ecommerce.Application.Common.Errors;
+using Ecommerce.Application.Common.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,10 +8,15 @@ namespace Ecommerce.Api.Middlewares;
 public class FluentValidationExceptionHandlingMiddleware
 {
   private readonly RequestDelegate _next;
+  private readonly ILogger<FluentValidationExceptionHandlingMiddleware> _logger;
 
-  public FluentValidationExceptionHandlingMiddleware(RequestDelegate next)
+  public FluentValidationExceptionHandlingMiddleware(
+    RequestDelegate next,
+    ILogger<FluentValidationExceptionHandlingMiddleware> logger
+  )
   {
     _next = next;
+    _logger = logger;
   }
 
   public async Task InvokeAsync(HttpContext context)
@@ -39,6 +45,7 @@ public class FluentValidationExceptionHandlingMiddleware
       context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
       await context.Response.WriteAsJsonAsync(problemDetails);
+      _logger.LogFormattedError(ex, context.TraceIdentifier);
     }
   }
 }
