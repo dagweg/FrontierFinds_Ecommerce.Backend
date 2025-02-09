@@ -27,7 +27,7 @@ public class Program
         builder
           .Services.ConfigureAutomapper()
           .AddApi()
-          .AddApplication()
+          .AddApplication(builder.Configuration)
           .AddInfrastructure(builder.Configuration);
       }
 
@@ -35,9 +35,8 @@ public class Program
       {
         app.UseAuthentication().UseAuthorization();
 
-        app.UseMiddleware<FluentValidationExceptionHandlingMiddleware>()
-          .UseMiddleware<ExceptionHandlingMiddleware>()
-          .UseMiddleware<DomainExceptionHandlingMiddleware>();
+        app.UseMiddleware<ExceptionHandlingMiddleware>()
+          .UseMiddleware<FluentValidationExceptionHandlingMiddleware>();
 
         if (app.Environment.IsDevelopment())
         {
