@@ -5,8 +5,11 @@ using System.Text;
 using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.Common.Interfaces.Providers.Date;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
+using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using FluentResults;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -16,22 +19,41 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 {
   private readonly JwtSettings _jwtSettings;
   private readonly IDateTimeProvider _dateTimeProvider;
+  private readonly ILogger<JwtTokenGenerator> _logger;
 
-  public JwtTokenGenerator(IOptions<JwtSettings> jwtSettings, IDateTimeProvider dateTimeProvider)
+  public JwtTokenGenerator(
+    IOptions<JwtSettings> jwtSettings,
+    IDateTimeProvider dateTimeProvider,
+    ILogger<JwtTokenGenerator> logger
+  )
   {
     _jwtSettings = jwtSettings.Value;
     _dateTimeProvider = dateTimeProvider;
+    _logger = logger;
   }
 
-  public string GenerateToken(UserId userId, Email email, Name firstName, Name lastName)
+  /// <summary>
+  /// Generates a JWT token for the given user
+  /// </summary>
+  /// <param name="userId"></param>
+  /// <param name="email"></param>
+  /// <param name="firstName"></param>
+  /// <param name="lastName"></param>
+  /// <returns>
+  ///   A JWT token string, or null if the token could not be generated.
+  /// </returns>
+  /// <exception cref="InvalidOperationException"></exception>
+  public Result<string> GenerateToken(UserId userId, Email email, Name firstName, Name lastName)
   {
+    if (_jwtSettings.SecretKey is null)
+    {
+      _logger.LogError("Jwt secret key is null");
+      return Result.Fail<string>("An internal error occurred. Please try again later.");
+    }
+
     // Create a signing credential using HMACSHA256 algorithm and a Symmetric Security Key
     SigningCredentials signingCredential = new(
-      new SymmetricSecurityKey(
-        Encoding.UTF8.GetBytes(
-          _jwtSettings.SecretKey ?? throw new InvalidOperationException("Jwt Secret key is null!")
-        )
-      ),
+      new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey)),
       SecurityAlgorithms.HmacSha256
     );
 
@@ -56,6 +78,6 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     );
 
     // Write the JwtSecurityToken into a String (Serialized form)
-    return new JwtSecurityTokenHandler().WriteToken(token);
+    return Result.Ok(new JwtSecurityTokenHandler().WriteToken(token));
   }
 }
