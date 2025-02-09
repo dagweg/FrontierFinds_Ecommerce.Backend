@@ -16,25 +16,25 @@ public sealed class ProductImages : Entity<Guid>
 
   public static ProductImages Create() => new(Guid.NewGuid());
 
-  public ProductImages WithLeftImage(string leftImageUrl)
+  public ProductImages WithLeftImage(string? leftImageUrl)
   {
     LeftImageUrl = leftImageUrl;
     return this;
   }
 
-  public ProductImages WithRightImage(string rightImageUrl)
+  public ProductImages WithRightImage(string? rightImageUrl)
   {
     RightImageUrl = rightImageUrl;
     return this;
   }
 
-  public ProductImages WithFrontImage(string frontImageUrl)
+  public ProductImages WithFrontImage(string? frontImageUrl)
   {
     FrontImageUrl = frontImageUrl;
     return this;
   }
 
-  public ProductImages WithBackImage(string backImageUrl)
+  public ProductImages WithBackImage(string? backImageUrl)
   {
     BackImageUrl = backImageUrl;
     return this;
