@@ -14,7 +14,6 @@ public sealed class Product : AggregateRoot<ProductId>
   public Price Price { get; private set; } = Price.Empty;
   public Stock Stock { get; private set; } = Stock.Empty;
   public UserId SellerId { get; private set; } = UserId.Empty;
-  public ProductImage Thumbnail { get; private set; }
 
   private readonly List<ProductCategory> _categories = [];
   private readonly List<ProductTag> _tags = [];
@@ -47,9 +46,8 @@ public sealed class Product : AggregateRoot<ProductId>
     Price = price;
     Stock = stock;
     SellerId = sellerId;
-    Thumbnail = thumbnail;
     Promotion = Promotion.CreateEmpty();
-    Images = ProductImages.Create();
+    Images = ProductImages.Create(thumbnail);
     AverageRating = Rating.Empty;
   }
 
@@ -117,13 +115,9 @@ public sealed class Product : AggregateRoot<ProductId>
 
   public void UpdateStock(Stock stock) => Stock = stock;
 
-  public void UpdateStockQuantity(Quantity quantity) => Stock.UpdateQuantity(quantity);
-
-  public void UpdateStockReserved(int reserved) => Stock.UpdateReserved(reserved);
-
   public override IEnumerable<object> GetEqualityComponents()
   {
-    yield return Id; // since its unique product, id will suffice
+    yield return Id;
   }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
