@@ -56,6 +56,6 @@ public class RemoveFromCartCommandHandler : IRequestHandler<RemoveFromCartComman
       return Result.Ok();
     }
 
-    return InternalError.GetResult("Internal error", "Couldn't remove items from cart");
+    return InternalError.GetResult("Couldn't remove items from cart");
   }
 }
