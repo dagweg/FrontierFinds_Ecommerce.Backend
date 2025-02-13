@@ -8,6 +8,9 @@ using Ecommerce.Api;
 using Ecommerce.Api.Mapping;
 using Ecommerce.Api.Middlewares;
 using Ecommerce.Application;
+using Ecommerce.Application.UseCases.Images.Common;
+using Ecommerce.Application.UseCases.Images.CreateImage;
+using Ecommerce.Contracts.Image;
 using Ecommerce.Infrastructure;
 
 public class Program
@@ -19,7 +22,7 @@ public class Program
       var builder = WebApplication.CreateBuilder(args);
       {
         // Configure Serilog from within infrastructure
-        builder.Host.AddInfrastructure();
+        builder.Host.AddHostConfigurations();
 
         // Swagger Api Documentation Generator
         builder.Services.AddSwaggerGen();
