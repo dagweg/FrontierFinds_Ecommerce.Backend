@@ -1,37 +1,27 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Ecommerce.Domain.Common.Models;
 
 namespace Ecommerce.Domain.Common.Entities;
 
-public class Image : Entity<Guid>
+public class Image : ValueObject
 {
-  public string Url { get; set; }
-  public string? FileType { get; set; }
-  public string? FileName { get; set; }
-  public long? FileSize { get; set; }
+  public string Url { get; protected set; }
+  public string ObjectIdentifier { get; protected set; }
 
-  protected Image(Guid id, string url, string? fileType, string? fileName, long? fileSize)
-    : base(id)
+  [NotMapped]
+  public const int SIZE_LIMIT_BYTES = 5 * 1024 * 1024; // 5MB
+
+  protected Image(string url, string objectIdentifier)
   {
     Url = url;
-    FileName = fileName;
-    FileSize = fileSize;
-    FileType = fileType;
+    ObjectIdentifier = objectIdentifier;
   }
 
-  public static Image Create(
-    string url,
-    string fileType = "",
-    string fileName = "",
-    long fileSize = 0
-  ) => new(Guid.NewGuid(), url, fileType, fileName, fileSize);
+  public static Image Create(string url, string objectIdentifier) => new(url, objectIdentifier);
 
   public override IEnumerable<object> GetEqualityComponents()
   {
-    yield return Id;
+    yield return Url;
+    yield return ObjectIdentifier;
   }
-
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-  protected Image()
-    : base(Guid.Empty) { }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 }
