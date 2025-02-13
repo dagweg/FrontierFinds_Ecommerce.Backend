@@ -26,4 +26,6 @@ public interface IProductRepository : IRepository<Product, ProductId>
     UserId sellerId,
     PaginationParameters paginationParameters
   );
+
+  Task GetProductImageAsync(ProductId productId, string objectIdentifier);
 }
