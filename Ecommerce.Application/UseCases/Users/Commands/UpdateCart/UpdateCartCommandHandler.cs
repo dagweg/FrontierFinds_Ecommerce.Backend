@@ -87,6 +87,6 @@ public class UpdateCartCommandHandler : IRequestHandler<UpdateCartCommand, Resul
       return Result.Ok();
     }
 
-    return InternalError.GetResult("Internal error", "Couldn't update cart");
+    return InternalError.GetResult("Couldn't update cart");
   }
 }
