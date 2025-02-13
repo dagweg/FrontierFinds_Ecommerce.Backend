@@ -1,18 +1,16 @@
 using Ecommerce.Domain.Common.Entities;
+using Ecommerce.Domain.ProductAggregate.Enums;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 
 namespace Ecommerce.Domain.ProductAggregate.Entities;
 
 public sealed class ProductImage : Image
 {
-  private ProductImage(Guid id, string url)
-    : base(id, url, null, null, 0)
-  {
-    Url = url;
-  }
+  private ProductImage(string url, string objectIdentifier)
+    : base(url, objectIdentifier) { }
 
-  public static ProductImage Create(string url)
+  public static new ProductImage Create(string url, string objectIdentifier)
   {
-    return new ProductImage(Guid.NewGuid(), url);
+    return new ProductImage(url, objectIdentifier);
   }
 }

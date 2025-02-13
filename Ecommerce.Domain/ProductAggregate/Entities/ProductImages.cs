@@ -6,37 +6,61 @@ namespace Ecommerce.Domain.ProductAggregate.Entities;
 
 public sealed class ProductImages : Entity<Guid>
 {
-  public string? LeftImageUrl { get; set; }
-  public string? RightImageUrl { get; set; }
-  public string? FrontImageUrl { get; set; }
-  public string? BackImageUrl { get; set; }
+  public ProductImage Thumbnail { get; set; }
+  public ProductImage? LeftImage { get; set; }
+  public ProductImage? RightImage { get; set; }
+  public ProductImage? FrontImage { get; set; }
+  public ProductImage? BackImage { get; set; }
+  public ProductImage? TopImage { get; set; }
+  public ProductImage? BottomImage { get; set; }
 
-  private ProductImages(Guid id)
-    : base(id) { }
-
-  public static ProductImages Create() => new(Guid.NewGuid());
-
-  public ProductImages WithLeftImage(string? leftImageUrl)
+  private ProductImages(Guid id, ProductImage thumbnail)
+    : base(id)
   {
-    LeftImageUrl = leftImageUrl;
+    Thumbnail = thumbnail;
+  }
+
+  public static ProductImages Create(ProductImage thumbnail) => new(Guid.NewGuid(), thumbnail);
+
+  public ProductImages WithThumbnail(ProductImage thumbnail)
+  {
+    Thumbnail = thumbnail;
     return this;
   }
 
-  public ProductImages WithRightImage(string? rightImageUrl)
+  public ProductImages WithLeftImage(ProductImage? leftImage)
   {
-    RightImageUrl = rightImageUrl;
+    LeftImage = leftImage;
     return this;
   }
 
-  public ProductImages WithFrontImage(string? frontImageUrl)
+  public ProductImages WithRightImage(ProductImage? rightImage)
   {
-    FrontImageUrl = frontImageUrl;
+    RightImage = rightImage;
     return this;
   }
 
-  public ProductImages WithBackImage(string? backImageUrl)
+  public ProductImages WithFrontImage(ProductImage? frontImage)
   {
-    BackImageUrl = backImageUrl;
+    FrontImage = frontImage;
+    return this;
+  }
+
+  public ProductImages WithBackImage(ProductImage? backImage)
+  {
+    BackImage = backImage;
+    return this;
+  }
+
+  public ProductImages WithTopImage(ProductImage? topImage)
+  {
+    TopImage = topImage;
+    return this;
+  }
+
+  public ProductImages WithBottomImage(ProductImage? bottomImage)
+  {
+    BottomImage = bottomImage;
     return this;
   }
 
