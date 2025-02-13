@@ -2,6 +2,7 @@ using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Domain.Common.Enums;
 using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.ProductAggregate.Entities;
+using Ecommerce.Domain.ProductAggregate.Enums;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -58,7 +59,6 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
           .HasConversion(v => v, v => Quantity.Create(v))
           .HasColumnName("StockQuantity")
           .IsRequired();
-        sb.Property(s => s.Reserved).HasColumnName("StockReserved").IsRequired();
       }
     );
     builder
@@ -127,19 +127,6 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
       .Metadata.FindNavigation(nameof(Product.Reviews))!
       .SetPropertyAccessMode(PropertyAccessMode.Field);
 
-    // Entities
-    builder.OwnsOne(
-      p => p.Thumbnail,
-      tb =>
-      {
-        tb.ToTable("ProductThumbnails");
-        tb.HasKey(nameof(ProductImage.Id), "ProductId");
-        tb.Property(i => i.Id).IsRequired();
-        tb.Property(i => i.Url).IsRequired();
-        tb.WithOwner().HasForeignKey("ProductId");
-      }
-    );
-
     builder.OwnsOne(
       p => p.Images,
       ib =>
@@ -147,10 +134,70 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
         ib.ToTable("ProductImages");
         ib.HasKey(nameof(ProductImages.Id), "ProductId");
         ib.Property(i => i.Id).HasColumnName("ProductImageId").IsRequired();
-        ib.Property(i => i.LeftImageUrl);
-        ib.Property(i => i.RightImageUrl);
-        ib.Property(i => i.FrontImageUrl);
-        ib.Property(i => i.BackImageUrl);
+        ib.OwnsOne(
+          i => i.Thumbnail,
+          tib =>
+          {
+            tib.HasIndex(t => t.ObjectIdentifier).IsUnique();
+            tib.Property(t => t.Url);
+            tib.Property(t => t.ObjectIdentifier);
+          }
+        );
+        ib.OwnsOne(
+          i => i.LeftImage,
+          lib =>
+          {
+            lib.HasIndex(l => l.ObjectIdentifier).IsUnique();
+            lib.Property(l => l.Url);
+            lib.Property(l => l.ObjectIdentifier);
+          }
+        );
+        ib.OwnsOne(
+          i => i.RightImage,
+          rib =>
+          {
+            rib.HasIndex(r => r.ObjectIdentifier).IsUnique();
+            rib.Property(r => r.Url);
+            rib.Property(r => r.ObjectIdentifier);
+          }
+        );
+        ib.OwnsOne(
+          i => i.FrontImage,
+          fib =>
+          {
+            fib.HasIndex(f => f.ObjectIdentifier).IsUnique();
+            fib.Property(f => f.Url);
+            fib.Property(f => f.ObjectIdentifier);
+          }
+        );
+        ib.OwnsOne(
+          i => i.BackImage,
+          bib =>
+          {
+            bib.HasIndex(b => b.ObjectIdentifier).IsUnique();
+            bib.Property(b => b.Url);
+            bib.Property(b => b.ObjectIdentifier);
+          }
+        );
+        ib.OwnsOne(
+          i => i.TopImage,
+          tib =>
+          {
+            tib.HasIndex(t => t.ObjectIdentifier).IsUnique();
+            tib.Property(t => t.Url);
+            tib.Property(t => t.ObjectIdentifier);
+          }
+        );
+        ib.OwnsOne(
+          i => i.BottomImage,
+          bib =>
+          {
+            bib.HasIndex(b => b.ObjectIdentifier).IsUnique();
+            bib.Property(b => b.Url);
+            bib.Property(b => b.ObjectIdentifier);
+          }
+        );
+
         ib.WithOwner().HasForeignKey("ProductId");
       }
     );
