@@ -59,7 +59,7 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand,
     var deletedProd = _productRepository.Delete(product);
 
     if (!deletedProd)
-      return Result.Fail(new InternalError(nameof(InternalError), "Failed to delete product"));
+      return Result.Fail(new InternalError("Failed to delete product"));
 
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
