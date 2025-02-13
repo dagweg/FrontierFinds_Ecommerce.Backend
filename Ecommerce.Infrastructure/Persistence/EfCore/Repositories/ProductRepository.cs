@@ -55,4 +55,9 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
       TotalItemsFetched = paginated.Count,
     };
   }
+
+  public Task GetProductImageAsync(ProductId productId, string objectIdentifier)
+  {
+    throw new NotImplementedException();
+  }
 }
