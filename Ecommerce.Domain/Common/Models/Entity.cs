@@ -40,7 +40,15 @@ public abstract class Entity<TId>(TId id) : IEquatable<Entity<TId>>, IHasDomainE
     _domainEvents.Add(domainEvent);
   }
 
-  public static bool operator ==(Entity<TId> left, Entity<TId> right) => left.Equals(right);
+  public static bool operator ==(Entity<TId>? left, Entity<TId>? right)
+  {
+    if (left is null)
+      return right is null;
+    return left.Equals(right);
+  }
 
-  public static bool operator !=(Entity<TId> left, Entity<TId> right) => !left.Equals(right);
+  public static bool operator !=(Entity<TId>? left, Entity<TId>? right)
+  {
+    return !(left == right);
+  }
 }
