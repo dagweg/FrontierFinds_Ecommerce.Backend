@@ -4,6 +4,7 @@ using Ecommerce.Infrastructure.Persistence.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerce.Infrastructure.Migrations
 {
     [DbContext(typeof(EfCoreContext))]
-    partial class EfCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250210105930_Modified_ProductImages_Thumbnail_ToFit_New_Model")]
+    partial class Modified_ProductImages_Thumbnail_ToFit_New_Model
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -415,6 +418,30 @@ namespace Ecommerce.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "Thumbnail", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<Guid>("ProductId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Url")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("Id", "ProductId");
+
+                            b1.HasIndex("ProductId")
+                                .IsUnique();
+
+                            b1.ToTable("ProductThumbnails", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProductId");
+                        });
+
                     b.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImages", "Images", b1 =>
                         {
                             b1.Property<Guid>("Id")
@@ -425,6 +452,18 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.Property<Guid>("ProductId")
                                 .HasColumnType("uniqueidentifier");
 
+                            b1.Property<string>("BackImage")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("FrontImage")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("LeftImage")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("RightImage")
+                                .HasColumnType("nvarchar(max)");
+
                             b1.HasKey("Id", "ProductId");
 
                             b1.HasIndex("ProductId")
@@ -434,216 +473,6 @@ namespace Ecommerce.Infrastructure.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("ProductId");
-
-                            b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "BackImage", b2 =>
-                                {
-                                    b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("ObjectIdentifier")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
-
-                                    b2.Property<string>("Url")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.HasKey("ProductImagesId", "ProductImagesProductId");
-
-                                    b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique()
-                                        .HasFilter("[BackImage_ObjectIdentifier] IS NOT NULL");
-
-                                    b2.ToTable("ProductImages");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ProductImagesId", "ProductImagesProductId");
-                                });
-
-                            b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "BottomImage", b2 =>
-                                {
-                                    b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("ObjectIdentifier")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
-
-                                    b2.Property<string>("Url")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.HasKey("ProductImagesId", "ProductImagesProductId");
-
-                                    b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique()
-                                        .HasFilter("[BottomImage_ObjectIdentifier] IS NOT NULL");
-
-                                    b2.ToTable("ProductImages");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ProductImagesId", "ProductImagesProductId");
-                                });
-
-                            b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "FrontImage", b2 =>
-                                {
-                                    b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("ObjectIdentifier")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
-
-                                    b2.Property<string>("Url")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.HasKey("ProductImagesId", "ProductImagesProductId");
-
-                                    b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique()
-                                        .HasFilter("[FrontImage_ObjectIdentifier] IS NOT NULL");
-
-                                    b2.ToTable("ProductImages");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ProductImagesId", "ProductImagesProductId");
-                                });
-
-                            b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "LeftImage", b2 =>
-                                {
-                                    b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("ObjectIdentifier")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
-
-                                    b2.Property<string>("Url")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.HasKey("ProductImagesId", "ProductImagesProductId");
-
-                                    b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique()
-                                        .HasFilter("[LeftImage_ObjectIdentifier] IS NOT NULL");
-
-                                    b2.ToTable("ProductImages");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ProductImagesId", "ProductImagesProductId");
-                                });
-
-                            b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "RightImage", b2 =>
-                                {
-                                    b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("ObjectIdentifier")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
-
-                                    b2.Property<string>("Url")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.HasKey("ProductImagesId", "ProductImagesProductId");
-
-                                    b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique()
-                                        .HasFilter("[RightImage_ObjectIdentifier] IS NOT NULL");
-
-                                    b2.ToTable("ProductImages");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ProductImagesId", "ProductImagesProductId");
-                                });
-
-                            b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "Thumbnail", b2 =>
-                                {
-                                    b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("ObjectIdentifier")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
-
-                                    b2.Property<string>("Url")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.HasKey("ProductImagesId", "ProductImagesProductId");
-
-                                    b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique();
-
-                                    b2.ToTable("ProductImages");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ProductImagesId", "ProductImagesProductId");
-                                });
-
-                            b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "TopImage", b2 =>
-                                {
-                                    b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("ObjectIdentifier")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
-
-                                    b2.Property<string>("Url")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.HasKey("ProductImagesId", "ProductImagesProductId");
-
-                                    b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique()
-                                        .HasFilter("[TopImage_ObjectIdentifier] IS NOT NULL");
-
-                                    b2.ToTable("ProductImages");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ProductImagesId", "ProductImagesProductId");
-                                });
-
-                            b1.Navigation("BackImage");
-
-                            b1.Navigation("BottomImage");
-
-                            b1.Navigation("FrontImage");
-
-                            b1.Navigation("LeftImage");
-
-                            b1.Navigation("RightImage");
-
-                            b1.Navigation("Thumbnail")
-                                .IsRequired();
-
-                            b1.Navigation("TopImage");
                         });
 
                     b.OwnsMany("Ecommerce.Domain.ProductAggregate.Entities.ProductReview", "Reviews", b1 =>
@@ -910,6 +739,9 @@ namespace Ecommerce.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Tags");
+
+                    b.Navigation("Thumbnail")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.UserAggregate.User", b =>
