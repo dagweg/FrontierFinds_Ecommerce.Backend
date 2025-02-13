@@ -11,16 +11,18 @@ public class ProductMappingProfile : Profile
   public ProductMappingProfile()
   {
     CreateMap<ProductImages, ProductImagesResult>()
-      .ForMember(dest => dest.FrontImageUrl, opt => opt.MapFrom(src => src.FrontImageUrl))
-      .ForMember(dest => dest.BackImageUrl, opt => opt.MapFrom(src => src.BackImageUrl))
-      .ForMember(dest => dest.LeftImageUrl, opt => opt.MapFrom(src => src.LeftImageUrl))
-      .ForMember(dest => dest.RightImageUrl, opt => opt.MapFrom(src => src.RightImageUrl));
+      .ForMember(dest => dest.Thumbnail, opt => opt.MapFrom(src => src.Thumbnail))
+      .ForMember(dest => dest.FrontImage, opt => opt.MapFrom(src => src.FrontImage))
+      .ForMember(dest => dest.BackImage, opt => opt.MapFrom(src => src.BackImage))
+      .ForMember(dest => dest.LeftImage, opt => opt.MapFrom(src => src.LeftImage))
+      .ForMember(dest => dest.RightImage, opt => opt.MapFrom(src => src.RightImage))
+      .ForMember(dest => dest.TopImage, opt => opt.MapFrom(src => src.TopImage))
+      .ForMember(dest => dest.BottomImage, opt => opt.MapFrom(src => src.BottomImage));
 
-    CreateMap<ProductImage, ImageResult>()
-      .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.Url))
-      .ForMember(dest => dest.FileName, opt => opt.MapFrom(src => src.FileName))
-      .ForMember(dest => dest.FileSize, opt => opt.MapFrom(src => src.FileSize))
-      .ForMember(dest => dest.FileType, opt => opt.MapFrom(src => src.FileType));
+    CreateMap<ProductImage, ProductImageResult>()
+      .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.Url));
+
+    CreateMap<ProductTag, TagResult>();
 
     CreateMap<Product, ProductResult>()
       .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.Id.Value))
@@ -29,11 +31,7 @@ public class ProductMappingProfile : Profile
       .ForMember(dest => dest.PriceValue, opt => opt.MapFrom(src => src.Price.Value))
       .ForMember(dest => dest.PriceCurrency, opt => opt.MapFrom(src => src.Price.Currency))
       .ForMember(dest => dest.StockQuantity, opt => opt.MapFrom(src => src.Stock.Quantity))
-      .ForMember(
-        dest => dest.Tags,
-        opt => opt.MapFrom(src => src.Tags.Select(t => new TagResult { Id = t.Id, Name = t.Name }))
-      )
-      .ForMember(dest => dest.Thumbnail, opt => opt.MapFrom(src => src.Thumbnail))
+      .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags))
       .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
   }
 }
