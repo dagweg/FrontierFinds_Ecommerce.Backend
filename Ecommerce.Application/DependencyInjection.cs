@@ -1,10 +1,11 @@
 namespace Ecommerce.Application;
 
-using Ecommerce.Application.Behaviors;
+using Ecommerce.Application.Behaviors.Pipelines;
 using Ecommerce.Application.Common;
+using Ecommerce.Application.Common.Interfaces.Storage;
 using Ecommerce.Application.Common.Interfaces.Validation;
 using Ecommerce.Application.Services.Validation;
-using Ecommerce.Application.UseCases.Images.Commands;
+using Ecommerce.Application.UseCases.Images.CreateImage;
 using Ecommerce.Application.UseCases.Smtp.Commands.SendEmail;
 using FluentValidation;
 using MediatR;
@@ -21,19 +22,24 @@ public static class DependencyInjection
     // Load EmailSettings Configuration from appsettings.json
     services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
 
-    // MediatR Registration
     services.AddMediatR(ApplicationAssembly.Assembly);
 
-    // Register MediatR Pipeline Behaviors
-    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+    services.AddMediatRBehaviors();
 
     // Register All Fluent Validation Models
     services.AddValidatorsFromAssembly(ApplicationAssembly.Assembly);
 
-    services.AddTransient<IValidator<CreateImageCommand>, CreateImageCommandValidator>();
-
     services.AddScoped<IUserValidationService, UserValidationService>();
     services.AddScoped<IProductValidationService, ProductValidationService>();
+
+    return services;
+  }
+
+  private static IServiceCollection AddMediatRBehaviors(this IServiceCollection services)
+  {
+    // Register MediatR Pipeline Behaviors
+    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CompensationBehavior<,>));
 
     return services;
   }
