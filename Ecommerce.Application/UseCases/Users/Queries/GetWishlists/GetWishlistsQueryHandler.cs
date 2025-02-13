@@ -46,10 +46,7 @@ public record GetWishlistsQueryHandler : IRequestHandler<GetWishlistsQuery, Resu
     );
 
     return result is null
-      ? InternalError.GetResult(
-        nameof(GetWishlistsQuery),
-        "A problem occured trying to get wishlists"
-      )
+      ? InternalError.GetResult("A problem occured trying to get wishlists")
       : Result.Ok(result);
   }
 }
