@@ -1,16 +1,13 @@
-using Ecommerce.Application.UseCases.Images.Commands;
+using Ecommerce.Application.UseCases.Images.CreateImage;
 using FluentValidation;
+using Newtonsoft.Json;
 
 namespace Ecommerce.Application.UseCases.Products.CreateUser.Commands;
 
 public class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
 {
-  private readonly CreateImageCommandValidator _createImageCommandValidator;
-
-  public CreateProductCommandValidator(CreateImageCommandValidator createImageCommandValidator)
+  public CreateProductCommandValidator()
   {
-    _createImageCommandValidator = createImageCommandValidator;
-
     RuleFor(x => x.ProductName).NotEmpty();
 
     RuleFor(x => x.ProductDescription).NotEmpty();
@@ -21,31 +18,27 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
 
     RuleFor(x => x.PriceCurrency).NotEmpty().MaximumLength(3);
 
-    string msg =
-      $"Invalid image format. Format should comprise of {string.Join(", ", typeof(CreateImageCommand).GetProperties().Select(p => p.Name))}";
-    RuleFor(x => x.Thumbnail)
-      .Must(x => x != null && _createImageCommandValidator.Validate(x).IsValid)
-      .WithMessage(msg);
+    RuleFor(x => x.Thumbnail).SetValidator(x => CreateImageCommandValidator.GetValidator());
 
-    When(
-      x => x.LeftImage is not null,
-      () => RuleFor(x => x.LeftImage!).SetValidator(_createImageCommandValidator)
-    );
+    RuleFor(x => x.LeftImage!)
+      .SetValidator(x =>
+        CreateImageCommandValidator.GetValidator(isRequired: x.LeftImage is not null)
+      );
 
-    When(
-      x => x.RightImage is not null,
-      () => RuleFor(x => x.RightImage!).SetValidator(_createImageCommandValidator)
-    );
+    RuleFor(x => x.RightImage!)
+      .SetValidator(x =>
+        CreateImageCommandValidator.GetValidator(isRequired: x.RightImage is not null)
+      );
 
-    When(
-      x => x.FrontImage is not null,
-      () => RuleFor(x => x.FrontImage!).SetValidator(_createImageCommandValidator)
-    );
+    RuleFor(x => x.FrontImage!)
+      .SetValidator(x =>
+        CreateImageCommandValidator.GetValidator(isRequired: x.FrontImage is not null)
+      );
 
-    When(
-      x => x.BackImage is not null,
-      () => RuleFor(x => x.BackImage!).SetValidator(_createImageCommandValidator)
-    );
+    RuleFor(x => x.BackImage!)
+      .SetValidator(x =>
+        CreateImageCommandValidator.GetValidator(isRequired: x.BackImage is not null)
+      );
 
     RuleFor(x => x.Tags).NotNull().ForEach(x => x.MaximumLength(50));
   }

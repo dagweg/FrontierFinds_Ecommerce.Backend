@@ -1,4 +1,4 @@
-using Ecommerce.Application.UseCases.Images.Commands;
+using Ecommerce.Application.UseCases.Images.CreateImage;
 using Ecommerce.Application.UseCases.Products.Common;
 using FluentResults;
 using MediatR;
