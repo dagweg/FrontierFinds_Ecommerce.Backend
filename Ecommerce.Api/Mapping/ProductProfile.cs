@@ -1,6 +1,6 @@
 using AutoMapper;
-using Ecommerce.Application.UseCases.Images.Commands;
 using Ecommerce.Application.UseCases.Images.Common;
+using Ecommerce.Application.UseCases.Images.CreateImage;
 using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Application.UseCases.Products.CreateUser.Commands;
 using Ecommerce.Contracts.Image;
@@ -14,7 +14,12 @@ public class ProductProfile : Profile
 {
   public ProductProfile()
   {
-    CreateMap<CreateImageRequest, CreateImageCommand>();
+    CreateMap<CreateImageRequest, CreateImageCommand>()
+      .ForMember(
+        dest => dest.ImageStream,
+        opt => opt.MapFrom(src => src.ImageFile.OpenReadStream())
+      );
+
     CreateMap<ImageResult, ImageResponse>();
 
     CreateMap<CreateProductRequest, CreateProductCommand>();
