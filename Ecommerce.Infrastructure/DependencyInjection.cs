@@ -4,11 +4,15 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using CloudinaryDotNet;
 using Ecommerce.Application.Common;
 using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.Common.Interfaces.Persistence;
+using Ecommerce.Application.Common.Interfaces.Processors;
 using Ecommerce.Application.Common.Interfaces.Providers.Date;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
+using Ecommerce.Application.Common.Interfaces.Storage;
+using Ecommerce.Application.Services.Storage;
 using Ecommerce.Infrastructure.Common;
 using Ecommerce.Infrastructure.Common.Providers;
 using Ecommerce.Infrastructure.Common.Providers.Localization;
@@ -17,6 +21,8 @@ using Ecommerce.Infrastructure.Persistence.EfCore.Interceptors;
 using Ecommerce.Infrastructure.Persistence.EfCore.Options;
 using Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 using Ecommerce.Infrastructure.Services.Authentication;
+using Ecommerce.Infrastructure.Services.Processors;
+using Ecommerce.Infrastructure.Services.Storage;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -40,21 +46,25 @@ public static class DependencyInjection
     IConfigurationManager configuration
   )
   {
+    // Load settings from appsettings.json
+    services.AddAppSettings(configuration);
+
+    // configure authentication and authorization
     services.AddAuth(configuration);
 
-    services.AddScoped<PublishDomainEventsInterceptor>();
+    services.AddInterceptors();
 
+    // register persistence (sql server, ef core, repositories)
     services.AddPersistence(configuration);
 
+    // register localization
     services.AddLocalization();
 
-    // Load settings from appsettings.json to appropriate classes
-    services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
-    services.Configure<CookieSettings>(configuration.GetSection(CookieSettings.SectionName));
+    // register utilities (jwt token generator, date time provider etc.)
+    services.AddUtilities();
 
-    // Register Utility Services
-    services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
-    services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+    // Register Cloud Services
+    services.AddCloudinary(configuration);
 
     return services;
   }
@@ -88,7 +98,7 @@ public static class DependencyInjection
   }
 
   // Extension method for modifying hosting configurations
-  public static IHostBuilder AddInfrastructure(this IHostBuilder hostBuilder)
+  public static IHostBuilder AddHostConfigurations(this IHostBuilder hostBuilder)
   {
     // Configure Serilog
     hostBuilder.UseSerilog(
@@ -166,6 +176,52 @@ public static class DependencyInjection
           },
         };
       });
+    return services;
+  }
+
+  public static IServiceCollection AddInterceptors(this IServiceCollection services)
+  {
+    services.AddScoped<PublishDomainEventsInterceptor>();
+    return services;
+  }
+
+  public static IServiceCollection AddAppSettings(
+    this IServiceCollection services,
+    IConfigurationManager configuration
+  )
+  {
+    services.Configure<CookieSettings>(configuration.GetSection(CookieSettings.SectionName));
+    services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+    services.Configure<CloudinarySettings>(
+      configuration.GetSection(CloudinarySettings.SectionName)
+    );
+    return services;
+  }
+
+  public static IServiceCollection AddUtilities(this IServiceCollection services)
+  {
+    services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+    services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+    services.AddSingleton<IImageProcessor, ImageProcessor>();
+    return services;
+  }
+
+  public static IServiceCollection AddCloudinary(
+    this IServiceCollection services,
+    IConfigurationManager configuration
+  )
+  {
+    services.AddScoped<ICloudinary>(p =>
+    {
+      var cloudinarySettings = p.GetRequiredService<IOptions<CloudinarySettings>>().Value;
+      return new Cloudinary(cloudinarySettings.GetUrl);
+    });
+
+    services.AddScoped<ICloudinaryService, CloudinaryService>();
+    services.AddScoped<ICloudStorageService, CloudinaryService>();
+
+    services.AddScoped<ICloudinaryResourceTracker, CloudinaryResourceTracker>();
+    services.AddScoped<IExternalResourceTracker, CloudinaryResourceTracker>();
     return services;
   }
 }
