@@ -1,1 +1,0 @@
-GET http://localhost:5111/me/cart/items?pageNumber=1&pageSize=10
