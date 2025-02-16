@@ -1,0 +1,7 @@
+POST http://localhost:5111/me/cart/items
+Content-Type: application/json
+
+{
+  "Quantity": 10,
+  "ProductId": "181db2eb-563a-485c-86be-1ed01c58a947"
+}   

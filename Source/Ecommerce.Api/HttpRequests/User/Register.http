@@ -1,0 +1,12 @@
+POST http://localhost:5111/auth/register
+Content-Type:  application/json
+
+{
+  "firstName": "hello",
+  "lastName": "olleh",
+  "email": "elio@gmail.com",
+  "password": "melio",
+  "confirmPassword": "melio", 
+  "phoneNumber": "melio2",
+  "countryCode": 12
+}
