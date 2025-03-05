@@ -8,5 +8,5 @@ namespace Ecommerce.Application.Common.Mapping;
 
 public class CartMappingProfile : Profile
 {
-    public CartMappingProfile() { }
+  public CartMappingProfile() { }
 }

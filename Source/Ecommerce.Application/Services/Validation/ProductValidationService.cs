@@ -12,25 +12,25 @@ namespace Ecommerce.Application.Services.Validation;
 
 public class ProductValidationService : IProductValidationService
 {
-    private readonly IProductRepository _productRepository;
-    private readonly IValidationMessages _validationMessages;
+  private readonly IProductRepository _productRepository;
+  private readonly IValidationMessages _validationMessages;
 
-    public ProductValidationService(
-      IProductRepository productRepository,
-      IValidationMessages validationMessages
-    )
+  public ProductValidationService(
+    IProductRepository productRepository,
+    IValidationMessages validationMessages
+  )
+  {
+    _productRepository = productRepository;
+    _validationMessages = validationMessages;
+  }
+
+  public async Task<Result> CheckIfProductExistsAsync(ProductId productId)
+  {
+    if (await _productRepository.AnyAsync(productId))
     {
-        _productRepository = productRepository;
-        _validationMessages = validationMessages;
+      return Result.Ok();
     }
 
-    public async Task<Result> CheckIfProductExistsAsync(ProductId productId)
-    {
-        if (await _productRepository.AnyAsync(productId))
-        {
-            return Result.Ok();
-        }
-
-        return NotFoundError.GetResult(nameof(productId), _validationMessages.ProductNotFound);
-    }
+    return NotFoundError.GetResult(nameof(productId), _validationMessages.ProductNotFound);
+  }
 }

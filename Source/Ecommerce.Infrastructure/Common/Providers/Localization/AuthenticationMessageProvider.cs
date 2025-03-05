@@ -8,12 +8,12 @@ namespace Ecommerce.Infrastructure.Common.Providers.Localization;
 
 public class AuthenticationMessageProvider : LocalizedMessageProvider, IAuthenticationMessages
 {
-    public AuthenticationMessageProvider(string basePath, Assembly assembly)
-      : base(basePath, assembly) { }
+  public AuthenticationMessageProvider(string basePath, Assembly assembly)
+    : base(basePath, assembly) { }
 
-    public string EmailOrPasswordIncorrect => GetMessage("EmailOrPasswordIncorrect");
+  public string EmailOrPasswordIncorrect => GetMessage("EmailOrPasswordIncorrect");
 
-    public string UserAlreadyExists => GetMessage("UserAlreadyExists");
+  public string UserAlreadyExists => GetMessage("UserAlreadyExists");
 
-    public string UserNotFound => GetMessage("UserNotFound");
+  public string UserNotFound => GetMessage("UserNotFound");
 }

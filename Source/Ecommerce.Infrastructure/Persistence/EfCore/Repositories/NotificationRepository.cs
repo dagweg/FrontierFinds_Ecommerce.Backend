@@ -5,5 +5,4 @@ namespace Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 
 public class NotificationRepository(EfCoreContext context)
   : EfCoreRepository<Notification, Guid>(context),
-    INotificationRepository
-{ }
+    INotificationRepository { }

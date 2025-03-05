@@ -4,6 +4,6 @@ namespace Ecommerce.Contracts.User;
 
 public class WishlistProductsResponse
 {
-    [Required]
-    public string ProductId { get; set; } = null!;
+  [Required]
+  public string ProductId { get; set; } = null!;
 }

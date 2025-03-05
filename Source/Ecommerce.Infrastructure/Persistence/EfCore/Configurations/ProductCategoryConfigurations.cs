@@ -8,21 +8,21 @@ namespace Ecommerce.Infrastructure.Persistence.EfCore.Configurations;
 
 internal sealed class ProductCategoryConfigurations : IEntityTypeConfiguration<ProductCategory>
 {
-    public void Configure(EntityTypeBuilder<ProductCategory> builder)
-    {
-        builder.ToTable("ProductCategories");
-        builder.HasKey(p => p.Id);
+  public void Configure(EntityTypeBuilder<ProductCategory> builder)
+  {
+    builder.ToTable("ProductCategories");
+    builder.HasKey(p => p.Id);
 
-        builder.Property(p => p.Id).ValueGeneratedNever().IsRequired();
+    builder.Property(p => p.Id).ValueGeneratedNever().IsRequired();
 
-        builder.OwnsOne(
-          p => p.Name,
-          pb =>
-            pb.Property(p => p.Value)
-              .HasConversion(p => p, p => ProductCategoryName.Create(p))
-              .HasColumnName("Name")
-              .IsRequired()
-              .HasMaxLength(255)
-        );
-    }
+    builder.OwnsOne(
+      p => p.Name,
+      pb =>
+        pb.Property(p => p.Value)
+          .HasConversion(p => p, p => ProductCategoryName.Create(p))
+          .HasColumnName("Name")
+          .IsRequired()
+          .HasMaxLength(255)
+    );
+  }
 }

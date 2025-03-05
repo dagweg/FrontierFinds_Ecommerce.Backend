@@ -6,5 +6,4 @@ namespace Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 
 public class OrderRepository(EfCoreContext context)
   : EfCoreRepository<Order, OrderId>(context),
-    IOrderRepository
-{ }
+    IOrderRepository { }

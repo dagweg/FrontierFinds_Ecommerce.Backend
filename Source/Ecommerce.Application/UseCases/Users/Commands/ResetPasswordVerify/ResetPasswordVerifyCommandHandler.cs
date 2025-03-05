@@ -15,78 +15,78 @@ namespace Ecommerce.Application.UseCases.Users.Commands.ResetPasswordVerify;
 
 public class ResetPasswordVerifyCommandHandler : IRequestHandler<ResetPasswordVerifyCommand, Result>
 {
-    private readonly IUserContextService _userContext;
-    private readonly IUserRepository _userRepository;
-    private readonly IPasswordHasher<User> _passwordHasher;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMediator _sender;
+  private readonly IUserContextService _userContext;
+  private readonly IUserRepository _userRepository;
+  private readonly IPasswordHasher<User> _passwordHasher;
+  private readonly IUnitOfWork _unitOfWork;
+  private readonly IMediator _sender;
 
-    public ResetPasswordVerifyCommandHandler(
-      IUserContextService userContext,
-      IUserRepository userRepository,
-      IPasswordHasher<User> passwordHasher,
-      IUnitOfWork unitOfWork,
-      IMediator sender
-    )
+  public ResetPasswordVerifyCommandHandler(
+    IUserContextService userContext,
+    IUserRepository userRepository,
+    IPasswordHasher<User> passwordHasher,
+    IUnitOfWork unitOfWork,
+    IMediator sender
+  )
+  {
+    _userContext = userContext;
+    _userRepository = userRepository;
+    _passwordHasher = passwordHasher;
+    _unitOfWork = unitOfWork;
+    _sender = sender;
+  }
+
+  public async Task<Result> Handle(
+    ResetPasswordVerifyCommand request,
+    CancellationToken cancellationToken
+  )
+  {
+    var userIdResult = _userContext.GetValidUserId();
+    if (userIdResult.IsFailed)
+      return userIdResult.ToResult();
+
+    var userId = UserId.Convert(userIdResult.Value);
+    var user = await _userRepository.GetByIdAsync(userId);
+    if (user is null)
     {
-        _userContext = userContext;
-        _userRepository = userRepository;
-        _passwordHasher = passwordHasher;
-        _unitOfWork = unitOfWork;
-        _sender = sender;
+      return NotFoundError.GetResult(nameof(User), "User not found");
     }
 
-    public async Task<Result> Handle(
-      ResetPasswordVerifyCommand request,
-      CancellationToken cancellationToken
-    )
-    {
-        var userIdResult = _userContext.GetValidUserId();
-        if (userIdResult.IsFailed)
-            return userIdResult.ToResult();
+    // convert OTP string to int array
+    var intArrResult = ConversionUtility.ToIntArray(request.Otp);
 
-        var userId = UserId.Convert(userIdResult.Value);
-        var user = await _userRepository.GetByIdAsync(userId);
-        if (user is null)
-        {
-            return NotFoundError.GetResult(nameof(User), "User not found");
-        }
+    if (intArrResult.IsFailed)
+      return intArrResult.ToResult();
 
-        // convert OTP string to int array
-        var intArrResult = ConversionUtility.ToIntArray(request.Otp);
+    // convert int array to OneTimePassword
+    var otpResult = OneTimePassword.Convert(intArrResult.Value);
 
-        if (intArrResult.IsFailed)
-            return intArrResult.ToResult();
+    if (otpResult.IsFailed)
+      return otpResult.ToResult();
 
-        // convert int array to OneTimePassword
-        var otpResult = OneTimePassword.Convert(intArrResult.Value);
+    // Verify the corretness of the OneTimePassword
+    var verifyOtpResult = user.VerifyPasswordResetOtp(otpResult.Value);
 
-        if (otpResult.IsFailed)
-            return otpResult.ToResult();
+    if (verifyOtpResult.IsFailed)
+      return verifyOtpResult;
 
-        // Verify the corretness of the OneTimePassword
-        var verifyOtpResult = user.VerifyPasswordResetOtp(otpResult.Value);
+    // If the OTP is correct, reset the otp and the password
+    user.SetPasswordResetOtp(null);
 
-        if (verifyOtpResult.IsFailed)
-            return verifyOtpResult;
+    var passwordResult = Password.Create(
+      _passwordHasher.HashPassword(user, request.NewPassword),
+      request.NewPassword
+    );
 
-        // If the OTP is correct, reset the otp and the password
-        user.SetPasswordResetOtp(null);
+    if (passwordResult.IsFailed)
+      return passwordResult.ToResult();
 
-        var passwordResult = Password.Create(
-          _passwordHasher.HashPassword(user, request.NewPassword),
-          request.NewPassword
-        );
+    user.ChangePassword(passwordResult.Value);
 
-        if (passwordResult.IsFailed)
-            return passwordResult.ToResult();
+    _userRepository.Update(user);
 
-        user.ChangePassword(passwordResult.Value);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        _userRepository.Update(user);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return Result.Ok();
-    }
+    return Result.Ok();
+  }
 }

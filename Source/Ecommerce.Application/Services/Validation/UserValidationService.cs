@@ -11,44 +11,44 @@ namespace Ecommerce.Application.Services.Validation;
 
 public class UserValidationService : IUserValidationService
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IAuthenticationMessages _authValidationMessages;
+  private readonly IUserRepository _userRepository;
+  private readonly IAuthenticationMessages _authValidationMessages;
 
-    public UserValidationService(
-      IUserRepository userRepository,
-      IAuthenticationMessages authValidationMessages
-    )
+  public UserValidationService(
+    IUserRepository userRepository,
+    IAuthenticationMessages authValidationMessages
+  )
+  {
+    _userRepository = userRepository;
+    _authValidationMessages = authValidationMessages;
+  }
+
+  public async Task<Result> CheckIfUserAlreadyExistsAsync(Email email)
+  {
+    User? user = await _userRepository.GetByEmailAsync(email);
+
+    // 1. Check if the User Exists
+    // if so return an error
+    if (user is not null)
     {
-        _userRepository = userRepository;
-        _authValidationMessages = authValidationMessages;
+      return AlreadyExistsError.GetResult(nameof(email), _authValidationMessages.UserAlreadyExists);
     }
 
-    public async Task<Result> CheckIfUserAlreadyExistsAsync(Email email)
+    return Result.Ok();
+  }
+
+  public async Task<Result> CheckIfUserAlreadyExistsAsync(PhoneNumber phoneNumber)
+  {
+    User? user = await _userRepository.GetByPhoneNumberAsync(phoneNumber);
+
+    if (user is not null)
     {
-        User? user = await _userRepository.GetByEmailAsync(email);
-
-        // 1. Check if the User Exists
-        // if so return an error
-        if (user is not null)
-        {
-            return AlreadyExistsError.GetResult(nameof(email), _authValidationMessages.UserAlreadyExists);
-        }
-
-        return Result.Ok();
+      return AlreadyExistsError.GetResult(
+        nameof(phoneNumber),
+        _authValidationMessages.UserAlreadyExists
+      );
     }
 
-    public async Task<Result> CheckIfUserAlreadyExistsAsync(PhoneNumber phoneNumber)
-    {
-        User? user = await _userRepository.GetByPhoneNumberAsync(phoneNumber);
-
-        if (user is not null)
-        {
-            return AlreadyExistsError.GetResult(
-              nameof(phoneNumber),
-              _authValidationMessages.UserAlreadyExists
-            );
-        }
-
-        return Result.Ok();
-    }
+    return Result.Ok();
+  }
 }

@@ -6,6 +6,6 @@ namespace Ecommerce.Application.Common.Interfaces.Validation;
 
 public interface IUserValidationService
 {
-    Task<Result> CheckIfUserAlreadyExistsAsync(Email email);
-    Task<Result> CheckIfUserAlreadyExistsAsync(PhoneNumber phoneNumber);
+  Task<Result> CheckIfUserAlreadyExistsAsync(Email email);
+  Task<Result> CheckIfUserAlreadyExistsAsync(PhoneNumber phoneNumber);
 }

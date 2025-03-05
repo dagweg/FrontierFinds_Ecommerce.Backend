@@ -16,144 +16,144 @@ namespace Ecommerce.Infrastructure.Persistence.EfCore.Configurations;
 
 public class OrderConfiguration : IEntityTypeConfiguration<Order>
 {
-    public void Configure(EntityTypeBuilder<Order> builder)
-    {
-        builder.ToTable("Orders");
+  public void Configure(EntityTypeBuilder<Order> builder)
+  {
+    builder.ToTable("Orders");
 
-        builder.HasKey(nameof(Order.Id));
+    builder.HasKey(nameof(Order.Id));
 
-        builder
-          .Property(o => o.Id)
+    builder
+      .Property(o => o.Id)
+      .ValueGeneratedNever()
+      .HasColumnName("OrderId")
+      .HasConversion(id => id.Value, value => OrderId.Convert(value))
+      .IsRequired();
+
+    builder.Property(o => o.OrderDate).HasColumnName("OrderDate").IsRequired();
+
+    builder.OwnsOne(
+      o => o.Total,
+      tb =>
+      {
+        tb.Property(t => t.Value).HasColumnName("TotalPrice").IsRequired();
+        tb.Property(p => p.Currency)
+          .HasColumnName("Currency")
+          .IsRequired()
+          .HasConversion(c => Price.BASE_CURRENCY.ToString(), c => Price.BASE_CURRENCY);
+      }
+    );
+
+    builder.OwnsOne(
+      o => o.ShippingAddress,
+      sb =>
+      {
+        sb.Property(sa => sa.Street).HasColumnName("ShippingStreet").IsRequired().HasMaxLength(255);
+        sb.Property(sa => sa.City).HasColumnName("ShippingCity").IsRequired().HasMaxLength(100);
+        sb.Property(sa => sa.State).HasColumnName("ShippingState").IsRequired().HasMaxLength(100);
+        sb.Property(sa => sa.ZipCode)
+          .HasColumnName("ShippingZipCode")
+          .IsRequired()
+          .HasMaxLength(10);
+        sb.Property(sa => sa.Country)
+          .HasColumnName("ShippingCountry")
+          .IsRequired()
+          .HasMaxLength(100);
+      }
+    );
+
+    builder.OwnsOne(
+      o => o.BillingAddress,
+      sb =>
+      {
+        sb.Property(sa => sa.Street).HasColumnName("BillingStreet").IsRequired().HasMaxLength(255);
+        sb.Property(sa => sa.City).HasColumnName("BillingCity").IsRequired().HasMaxLength(100);
+        sb.Property(sa => sa.State).HasColumnName("BillingState").IsRequired().HasMaxLength(100);
+        sb.Property(sa => sa.ZipCode).HasColumnName("BillingZipCode").IsRequired().HasMaxLength(10);
+        sb.Property(sa => sa.Country)
+          .HasColumnName("BillingCountry")
+          .IsRequired()
+          .HasMaxLength(100);
+      }
+    );
+
+    builder
+      .Property(o => o.Status)
+      .HasColumnName("Status")
+      .IsRequired()
+      .HasConversion(s => s.ToString(), s => s.ConvertTo<OrderStatus>() ?? OrderStatus.None);
+
+    builder.OwnsMany(
+      o => o.OrderItems,
+      oib =>
+      {
+        oib.ToTable("OrderItems");
+        oib.WithOwner().HasForeignKey("OrderId");
+        oib.HasKey(nameof(OrderItem.Id), "OrderId");
+
+        oib.Property(oi => oi.Id)
           .ValueGeneratedNever()
-          .HasColumnName("OrderId")
-          .HasConversion(id => id.Value, value => OrderId.Convert(value))
+          .HasColumnName("OrderItemId")
+          .HasConversion(id => id.Value, value => OrderItemId.Convert(value))
           .IsRequired();
 
-        builder.Property(o => o.OrderDate).HasColumnName("OrderDate").IsRequired();
+        oib.Property(oi => oi.Quantity).HasColumnName("Quantity").IsRequired();
 
-        builder.OwnsOne(
-          o => o.Total,
-          tb =>
+        oib.Property(p => p.ProductId)
+          .HasConversion(pi => pi.Value, v => ProductId.Convert(v))
+          .HasColumnName("ProductId")
+          .IsRequired();
+
+        // relationship with Product entity
+        oib.HasOne<Product>()
+          .WithMany()
+          .HasForeignKey("ProductId")
+          .OnDelete(DeleteBehavior.Restrict);
+
+        oib.OwnsOne(
+          oi => oi.Price,
+          pb =>
           {
-              tb.Property(t => t.Value).HasColumnName("TotalPrice").IsRequired();
-              tb.Property(p => p.Currency)
-            .HasColumnName("Currency")
-            .IsRequired()
-            .HasConversion(c => Price.BASE_CURRENCY.ToString(), c => Price.BASE_CURRENCY);
+            pb.Property(p => p.Value).HasColumnName("PriceValue").IsRequired();
+            // pb.Property(p => p.Currency)
+            //   .HasColumnName("PriceCurrency")
+            //   .IsRequired()
+            //   .HasConversion(c => c.ToString(), c => c.ConvertTo<Currency>() ?? Currency.None);
           }
         );
+      }
+    );
 
-        builder.OwnsOne(
-          o => o.ShippingAddress,
-          sb =>
-          {
-              sb.Property(sa => sa.Street).HasColumnName("ShippingStreet").IsRequired().HasMaxLength(255);
-              sb.Property(sa => sa.City).HasColumnName("ShippingCity").IsRequired().HasMaxLength(100);
-              sb.Property(sa => sa.State).HasColumnName("ShippingState").IsRequired().HasMaxLength(100);
-              sb.Property(sa => sa.ZipCode)
-            .HasColumnName("ShippingZipCode")
-            .IsRequired()
-            .HasMaxLength(10);
-              sb.Property(sa => sa.Country)
-            .HasColumnName("ShippingCountry")
-            .IsRequired()
-            .HasMaxLength(100);
-          }
-        );
-
-        builder.OwnsOne(
-          o => o.BillingAddress,
-          sb =>
-          {
-              sb.Property(sa => sa.Street).HasColumnName("BillingStreet").IsRequired().HasMaxLength(255);
-              sb.Property(sa => sa.City).HasColumnName("BillingCity").IsRequired().HasMaxLength(100);
-              sb.Property(sa => sa.State).HasColumnName("BillingState").IsRequired().HasMaxLength(100);
-              sb.Property(sa => sa.ZipCode).HasColumnName("BillingZipCode").IsRequired().HasMaxLength(10);
-              sb.Property(sa => sa.Country)
-            .HasColumnName("BillingCountry")
-            .IsRequired()
-            .HasMaxLength(100);
-          }
-        );
-
-        builder
-          .Property(o => o.Status)
-          .HasColumnName("Status")
+    builder.OwnsOne(
+      b => b.PaymentInformation,
+      (pib) =>
+      {
+        pib.Property(p => p.CardHolderName)
+          .HasColumnName("CardHolderName")
           .IsRequired()
-          .HasConversion(s => s.ToString(), s => s.ConvertTo<OrderStatus>() ?? OrderStatus.None);
+          .HasConversion(n => n.Value, v => Name.Create(v));
 
-        builder.OwnsMany(
-          o => o.OrderItems,
-          oib =>
-          {
-              oib.ToTable("OrderItems");
-              oib.WithOwner().HasForeignKey("OrderId");
-              oib.HasKey(nameof(OrderItem.Id), "OrderId");
+        pib.Property(p => p.CardNumber)
+          .HasColumnName("CardNumber")
+          .IsRequired()
+          .HasConversion(cn => cn.Value, v => CardNumber.Create(v).Value);
 
-              oib.Property(oi => oi.Id)
-            .ValueGeneratedNever()
-            .HasColumnName("OrderItemId")
-            .HasConversion(id => id.Value, value => OrderItemId.Convert(value))
-            .IsRequired();
+        pib.Property(p => p.ExpiryMonth)
+          .HasColumnName("CardExpiryMonth")
+          .IsRequired()
+          .HasConversion(m => m.Value, v => Month.Create(v).Value);
 
-              oib.Property(oi => oi.Quantity).HasColumnName("Quantity").IsRequired();
+        pib.Property(p => p.ExpiryYear)
+          .HasColumnName("CardExpiryYear")
+          .IsRequired()
+          .HasConversion(y => y.Value, v => Year.Create(v).Value);
 
-              oib.Property(p => p.ProductId)
-            .HasConversion(pi => pi.Value, v => ProductId.Convert(v))
-            .HasColumnName("ProductId")
-            .IsRequired();
+        pib.Property(p => p.CVV)
+          .HasColumnName("CardCVV")
+          .IsRequired()
+          .HasConversion(c => c.Value, v => CVV.Create(v).Value);
+      }
+    );
 
-              // relationship with Product entity
-              oib.HasOne<Product>()
-            .WithMany()
-            .HasForeignKey("ProductId")
-            .OnDelete(DeleteBehavior.Restrict);
-
-              oib.OwnsOne(
-            oi => oi.Price,
-            pb =>
-            {
-                pb.Property(p => p.Value).HasColumnName("PriceValue").IsRequired();
-                // pb.Property(p => p.Currency)
-                //   .HasColumnName("PriceCurrency")
-                //   .IsRequired()
-                //   .HasConversion(c => c.ToString(), c => c.ConvertTo<Currency>() ?? Currency.None);
-            }
-          );
-          }
-        );
-
-        builder.OwnsOne(
-          b => b.PaymentInformation,
-          (pib) =>
-          {
-              pib.Property(p => p.CardHolderName)
-            .HasColumnName("CardHolderName")
-            .IsRequired()
-            .HasConversion(n => n.Value, v => Name.Create(v));
-
-              pib.Property(p => p.CardNumber)
-            .HasColumnName("CardNumber")
-            .IsRequired()
-            .HasConversion(cn => cn.Value, v => CardNumber.Create(v).Value);
-
-              pib.Property(p => p.ExpiryMonth)
-            .HasColumnName("CardExpiryMonth")
-            .IsRequired()
-            .HasConversion(m => m.Value, v => Month.Create(v).Value);
-
-              pib.Property(p => p.ExpiryYear)
-            .HasColumnName("CardExpiryYear")
-            .IsRequired()
-            .HasConversion(y => y.Value, v => Year.Create(v).Value);
-
-              pib.Property(p => p.CVV)
-            .HasColumnName("CardCVV")
-            .IsRequired()
-            .HasConversion(c => c.Value, v => CVV.Create(v).Value);
-          }
-        );
-
-        builder.Navigation(o => o.OrderItems).UsePropertyAccessMode(PropertyAccessMode.Field);
-    }
+    builder.Navigation(o => o.OrderItems).UsePropertyAccessMode(PropertyAccessMode.Field);
+  }
 }

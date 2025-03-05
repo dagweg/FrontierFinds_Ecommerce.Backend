@@ -5,5 +5,5 @@ using Ecommerce.Application.Common.Interfaces.Providers.Date;
 
 public class DateTimeProvider : IDateTimeProvider
 {
-    public DateTime UtcNow { get; set; } = DateTime.UtcNow;
+  public DateTime UtcNow { get; set; } = DateTime.UtcNow;
 }

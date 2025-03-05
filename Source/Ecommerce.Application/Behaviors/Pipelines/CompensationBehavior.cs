@@ -12,29 +12,29 @@ namespace Ecommerce.Application.Behaviors.Pipelines;
 public class CompensationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
   where TRequest : IRequest<TResponse>
 {
-    private readonly IEnumerable<IExternalResourceTracker> _externalResourceTrackers;
+  private readonly IEnumerable<IExternalResourceTracker> _externalResourceTrackers;
 
-    public CompensationBehavior(IEnumerable<IExternalResourceTracker> externalResourceTrackers)
+  public CompensationBehavior(IEnumerable<IExternalResourceTracker> externalResourceTrackers)
+  {
+    _externalResourceTrackers = externalResourceTrackers;
+  }
+
+  public async Task<TResponse> Handle(
+    TRequest request,
+    RequestHandlerDelegate<TResponse> next,
+    CancellationToken cancellationToken
+  )
+  {
+    var response = await next();
+
+    // Check if the response is a FluentResults.Result and it indicates failure.
+    if (response is Result result && result.IsFailed)
     {
-        _externalResourceTrackers = externalResourceTrackers;
+      // Execute external resource rollback for each tracker.
+      foreach (var _externalResourceTracker in _externalResourceTrackers)
+        await _externalResourceTracker.RollbackAsync();
     }
 
-    public async Task<TResponse> Handle(
-      TRequest request,
-      RequestHandlerDelegate<TResponse> next,
-      CancellationToken cancellationToken
-    )
-    {
-        var response = await next();
-
-        // Check if the response is a FluentResults.Result and it indicates failure.
-        if (response is Result result && result.IsFailed)
-        {
-            // Execute external resource rollback for each tracker.
-            foreach (var _externalResourceTracker in _externalResourceTrackers)
-                await _externalResourceTracker.RollbackAsync();
-        }
-
-        return response;
-    }
+    return response;
+  }
 }

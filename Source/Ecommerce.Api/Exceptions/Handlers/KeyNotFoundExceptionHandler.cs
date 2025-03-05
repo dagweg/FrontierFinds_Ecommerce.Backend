@@ -10,42 +10,42 @@ namespace Ecommerce.Api.Exceptions.Handlers;
 
 public class KeyNotFoundExceptionHandler : IExceptionHandler
 {
-    private readonly ILogger<KeyNotFoundExceptionHandler> _logger;
+  private readonly ILogger<KeyNotFoundExceptionHandler> _logger;
 
-    public KeyNotFoundExceptionHandler(ILogger<KeyNotFoundExceptionHandler> logger)
+  public KeyNotFoundExceptionHandler(ILogger<KeyNotFoundExceptionHandler> logger)
+  {
+    _logger = logger;
+  }
+
+  public async ValueTask<bool> TryHandleAsync(
+    HttpContext context,
+    Exception ex,
+    CancellationToken cancellationToken
+  )
+  {
+    if (ex is not KeyNotFoundException)
     {
-        _logger = logger;
+      // Return false to indicate that this handler did not handle the exception.
+      return false;
     }
 
-    public async ValueTask<bool> TryHandleAsync(
-      HttpContext context,
-      Exception ex,
-      CancellationToken cancellationToken
-    )
+    var problemDetails = new ProblemDetails
     {
-        if (ex is not KeyNotFoundException)
-        {
-            // Return false to indicate that this handler did not handle the exception.
-            return false;
-        }
+      Status = StatusCodes.Status404NotFound,
+      Type = "ResourceNotFound",
+      Title = "Resource Not Found",
+      Detail = "The requested resource was not found.",
+      Extensions = { { "traceId", context.TraceIdentifier } },
+    };
 
-        var problemDetails = new ProblemDetails
-        {
-            Status = StatusCodes.Status404NotFound,
-            Type = "ResourceNotFound",
-            Title = "Resource Not Found",
-            Detail = "The requested resource was not found.",
-            Extensions = { { "traceId", context.TraceIdentifier } },
-        };
+    context.Response.StatusCode = StatusCodes.Status404NotFound;
+    context.Response.Headers.Add("X-Trace-ID", context.TraceIdentifier);
 
-        context.Response.StatusCode = StatusCodes.Status404NotFound;
-        context.Response.Headers.Add("X-Trace-ID", context.TraceIdentifier);
+    await context.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 
-        await context.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+    _logger.LogFormattedError(ex, context.TraceIdentifier);
 
-        _logger.LogFormattedError(ex, context.TraceIdentifier);
-
-        // Return true to indicate that the exception was handled.
-        return true;
-    }
+    // Return true to indicate that the exception was handled.
+    return true;
+  }
 }

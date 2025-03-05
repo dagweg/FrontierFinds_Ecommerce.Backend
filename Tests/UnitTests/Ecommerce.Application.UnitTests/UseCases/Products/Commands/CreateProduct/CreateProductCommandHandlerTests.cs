@@ -35,145 +35,145 @@ using static Ecommerce.Application.UnitTests.UseCases.Users.TestUtils.Constants;
 
 namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProduct
 {
-    public class CreateProductCommandHandlerTests
+  public class CreateProductCommandHandlerTests
+  {
+    private readonly CreateProductCommandHandler _createProductCommandHandler;
+    private readonly Mock<IMapper> _mapperMock;
+    private readonly Mock<IProductRepository> _productRepositoryMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly Mock<IUserContextService> _userContextServiceMock;
+    private readonly Mock<IMediator> _senderMock;
+    private readonly Mock<ILogger<CreateProductCommandHandler>> _loggerMock;
+    private readonly Mock<IForexSerivce> _forexServiceMock;
+    private readonly Mock<IProductImageStrategyResolver> _productImageStrategyResolver;
+
+    public CreateProductCommandHandlerTests()
     {
-        private readonly CreateProductCommandHandler _createProductCommandHandler;
-        private readonly Mock<IMapper> _mapperMock;
-        private readonly Mock<IProductRepository> _productRepositoryMock;
-        private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-        private readonly Mock<IUserContextService> _userContextServiceMock;
-        private readonly Mock<IMediator> _senderMock;
-        private readonly Mock<ILogger<CreateProductCommandHandler>> _loggerMock;
-        private readonly Mock<IForexSerivce> _forexServiceMock;
-        private readonly Mock<IProductImageStrategyResolver> _productImageStrategyResolver;
+      _mapperMock = new Mock<IMapper>();
+      _productRepositoryMock = new Mock<IProductRepository>();
+      _unitOfWorkMock = new Mock<IUnitOfWork>();
+      _userContextServiceMock = new Mock<IUserContextService>();
+      _senderMock = new Mock<IMediator>();
+      _loggerMock = new Mock<ILogger<CreateProductCommandHandler>>();
+      _forexServiceMock = new Mock<IForexSerivce>();
+      _productImageStrategyResolver = new Mock<IProductImageStrategyResolver>();
 
-        public CreateProductCommandHandlerTests()
-        {
-            _mapperMock = new Mock<IMapper>();
-            _productRepositoryMock = new Mock<IProductRepository>();
-            _unitOfWorkMock = new Mock<IUnitOfWork>();
-            _userContextServiceMock = new Mock<IUserContextService>();
-            _senderMock = new Mock<IMediator>();
-            _loggerMock = new Mock<ILogger<CreateProductCommandHandler>>();
-            _forexServiceMock = new Mock<IForexSerivce>();
-            _productImageStrategyResolver = new Mock<IProductImageStrategyResolver>();
-
-            _createProductCommandHandler = new(
-              _mapperMock.Object,
-              _productRepositoryMock.Object,
-              _unitOfWorkMock.Object,
-              _userContextServiceMock.Object,
-              _senderMock.Object,
-              _loggerMock.Object,
-              _forexServiceMock.Object,
-              _productImageStrategyResolver.Object
-            );
-        }
-
-        [Fact]
-        public async Task HandlerShould_ReturnFailed_WhenUserIsNotLoggedIn()
-        {
-            // arrange
-            var command = CreateProductTestUtils.CreateCommand();
-
-            string errMsg = "User id not found";
-            // configure the userContextMock to return failed
-            _userContextServiceMock.Setup(x => x.GetValidUserId()).Returns(Result.Fail(errMsg));
-            // act
-            var result = await _createProductCommandHandler.Handle(command, default);
-
-            // assert
-            result.IsFailed.Should().BeTrue();
-            result.Errors.Find(e => e.Message == errMsg).Should().NotBeNull();
-        }
-
-        [Fact]
-        public async Task HandlerShould_ReturnFailed_WhenCurrencyIsInvalid()
-        {
-            //arrange
-            var command = CreateProductTestUtils.CreateCommand() with
-            {
-                PriceCurrency = "invalid_currency",
-            };
-
-            _userContextServiceMock.Setup(x => x.GetValidUserId()).Returns(Result.Ok());
-
-            //act
-            var result = await _createProductCommandHandler.Handle(command, default);
-
-            // assert
-            result.IsFailed.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task HandlerShould_ReturnOk_WhenCommandIsValid()
-        {
-            //arrange
-            var command = CreateProductTestUtils.CreateCommand();
-
-            _userContextServiceMock.Setup(x => x.GetValidUserId()).Returns(Result.Ok());
-            _forexServiceMock
-              .Setup(x => x.ConvertToBaseCurrencyAsync(It.IsAny<decimal>(), It.IsAny<Currency>()))
-              .ReturnsAsync(Result.Ok());
-
-            _mapperMock
-              .Setup(x => x.Map<Domain.ProductAggregate.Product>(It.IsAny<CreateProductCommand>()))
-              .Returns(
-                (CreateProductCommand cmd) =>
-                  Domain.ProductAggregate.Product.Create(
-                    ProductName.Create(cmd.ProductName),
-                    ProductDescription.Create(cmd.ProductDescription),
-                    Price.CreateInBaseCurrency(100m),
-                    Stock.Create(Quantity.Create(cmd.StockQuantity)),
-                    UserId.CreateUnique(),
-                    ProductImage.Create("", "")
-                  )
-              );
-
-            _productRepositoryMock
-              .Setup(x => x.AddAsync(It.IsAny<Domain.ProductAggregate.Product>()))
-              .ReturnsAsync(true);
-
-            _unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
-
-            var dummyImageResult = new ImageResult
-            {
-                Url = "http://example.com/image.jpg",
-                ObjectIdentifier = Guid.NewGuid().ToString(),
-            };
-
-            _senderMock
-              .Setup(x => x.Send(It.IsAny<CreateImageCommand>(), It.IsAny<CancellationToken>())) // Match the command type
-              .ReturnsAsync(Result.Ok(dummyImageResult));
-
-            var mockProductImageStrategy = new Mock<IProductImageStrategy>();
-
-            _productImageStrategyResolver
-              .Setup(x => x.Resolve(It.IsAny<ProductView>()))
-              .Returns(mockProductImageStrategy.Object);
-
-            mockProductImageStrategy
-              .Setup(x => x.Apply(It.IsAny<ProductImages>(), It.IsAny<ProductImage>()))
-              .Callback<ProductImages, ProductImage>(
-                (images, image) =>
-                {
-                    images.WithThumbnail(image); // Simulate setting Thumbnail
-                }
-              );
-
-            _mapperMock
-              .Setup(x => x.Map<ProductResult>(It.IsAny<Product>()))
-              .Returns(
-                new ProductResult
-                { /* Populate as needed */
-                }
-              );
-
-            //act
-            var result = await _createProductCommandHandler.Handle(command, default);
-
-            // assert
-            result.IsSuccess.Should().BeTrue();
-        }
+      _createProductCommandHandler = new(
+        _mapperMock.Object,
+        _productRepositoryMock.Object,
+        _unitOfWorkMock.Object,
+        _userContextServiceMock.Object,
+        _senderMock.Object,
+        _loggerMock.Object,
+        _forexServiceMock.Object,
+        _productImageStrategyResolver.Object
+      );
     }
+
+    [Fact]
+    public async Task HandlerShould_ReturnFailed_WhenUserIsNotLoggedIn()
+    {
+      // arrange
+      var command = CreateProductTestUtils.CreateCommand();
+
+      string errMsg = "User id not found";
+      // configure the userContextMock to return failed
+      _userContextServiceMock.Setup(x => x.GetValidUserId()).Returns(Result.Fail(errMsg));
+      // act
+      var result = await _createProductCommandHandler.Handle(command, default);
+
+      // assert
+      result.IsFailed.Should().BeTrue();
+      result.Errors.Find(e => e.Message == errMsg).Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task HandlerShould_ReturnFailed_WhenCurrencyIsInvalid()
+    {
+      //arrange
+      var command = CreateProductTestUtils.CreateCommand() with
+      {
+        PriceCurrency = "invalid_currency",
+      };
+
+      _userContextServiceMock.Setup(x => x.GetValidUserId()).Returns(Result.Ok());
+
+      //act
+      var result = await _createProductCommandHandler.Handle(command, default);
+
+      // assert
+      result.IsFailed.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task HandlerShould_ReturnOk_WhenCommandIsValid()
+    {
+      //arrange
+      var command = CreateProductTestUtils.CreateCommand();
+
+      _userContextServiceMock.Setup(x => x.GetValidUserId()).Returns(Result.Ok());
+      _forexServiceMock
+        .Setup(x => x.ConvertToBaseCurrencyAsync(It.IsAny<decimal>(), It.IsAny<Currency>()))
+        .ReturnsAsync(Result.Ok());
+
+      _mapperMock
+        .Setup(x => x.Map<Domain.ProductAggregate.Product>(It.IsAny<CreateProductCommand>()))
+        .Returns(
+          (CreateProductCommand cmd) =>
+            Domain.ProductAggregate.Product.Create(
+              ProductName.Create(cmd.ProductName),
+              ProductDescription.Create(cmd.ProductDescription),
+              Price.CreateInBaseCurrency(100m),
+              Stock.Create(Quantity.Create(cmd.StockQuantity)),
+              UserId.CreateUnique(),
+              ProductImage.Create("", "")
+            )
+        );
+
+      _productRepositoryMock
+        .Setup(x => x.AddAsync(It.IsAny<Domain.ProductAggregate.Product>()))
+        .ReturnsAsync(true);
+
+      _unitOfWorkMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+      var dummyImageResult = new ImageResult
+      {
+        Url = "http://example.com/image.jpg",
+        ObjectIdentifier = Guid.NewGuid().ToString(),
+      };
+
+      _senderMock
+        .Setup(x => x.Send(It.IsAny<CreateImageCommand>(), It.IsAny<CancellationToken>())) // Match the command type
+        .ReturnsAsync(Result.Ok(dummyImageResult));
+
+      var mockProductImageStrategy = new Mock<IProductImageStrategy>();
+
+      _productImageStrategyResolver
+        .Setup(x => x.Resolve(It.IsAny<ProductView>()))
+        .Returns(mockProductImageStrategy.Object);
+
+      mockProductImageStrategy
+        .Setup(x => x.Apply(It.IsAny<ProductImages>(), It.IsAny<ProductImage>()))
+        .Callback<ProductImages, ProductImage>(
+          (images, image) =>
+          {
+            images.WithThumbnail(image); // Simulate setting Thumbnail
+          }
+        );
+
+      _mapperMock
+        .Setup(x => x.Map<ProductResult>(It.IsAny<Product>()))
+        .Returns(
+          new ProductResult
+          { /* Populate as needed */
+          }
+        );
+
+      //act
+      var result = await _createProductCommandHandler.Handle(command, default);
+
+      // assert
+      result.IsSuccess.Should().BeTrue();
+    }
+  }
 }

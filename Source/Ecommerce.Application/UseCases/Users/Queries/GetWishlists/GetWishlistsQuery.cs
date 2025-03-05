@@ -10,6 +10,6 @@ public record GetWishlistsQuery(int pageNumber, int pageSize)
   : IRequest<Result<WishlistsResult>>,
     IPaginated
 {
-    public int PageNumber { get; init; } = pageNumber;
-    public int PageSize { get; init; } = pageSize;
+  public int PageNumber { get; init; } = pageNumber;
+  public int PageSize { get; init; } = pageSize;
 }

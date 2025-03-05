@@ -7,5 +7,5 @@ namespace Ecommerce.Application.Common.Interfaces.Providers.Localization;
 /// </summary>
 public interface ILocalizedMessageProvider
 {
-    string GetMessage(string key, CultureInfo cultureInfo);
+  string GetMessage(string key, CultureInfo cultureInfo);
 }

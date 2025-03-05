@@ -8,19 +8,19 @@ namespace Ecommerce.Infrastructure.Services.Providers.Forex;
 
 public class ForexService(IExchangeApiClient exchangeApiClient) : IForexSerivce
 {
-    public async Task<Result<decimal>> ConvertToBaseCurrencyAsync(
-      decimal amount,
-      Currency fromCurrency
-    )
-    {
-        var rateResult = await exchangeApiClient.GetExchangeRateAsync(
-          fromCurrency,
-          Price.BASE_CURRENCY
-        );
+  public async Task<Result<decimal>> ConvertToBaseCurrencyAsync(
+    decimal amount,
+    Currency fromCurrency
+  )
+  {
+    var rateResult = await exchangeApiClient.GetExchangeRateAsync(
+      fromCurrency,
+      Price.BASE_CURRENCY
+    );
 
-        if (rateResult.IsFailed)
-            return rateResult;
+    if (rateResult.IsFailed)
+      return rateResult;
 
-        return rateResult.Value * amount;
-    }
+    return rateResult.Value * amount;
+  }
 }

@@ -5,5 +5,5 @@ namespace Ecommerce.Application.UseCases.Users.Commands.RemoveWishlistProducts;
 
 public record RemoveWishlistProductsCommand : IRequest<Result>
 {
-    public required List<string> ProductIds;
+  public required List<string> ProductIds;
 }

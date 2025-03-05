@@ -12,26 +12,26 @@ namespace Ecommerce.Api.Mapping;
 
 public class ProductProfile : Profile
 {
-    public ProductProfile()
-    {
-        CreateMap<CreateImageRequest, CreateImageCommand>()
-          .ForMember(
-            dest => dest.ImageStream,
-            opt => opt.MapFrom(src => src.ImageFile.OpenReadStream())
-          );
+  public ProductProfile()
+  {
+    CreateMap<CreateImageRequest, CreateImageCommand>()
+      .ForMember(
+        dest => dest.ImageStream,
+        opt => opt.MapFrom(src => src.ImageFile.OpenReadStream())
+      );
 
-        CreateMap<ImageResult, ImageResponse>();
+    CreateMap<ImageResult, ImageResponse>();
 
-        CreateMap<CreateProductRequest, CreateProductCommand>();
+    CreateMap<CreateProductRequest, CreateProductCommand>();
 
-        CreateMap<ProductImagesResult, ProductImagesResponse>();
+    CreateMap<ProductImagesResult, ProductImagesResponse>();
 
-        CreateMap<ProductResult, ProductResponse>();
-        CreateMap<ProductsResult, ProductsResponse>()
-          .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.Products))
-          .ForMember(dest => dest.TotalCount, opt => opt.MapFrom(src => src.TotalCount))
-          .ForMember(dest => dest.FetchedCount, opt => opt.MapFrom(src => src.TotalFetchedCount));
+    CreateMap<ProductResult, ProductResponse>();
+    CreateMap<ProductsResult, ProductsResponse>()
+      .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.Products))
+      .ForMember(dest => dest.TotalCount, opt => opt.MapFrom(src => src.TotalCount))
+      .ForMember(dest => dest.FetchedCount, opt => opt.MapFrom(src => src.TotalFetchedCount));
 
-        CreateMap<TagResult, TagResponse>();
-    }
+    CreateMap<TagResult, TagResponse>();
+  }
 }

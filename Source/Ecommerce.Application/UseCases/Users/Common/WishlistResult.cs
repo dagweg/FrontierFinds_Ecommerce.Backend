@@ -5,5 +5,5 @@ namespace Ecommerce.Application.UseCases.Users.Common;
 
 public class WishlistResult
 {
-    public required ProductResult Product { get; set; }
+  public required ProductResult Product { get; set; }
 }

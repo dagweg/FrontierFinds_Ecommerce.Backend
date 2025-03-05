@@ -11,37 +11,37 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApi(this IServiceCollection services)
+  public static IServiceCollection AddApi(this IServiceCollection services)
+  {
+    services.AddExceptionHandlers();
+
+    services.AddControllers(options =>
     {
-        services.AddExceptionHandlers();
+      // Register global action filters
+      options.Filters.Add<FluentResultsActionFilter>();
+      options.Filters.Add<ModelBindingErrorActionFilter>();
+    });
 
-        services.AddControllers(options =>
-        {
-            // Register global action filters
-            options.Filters.Add<FluentResultsActionFilter>();
-            options.Filters.Add<ModelBindingErrorActionFilter>();
-        });
+    services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+    services.AddTransient(typeof(IPasswordHasher<>), typeof(PasswordHasher<>));
 
-        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        services.AddTransient(typeof(IPasswordHasher<>), typeof(PasswordHasher<>));
-
-        services.Configure<ApiBehaviorOptions>(options =>
-        {
-            options.SuppressModelStateInvalidFilter = true;
-        });
-
-        services.AddScoped<IUserContextService, UserContextService>();
-
-        return services;
-    }
-
-    public static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
+    services.Configure<ApiBehaviorOptions>(options =>
     {
-        services.AddSingleton<ExceptionHandlerFactory>();
-        services.AddSingleton<KeyNotFoundExceptionHandler>();
-        services.AddSingleton<UnauthorizedAccessExceptionHandler>();
-        services.AddSingleton<GenericExceptionHandler>();
+      options.SuppressModelStateInvalidFilter = true;
+    });
 
-        return services;
-    }
+    services.AddScoped<IUserContextService, UserContextService>();
+
+    return services;
+  }
+
+  public static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
+  {
+    services.AddSingleton<ExceptionHandlerFactory>();
+    services.AddSingleton<KeyNotFoundExceptionHandler>();
+    services.AddSingleton<UnauthorizedAccessExceptionHandler>();
+    services.AddSingleton<GenericExceptionHandler>();
+
+    return services;
+  }
 }
