@@ -115,28 +115,28 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
               c => c.Items,
               cib =>
               {
-                    cib.ToTable("UserCartItems");
-                    cib.WithOwner().HasForeignKey("CartId");
-                    cib.HasKey(nameof(CartItem.Id), "CartId");
-                    cib.Property(ci => ci.Id)
-                  .HasColumnName("CartItemId")
-                  .ValueGeneratedNever()
-                  .HasConversion(id => id.Value, value => CartItemId.Convert(value))
-                  .IsRequired();
+                  cib.ToTable("UserCartItems");
+                  cib.WithOwner().HasForeignKey("CartId");
+                  cib.HasKey(nameof(CartItem.Id), "CartId");
+                  cib.Property(ci => ci.Id)
+                .HasColumnName("CartItemId")
+                .ValueGeneratedNever()
+                .HasConversion(id => id.Value, value => CartItemId.Convert(value))
+                .IsRequired();
 
-                    cib.Property(ci => ci.Quantity).HasColumnName("Quantity").IsRequired();
+                  cib.Property(ci => ci.Quantity).HasColumnName("Quantity").IsRequired();
 
-                    cib.Property(p => p.ProductId)
-                  .HasConversion(pi => pi.Value, v => ProductId.Convert(v))
-                  .HasColumnName("ProductId")
-                  .IsRequired();
+                  cib.Property(p => p.ProductId)
+                .HasConversion(pi => pi.Value, v => ProductId.Convert(v))
+                .HasColumnName("ProductId")
+                .IsRequired();
 
                   // relationship with Product entity
-                    cib.HasOne<Product>()
-                  .WithMany()
-                  .HasForeignKey("ProductId")
-                  .OnDelete(DeleteBehavior.Restrict);
-                }
+                  cib.HasOne<Product>()
+                .WithMany()
+                .HasForeignKey("ProductId")
+                .OnDelete(DeleteBehavior.Restrict);
+              }
             );
 
                 cb.Navigation(c => c.Items).UsePropertyAccessMode(PropertyAccessMode.Field);
@@ -169,14 +169,14 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             w => w.ProductIds,
             wpb =>
             {
-                  wpb.ToTable("WishlistProducts");
-                  wpb.WithOwner().HasForeignKey("WishlistId");
-                  wpb.HasKey(nameof(ProductId.Value), "WishlistId");
-                  wpb.Property(pi => pi.Value).HasColumnName("ProductId").IsRequired();
+                wpb.ToTable("WishlistProducts");
+                wpb.WithOwner().HasForeignKey("WishlistId");
+                wpb.HasKey(nameof(ProductId.Value), "WishlistId");
+                wpb.Property(pi => pi.Value).HasColumnName("ProductId").IsRequired();
 
                 // relationship with Product entity
-                  wpb.HasOne<Product>().WithMany().OnDelete(DeleteBehavior.Restrict);
-              }
+                wpb.HasOne<Product>().WithMany().OnDelete(DeleteBehavior.Restrict);
+            }
           );
           }
         );

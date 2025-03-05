@@ -98,11 +98,11 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
               r => r.AuthorId,
               ab =>
               {
-                    ab.Property(a => a.Value) // Access the 'Value' property of AuthorId
-                  .HasConversion(a => a, a => UserId.Convert(a))
-                  .HasColumnName("AuthorId")
-                  .IsRequired();
-                }
+                  ab.Property(a => a.Value) // Access the 'Value' property of AuthorId
+                .HasConversion(a => a, a => UserId.Convert(a))
+                .HasColumnName("AuthorId")
+                .IsRequired();
+              }
             );
 
                 rb.Property(r => r.Description).IsRequired().HasMaxLength(1000);
@@ -110,11 +110,11 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
               r => r.Rating,
               rb =>
               {
-                    rb.Property(r => r.Value)
-                  .HasColumnName("Rating")
-                  .HasConversion(r => r, r => Rating.Create(r).Value)
-                  .IsRequired();
-                }
+                  rb.Property(r => r.Value)
+                .HasColumnName("Rating")
+                .HasConversion(r => r, r => Rating.Create(r).Value)
+                .IsRequired();
+              }
             );
                 rb.WithOwner().HasForeignKey("ProductId");
             }
@@ -133,64 +133,64 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
             i => i.Thumbnail,
             tib =>
             {
-                  tib.HasIndex(t => t.ObjectIdentifier).IsUnique();
-                  tib.Property(t => t.Url);
-                  tib.Property(t => t.ObjectIdentifier);
-              }
+                tib.HasIndex(t => t.ObjectIdentifier).IsUnique();
+                tib.Property(t => t.Url);
+                tib.Property(t => t.ObjectIdentifier);
+            }
           );
               ib.OwnsOne(
             i => i.LeftImage,
             lib =>
             {
-                  lib.HasIndex(l => l.ObjectIdentifier).IsUnique();
-                  lib.Property(l => l.Url);
-                  lib.Property(l => l.ObjectIdentifier);
-              }
+                lib.HasIndex(l => l.ObjectIdentifier).IsUnique();
+                lib.Property(l => l.Url);
+                lib.Property(l => l.ObjectIdentifier);
+            }
           );
               ib.OwnsOne(
             i => i.RightImage,
             rib =>
             {
-                  rib.HasIndex(r => r.ObjectIdentifier).IsUnique();
-                  rib.Property(r => r.Url);
-                  rib.Property(r => r.ObjectIdentifier);
-              }
+                rib.HasIndex(r => r.ObjectIdentifier).IsUnique();
+                rib.Property(r => r.Url);
+                rib.Property(r => r.ObjectIdentifier);
+            }
           );
               ib.OwnsOne(
             i => i.FrontImage,
             fib =>
             {
-                  fib.HasIndex(f => f.ObjectIdentifier).IsUnique();
-                  fib.Property(f => f.Url);
-                  fib.Property(f => f.ObjectIdentifier);
-              }
+                fib.HasIndex(f => f.ObjectIdentifier).IsUnique();
+                fib.Property(f => f.Url);
+                fib.Property(f => f.ObjectIdentifier);
+            }
           );
               ib.OwnsOne(
             i => i.BackImage,
             bib =>
             {
-                  bib.HasIndex(b => b.ObjectIdentifier).IsUnique();
-                  bib.Property(b => b.Url);
-                  bib.Property(b => b.ObjectIdentifier);
-              }
+                bib.HasIndex(b => b.ObjectIdentifier).IsUnique();
+                bib.Property(b => b.Url);
+                bib.Property(b => b.ObjectIdentifier);
+            }
           );
               ib.OwnsOne(
             i => i.TopImage,
             tib =>
             {
-                  tib.HasIndex(t => t.ObjectIdentifier).IsUnique();
-                  tib.Property(t => t.Url);
-                  tib.Property(t => t.ObjectIdentifier);
-              }
+                tib.HasIndex(t => t.ObjectIdentifier).IsUnique();
+                tib.Property(t => t.Url);
+                tib.Property(t => t.ObjectIdentifier);
+            }
           );
               ib.OwnsOne(
             i => i.BottomImage,
             bib =>
             {
-                  bib.HasIndex(b => b.ObjectIdentifier).IsUnique();
-                  bib.Property(b => b.Url);
-                  bib.Property(b => b.ObjectIdentifier);
-              }
+                bib.HasIndex(b => b.ObjectIdentifier).IsUnique();
+                bib.Property(b => b.Url);
+                bib.Property(b => b.ObjectIdentifier);
+            }
           );
 
               ib.WithOwner().HasForeignKey("ProductId");
