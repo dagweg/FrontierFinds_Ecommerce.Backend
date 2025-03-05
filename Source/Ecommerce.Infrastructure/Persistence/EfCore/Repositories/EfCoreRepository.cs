@@ -19,49 +19,49 @@ public abstract class EfCoreRepository<TEntity, TId>(EfCoreContext context)
   : IRepository<TEntity, TId>
   where TEntity : class
 {
-  public async Task<bool> AddAsync(TEntity entity)
-  {
-    var entityEntry = await context.AddAsync(entity);
-    return entityEntry != null;
-  }
-
-  public async Task<GetAllResult<TEntity>> GetAllAsync(PaginationParameters pagination)
-  {
-    var query = context.Set<TEntity>().AsQueryable();
-
-    var totalCount = query.Count();
-    var entities = await query.Paginate(pagination).ToListAsync();
-
-    return new GetAllResult<TEntity>
+    public async Task<bool> AddAsync(TEntity entity)
     {
-      Items = entities,
-      TotalItems = totalCount,
-      TotalItemsFetched = entities.Count,
-    };
-  }
+        var entityEntry = await context.AddAsync(entity);
+        return entityEntry != null;
+    }
 
-  public async Task<TEntity?> GetByIdAsync(TId id)
-  {
-    var entity = await context.FindAsync<TEntity>(id);
+    public async Task<GetAllResult<TEntity>> GetAllAsync(PaginationParameters pagination)
+    {
+        var query = context.Set<TEntity>().AsQueryable();
 
-    return entity;
-  }
+        var totalCount = query.Count();
+        var entities = await query.Paginate(pagination).ToListAsync();
 
-  public bool Update(TEntity entity)
-  {
-    var updated = context.Update(entity);
-    return updated != null;
-  }
+        return new GetAllResult<TEntity>
+        {
+            Items = entities,
+            TotalItems = totalCount,
+            TotalItemsFetched = entities.Count,
+        };
+    }
 
-  public bool Delete(TEntity entity)
-  {
-    var deleted = context.Remove(entity);
-    return deleted != null;
-  }
+    public async Task<TEntity?> GetByIdAsync(TId id)
+    {
+        var entity = await context.FindAsync<TEntity>(id);
 
-  public async Task<bool> AnyAsync(TId id)
-  {
-    var entity = await context.FindAsync<TEntity>(id); // Try to find by ID
-    return entity != null;
-  }
+        return entity;
+    }
+
+    public bool Update(TEntity entity)
+    {
+        var updated = context.Update(entity);
+        return updated != null;
+    }
+
+    public bool Delete(TEntity entity)
+    {
+        var deleted = context.Remove(entity);
+        return deleted != null;
+    }
+
+    public async Task<bool> AnyAsync(TId id)
+    {
+        var entity = await context.FindAsync<TEntity>(id); // Try to find by ID
+        return entity != null;
+    }
 }

@@ -5,8 +5,8 @@ namespace Ecommerce.Application.Behaviors.Strategies.ProductImageStrategies;
 
 public class BottomImageStrategy : IProductImageStrategy
 {
-  public void Apply(ProductImages productImages, ProductImage productImage)
-  {
-    productImages.WithBottomImage(productImage);
-  }
+    public void Apply(ProductImages productImages, ProductImage productImage)
+    {
+        productImages.WithBottomImage(productImage);
+    }
 }

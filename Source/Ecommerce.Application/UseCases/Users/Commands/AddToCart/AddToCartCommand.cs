@@ -7,5 +7,5 @@ namespace Ecommerce.Application.UseCases.Users.Commands.AddToCart;
 
 public record AddToCartCommand : IRequest<Result>
 {
-  public List<CreateCartItemCommand> createCartItemCommands = [];
+    public List<CreateCartItemCommand> createCartItemCommands = [];
 }

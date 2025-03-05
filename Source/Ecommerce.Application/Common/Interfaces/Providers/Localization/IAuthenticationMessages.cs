@@ -5,7 +5,7 @@ namespace Ecommerce.Application.Common.Interfaces.Providers.Localization;
 /// </summary>
 public interface IAuthenticationMessages
 {
-  string EmailOrPasswordIncorrect { get; }
-  string UserAlreadyExists { get; }
-  string UserNotFound { get; }
+    string EmailOrPasswordIncorrect { get; }
+    string UserAlreadyExists { get; }
+    string UserNotFound { get; }
 }

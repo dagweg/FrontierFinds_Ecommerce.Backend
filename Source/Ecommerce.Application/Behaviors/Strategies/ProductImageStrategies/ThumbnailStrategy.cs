@@ -5,8 +5,8 @@ namespace Ecommerce.Application.Behaviors.Strategies.ProductImageStrategies;
 
 public class ThumbnailStrategy : IProductImageStrategy
 {
-  public void Apply(ProductImages productImages, ProductImage productImage)
-  {
-    productImages.WithThumbnail(productImage);
-  }
+    public void Apply(ProductImages productImages, ProductImage productImage)
+    {
+        productImages.WithThumbnail(productImage);
+    }
 }

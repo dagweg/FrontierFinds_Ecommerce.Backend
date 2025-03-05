@@ -4,13 +4,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Ecommerce.Application.Behaviors.Strategies.ProductImageStrategies;
 
-public class ProductImageStrategyResolver
+public interface IProductImageStrategyResolver
 {
-  private readonly Dictionary<ProductView, IProductImageStrategy> _strategies;
+    IProductImageStrategy Resolve(ProductView productView);
+}
 
-  public ProductImageStrategyResolver()
-  {
-    _strategies = new Dictionary<ProductView, IProductImageStrategy>
+public class ProductImageStrategyResolver : IProductImageStrategyResolver
+{
+    private readonly Dictionary<ProductView, IProductImageStrategy> _strategies;
+
+    public ProductImageStrategyResolver()
+    {
+        _strategies = new Dictionary<ProductView, IProductImageStrategy>
     {
       { ProductView.Thumbnail, new ThumbnailStrategy() },
       { ProductView.Front, new FrontImageStrategy() },
@@ -20,19 +25,19 @@ public class ProductImageStrategyResolver
       { ProductView.Top, new TopImageStrategy() },
       { ProductView.Bottom, new BottomImageStrategy() },
     };
-  }
+    }
 
-  /// <summary>
-  ///  Resolve the strategy for the given product view.
-  /// </summary>
-  /// <param name="productView"></param>
-  /// <returns></returns>
-  /// <exception cref="InvalidOperationException"></exception>
-  public IProductImageStrategy Resolve(ProductView productView)
-  {
-    if (_strategies.TryGetValue(productView, out var strategy))
-      return strategy;
+    /// <summary>
+    ///  Resolve the strategy for the given product view.
+    /// </summary>
+    /// <param name="productView"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public IProductImageStrategy Resolve(ProductView productView)
+    {
+        if (_strategies.TryGetValue(productView, out var strategy))
+            return strategy;
 
-    throw new InvalidOperationException($"No strategy found for {productView}");
-  }
+        throw new InvalidOperationException($"No strategy found for {productView}");
+    }
 }

@@ -16,57 +16,57 @@ namespace Ecommerce.Application.UseCases.Users.Commands.AddToCart;
 
 public class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, Result>
 {
-  private readonly IUserRepository _userRepository;
-  private readonly IUserContextService _userContextService;
-  private readonly IUnitOfWork _unitOfWork;
-  private readonly IProductRepository _productRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly IUserContextService _userContextService;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IProductRepository _productRepository;
 
-  public AddToCartCommandHandler(
-    IUserRepository userRepository,
-    IUserContextService userContextService,
-    IUnitOfWork unitOfWork,
-    IProductRepository productRepository
-  )
-  {
-    _userRepository = userRepository;
-    _userContextService = userContextService;
-    _unitOfWork = unitOfWork;
-    _productRepository = productRepository;
-  }
-
-  public async Task<Result> Handle(AddToCartCommand command, CancellationToken cancellationToken)
-  {
-    var userIdResult = _userContextService.GetValidUserId();
-    if (userIdResult.IsFailed)
-      return userIdResult.ToResult();
-
-    List<CartItem> cartItems = [];
-
-    // convert each cartItemCommand to CartItem instance and append to cartItems list
-    foreach (var cartItemCommand in command.createCartItemCommands)
+    public AddToCartCommandHandler(
+      IUserRepository userRepository,
+      IUserContextService userContextService,
+      IUnitOfWork unitOfWork,
+      IProductRepository productRepository
+    )
     {
-      var productIdGuidResult = ConversionUtility.ToGuid(cartItemCommand.ProductId);
-      if (productIdGuidResult.IsFailed)
-        return productIdGuidResult.ToResult();
-
-      var productId = ProductId.Convert(productIdGuidResult.Value);
-
-      if (!await _productRepository.AnyAsync(productId))
-      {
-        return NotFoundError.GetResult(nameof(productId), "Product not found");
-      }
-
-      var cartItem = CartItem.Create(productId, cartItemCommand.Quantity);
-
-      cartItems.Add(cartItem);
+        _userRepository = userRepository;
+        _userContextService = userContextService;
+        _unitOfWork = unitOfWork;
+        _productRepository = productRepository;
     }
 
-    // add to the user cart
-    await _userRepository.AddToCartRangeAsync(userIdResult.Value, cartItems);
+    public async Task<Result> Handle(AddToCartCommand command, CancellationToken cancellationToken)
+    {
+        var userIdResult = _userContextService.GetValidUserId();
+        if (userIdResult.IsFailed)
+            return userIdResult.ToResult();
 
-    // persist to db
-    await _unitOfWork.SaveChangesAsync();
+        List<CartItem> cartItems = [];
 
-    return Result.Ok();
-  }
+        // convert each cartItemCommand to CartItem instance and append to cartItems list
+        foreach (var cartItemCommand in command.createCartItemCommands)
+        {
+            var productIdGuidResult = ConversionUtility.ToGuid(cartItemCommand.ProductId);
+            if (productIdGuidResult.IsFailed)
+                return productIdGuidResult.ToResult();
+
+            var productId = ProductId.Convert(productIdGuidResult.Value);
+
+            if (!await _productRepository.AnyAsync(productId))
+            {
+                return NotFoundError.GetResult(nameof(productId), "Product not found");
+            }
+
+            var cartItem = CartItem.Create(productId, cartItemCommand.Quantity);
+
+            cartItems.Add(cartItem);
+        }
+
+        // add to the user cart
+        await _userRepository.AddToCartRangeAsync(userIdResult.Value, cartItems);
+
+        // persist to db
+        await _unitOfWork.SaveChangesAsync();
+
+        return Result.Ok();
+    }
 }

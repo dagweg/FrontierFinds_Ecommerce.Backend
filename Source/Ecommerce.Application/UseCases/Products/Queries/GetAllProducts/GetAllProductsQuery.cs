@@ -7,13 +7,13 @@ namespace Ecommerce.Application.UseCases.Products.Queries.GetAllProducts;
 
 public class GetAllProductsQuery : IPaginated, IRequest<Result<ProductsResult>>
 {
-  public int PageNumber { get; init; }
+    public int PageNumber { get; init; }
 
-  public int PageSize { get; init; }
+    public int PageSize { get; init; }
 
-  public GetAllProductsQuery(int pageNumber, int pageSize)
-  {
-    PageNumber = pageNumber;
-    PageSize = pageSize;
-  }
+    public GetAllProductsQuery(int pageNumber, int pageSize)
+    {
+        PageNumber = pageNumber;
+        PageSize = pageSize;
+    }
 }

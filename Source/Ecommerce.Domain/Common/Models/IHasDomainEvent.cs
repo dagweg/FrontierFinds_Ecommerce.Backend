@@ -7,8 +7,8 @@ namespace Ecommerce.Domain.Common.Models;
 /// </summary>
 public interface IHasDomainEvent
 {
-  IReadOnlyList<IDomainEvent> DomainEvents { get; }
+    IReadOnlyList<IDomainEvent> DomainEvents { get; }
 
-  void ClearDomainEvents();
-  void AddDomainEvent(IDomainEvent domainEvent);
+    void ClearDomainEvents();
+    void AddDomainEvent(IDomainEvent domainEvent);
 }

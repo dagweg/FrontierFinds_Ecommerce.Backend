@@ -6,6 +6,6 @@ namespace Ecommerce.Infrastructure.Persistence.EfCore.Options;
 
 public class SqlServerOptions
 {
-  public const string SectionName = "SqlServerSettings";
-  public string ConnectionString { get; set; } = string.Empty;
+    public const string SectionName = "SqlServerSettings";
+    public string ConnectionString { get; set; } = string.Empty;
 }

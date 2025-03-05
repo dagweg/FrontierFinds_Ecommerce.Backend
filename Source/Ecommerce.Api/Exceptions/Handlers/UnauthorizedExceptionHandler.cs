@@ -10,42 +10,42 @@ namespace Ecommerce.Api.Exceptions.Handlers;
 
 public class UnauthorizedAccessExceptionHandler : IExceptionHandler
 {
-  private readonly ILogger<UnauthorizedAccessExceptionHandler> _logger;
+    private readonly ILogger<UnauthorizedAccessExceptionHandler> _logger;
 
-  public UnauthorizedAccessExceptionHandler(ILogger<UnauthorizedAccessExceptionHandler> logger)
-  {
-    _logger = logger;
-  }
-
-  public async ValueTask<bool> TryHandleAsync(
-    HttpContext context,
-    Exception ex,
-    CancellationToken cancellationToken
-  )
-  {
-    if (ex is not UnauthorizedAccessException)
+    public UnauthorizedAccessExceptionHandler(ILogger<UnauthorizedAccessExceptionHandler> logger)
     {
-      // Return false to indicate that this handler did not handle the exception.
-      return false;
+        _logger = logger;
     }
 
-    var problemDetails = new ProblemDetails
+    public async ValueTask<bool> TryHandleAsync(
+      HttpContext context,
+      Exception ex,
+      CancellationToken cancellationToken
+    )
     {
-      Status = StatusCodes.Status401Unauthorized,
-      Type = "UnauthorizedAccessFailure",
-      Title = "Unauthorized Access",
-      Detail = "You are not authorized to access this resource.",
-      Extensions = { { "traceId", context.TraceIdentifier } },
-    };
+        if (ex is not UnauthorizedAccessException)
+        {
+            // Return false to indicate that this handler did not handle the exception.
+            return false;
+        }
 
-    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-    context.Response.Headers.Add("X-Trace-ID", context.TraceIdentifier);
+        var problemDetails = new ProblemDetails
+        {
+            Status = StatusCodes.Status401Unauthorized,
+            Type = "UnauthorizedAccessFailure",
+            Title = "Unauthorized Access",
+            Detail = "You are not authorized to access this resource.",
+            Extensions = { { "traceId", context.TraceIdentifier } },
+        };
 
-    await context.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        context.Response.Headers.Add("X-Trace-ID", context.TraceIdentifier);
 
-    _logger.LogFormattedError(ex, context.TraceIdentifier);
+        await context.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 
-    // Return true to indicate that the exception was handled.
-    return true;
-  }
+        _logger.LogFormattedError(ex, context.TraceIdentifier);
+
+        // Return true to indicate that the exception was handled.
+        return true;
+    }
 }

@@ -8,12 +8,12 @@ namespace Ecommerce.Application.UseCases.Users.Commands.AddToCart;
 
 public class AddToCartCommandValidator : AbstractValidator<AddToCartCommand>
 {
-  public AddToCartCommandValidator()
-  {
-    RuleForEach(x => x.createCartItemCommands)
-      .Must(ci => Guid.TryParse(ci.ProductId, out _))
-      .WithMessage("Invalid cart item product id")
-      .Must(ci => ci.Quantity > 0)
-      .WithMessage("Quantity must be greater than zero");
-  }
+    public AddToCartCommandValidator()
+    {
+        RuleForEach(x => x.createCartItemCommands)
+          .Must(ci => Guid.TryParse(ci.ProductId, out _))
+          .WithMessage("Invalid cart item product id")
+          .Must(ci => ci.Quantity > 0)
+          .WithMessage("Quantity must be greater than zero");
+    }
 }

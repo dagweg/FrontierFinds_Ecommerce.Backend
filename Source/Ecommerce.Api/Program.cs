@@ -15,46 +15,46 @@ using Ecommerce.Infrastructure;
 
 public class Program
 {
-  public static void Main(string[] args)
-  {
-    try
+    public static void Main(string[] args)
     {
-      var builder = WebApplication.CreateBuilder(args);
-      {
-        // Configure Serilog from within infrastructure
-        builder.Host.AddHostConfigurations();
-
-        // Swagger Api Documentation Generator
-        builder.Services.AddSwaggerGen();
-
-        builder
-          .Services.ConfigureAutomapper()
-          .AddApi()
-          .AddApplication(builder.Configuration)
-          .AddInfrastructure(builder.Configuration);
-      }
-
-      var app = builder.Build();
-      {
-        app.UseAuthentication().UseAuthorization();
-
-        app.UseMiddleware<ExceptionHandlingMiddleware>()
-          .UseMiddleware<FluentValidationExceptionHandlingMiddleware>();
-
-        if (app.Environment.IsDevelopment())
+        try
         {
-          app.UseSwagger();
-          app.UseSwaggerUI();
+            var builder = WebApplication.CreateBuilder(args);
+            {
+                // Configure Serilog from within infrastructure
+                builder.Host.AddHostConfigurations();
+
+                // Swagger Api Documentation Generator
+                builder.Services.AddSwaggerGen();
+
+                builder
+                  .Services.ConfigureAutomapper()
+                  .AddApi()
+                  .AddApplication(builder.Configuration)
+                  .AddInfrastructure(builder.Configuration);
+            }
+
+            var app = builder.Build();
+            {
+                app.UseAuthentication().UseAuthorization();
+
+                app.UseMiddleware<ExceptionHandlingMiddleware>()
+                  .UseMiddleware<FluentValidationExceptionHandlingMiddleware>();
+
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI();
+                }
+
+                app.MapControllers();
+
+                app.Run();
+            }
         }
-
-        app.MapControllers();
-
-        app.Run();
-      }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Server terminated unexpectedly. {ex}");
+        }
     }
-    catch (Exception ex)
-    {
-      Console.WriteLine($"Server terminated unexpectedly. {ex}");
-    }
-  }
 }

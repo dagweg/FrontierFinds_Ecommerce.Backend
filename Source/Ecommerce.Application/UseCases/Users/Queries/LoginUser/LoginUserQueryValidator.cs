@@ -9,18 +9,18 @@ namespace Ecommerce.Application.UseCases.Users.Queries.LoginUser;
 /// </summary>
 public class LoginUserQueryValidator : AbstractValidator<LoginUserQuery>
 {
-  private readonly IValidationMessages _messages;
+    private readonly IValidationMessages _messages;
 
-  public LoginUserQueryValidator(IValidationMessages messages)
-  {
-    _messages = messages;
+    public LoginUserQueryValidator(IValidationMessages messages)
+    {
+        _messages = messages;
 
-    RuleFor(x => x.Email)
-      .NotEmpty()
-      .WithMessage(_messages.EmailRequired)
-      .EmailAddress()
-      .WithMessage(_messages.EmailInvalidFormat);
+        RuleFor(x => x.Email)
+          .NotEmpty()
+          .WithMessage(_messages.EmailRequired)
+          .EmailAddress()
+          .WithMessage(_messages.EmailInvalidFormat);
 
-    RuleFor(x => x.Password).NotEmpty().WithMessage(_messages.PasswordRequired);
-  }
+        RuleFor(x => x.Password).NotEmpty().WithMessage(_messages.PasswordRequired);
+    }
 }

@@ -8,12 +8,12 @@ namespace Ecommerce.Api.Mapping;
 
 public class AuthenticationProfile : Profile
 {
-  public AuthenticationProfile()
-  {
-    CreateMap<AuthenticationResult, AuthenticationResponse>();
+    public AuthenticationProfile()
+    {
+        CreateMap<AuthenticationResult, AuthenticationResponse>();
 
-    CreateMap<RegisterRequest, RegisterUserCommand>();
+        CreateMap<RegisterRequest, RegisterUserCommand>();
 
-    CreateMap<LoginRequest, LoginUserQuery>();
-  }
+        CreateMap<LoginRequest, LoginUserQuery>();
+    }
 }

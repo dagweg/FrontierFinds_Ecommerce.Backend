@@ -5,8 +5,8 @@ namespace Ecommerce.Application.Behaviors.Strategies.ProductImageStrategies;
 
 public class LeftImageStrategy : IProductImageStrategy
 {
-  public void Apply(ProductImages productImages, ProductImage productImage)
-  {
-    productImages.WithLeftImage(productImage);
-  }
+    public void Apply(ProductImages productImages, ProductImage productImage)
+    {
+        productImages.WithLeftImage(productImage);
+    }
 }

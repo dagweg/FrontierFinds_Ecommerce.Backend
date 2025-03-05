@@ -4,5 +4,5 @@ namespace Ecommerce.Application.Common.Interfaces.Strategies;
 
 public interface IProductImageStrategy
 {
-  void Apply(ProductImages productImages, ProductImage productImage);
+    void Apply(ProductImages productImages, ProductImage productImage);
 }

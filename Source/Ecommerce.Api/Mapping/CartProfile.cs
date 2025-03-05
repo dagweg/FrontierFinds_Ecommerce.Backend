@@ -6,5 +6,5 @@ namespace Ecommerce.Api.Mapping;
 
 public class CartProfile : Profile
 {
-  public CartProfile() { }
+    public CartProfile() { }
 }

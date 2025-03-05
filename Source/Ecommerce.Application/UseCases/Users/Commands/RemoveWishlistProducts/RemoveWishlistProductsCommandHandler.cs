@@ -11,55 +11,55 @@ namespace Ecommerce.Application.UseCases.Users.Commands.RemoveWishlistProducts;
 public class RemoveWishlistProductsCommandHandler
   : IRequestHandler<RemoveWishlistProductsCommand, Result>
 {
-  private readonly IUserRepository _userRepository;
-  private readonly IUserContextService _userContextService;
-  private readonly IUnitOfWork _unitOfWork;
-  private readonly IProductRepository _productRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly IUserContextService _userContextService;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IProductRepository _productRepository;
 
-  public RemoveWishlistProductsCommandHandler(
-    IUserRepository userRepository,
-    IUserContextService userContextService,
-    IUnitOfWork unitOfWork,
-    IProductRepository productRepository
-  )
-  {
-    _userRepository = userRepository;
-    _userContextService = userContextService;
-    _unitOfWork = unitOfWork;
-    _productRepository = productRepository;
-  }
-
-  public async Task<Result> Handle(
-    RemoveWishlistProductsCommand request,
-    CancellationToken cancellationToken
-  )
-  {
-    var userIdResult = _userContextService.GetValidUserId();
-    if (userIdResult.IsFailed)
-      return userIdResult.ToResult();
-
-    HashSet<ProductId> productIds = [];
-
-    foreach (var pidGuidResult in request.ProductIds.Select(ConversionUtility.ToGuid))
+    public RemoveWishlistProductsCommandHandler(
+      IUserRepository userRepository,
+      IUserContextService userContextService,
+      IUnitOfWork unitOfWork,
+      IProductRepository productRepository
+    )
     {
-      if (pidGuidResult.IsFailed)
-        return pidGuidResult.ToResult();
-
-      var productId = ProductId.Convert(pidGuidResult.Value);
-      productIds.Add(productId);
+        _userRepository = userRepository;
+        _userContextService = userContextService;
+        _unitOfWork = unitOfWork;
+        _productRepository = productRepository;
     }
 
-    var success = await _userRepository.RemoveFromWishlistRangeAsync(
-      userIdResult.Value,
-      productIds
-    );
-
-    if (success)
+    public async Task<Result> Handle(
+      RemoveWishlistProductsCommand request,
+      CancellationToken cancellationToken
+    )
     {
-      await _unitOfWork.SaveChangesAsync();
-      return Result.Ok();
-    }
+        var userIdResult = _userContextService.GetValidUserId();
+        if (userIdResult.IsFailed)
+            return userIdResult.ToResult();
 
-    return Result.Fail("Failed to add products to wishlist");
-  }
+        HashSet<ProductId> productIds = [];
+
+        foreach (var pidGuidResult in request.ProductIds.Select(ConversionUtility.ToGuid))
+        {
+            if (pidGuidResult.IsFailed)
+                return pidGuidResult.ToResult();
+
+            var productId = ProductId.Convert(pidGuidResult.Value);
+            productIds.Add(productId);
+        }
+
+        var success = await _userRepository.RemoveFromWishlistRangeAsync(
+          userIdResult.Value,
+          productIds
+        );
+
+        if (success)
+        {
+            await _unitOfWork.SaveChangesAsync();
+            return Result.Ok();
+        }
+
+        return Result.Fail("Failed to add products to wishlist");
+    }
 }

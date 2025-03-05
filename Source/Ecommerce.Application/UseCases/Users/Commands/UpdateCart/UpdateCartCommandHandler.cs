@@ -18,75 +18,75 @@ namespace Ecommerce.Application.UseCases.Users.Commands.UpdateCart;
 
 public class UpdateCartCommandHandler : IRequestHandler<UpdateCartCommand, Result>
 {
-  private readonly IUserRepository _userRepository;
-  private readonly IUserContextService _userContextService;
-  private readonly IUnitOfWork _unitOfWork;
-  private readonly IProductRepository _productRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly IUserContextService _userContextService;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IProductRepository _productRepository;
 
-  public UpdateCartCommandHandler(
-    IUserRepository userRepository,
-    IUserContextService userContextService,
-    IUnitOfWork unitOfWork,
-    IProductRepository productRepository
-  )
-  {
-    _userRepository = userRepository;
-    _userContextService = userContextService;
-    _unitOfWork = unitOfWork;
-    _productRepository = productRepository;
-  }
-
-  public async Task<Result> Handle(UpdateCartCommand command, CancellationToken cancellationToken)
-  {
-    var userId = _userContextService.GetValidUserId();
-    if (userId.IsFailed)
-      return userId.ToResult();
-
-    Dictionary<CartItemId, int> cartItems = [];
-
-    var user = await _userRepository.GetByIdAsync(userId.Value);
-
-    if (user is null)
+    public UpdateCartCommandHandler(
+      IUserRepository userRepository,
+      IUserContextService userContextService,
+      IUnitOfWork unitOfWork,
+      IProductRepository productRepository
+    )
     {
-      return NotFoundError.GetResult(nameof(User), "User not found");
+        _userRepository = userRepository;
+        _userContextService = userContextService;
+        _unitOfWork = unitOfWork;
+        _productRepository = productRepository;
     }
 
-    var dbCartItems = user.Cart.Items.Select(i => i.Id.Value).ToHashSet();
-
-    foreach (var cartItemCommand in command.CartItems)
+    public async Task<Result> Handle(UpdateCartCommand command, CancellationToken cancellationToken)
     {
-      var cartItemIdGuidResult = ConversionUtility.ToGuid(cartItemCommand.CartItemId);
+        var userId = _userContextService.GetValidUserId();
+        if (userId.IsFailed)
+            return userId.ToResult();
 
-      if (!cartItemIdGuidResult.IsSuccess)
-      {
-        return cartItemIdGuidResult.ToResult();
-      }
+        Dictionary<CartItemId, int> cartItems = [];
 
-      var cartItemId = CartItemId.Convert(cartItemIdGuidResult.Value);
+        var user = await _userRepository.GetByIdAsync(userId.Value);
 
-      if (!dbCartItems.Contains(cartItemIdGuidResult.Value))
-      {
-        return NotFoundError.GetResult(nameof(cartItemId), "Cart item not found");
-      }
+        if (user is null)
+        {
+            return NotFoundError.GetResult(nameof(User), "User not found");
+        }
 
-      if (cartItems.ContainsKey(cartItemId))
-      {
-        cartItems[cartItemId] += cartItemCommand.Quantity;
-      }
-      else
-      {
-        cartItems.Add(cartItemId, cartItemCommand.Quantity);
-      }
+        var dbCartItems = user.Cart.Items.Select(i => i.Id.Value).ToHashSet();
+
+        foreach (var cartItemCommand in command.CartItems)
+        {
+            var cartItemIdGuidResult = ConversionUtility.ToGuid(cartItemCommand.CartItemId);
+
+            if (!cartItemIdGuidResult.IsSuccess)
+            {
+                return cartItemIdGuidResult.ToResult();
+            }
+
+            var cartItemId = CartItemId.Convert(cartItemIdGuidResult.Value);
+
+            if (!dbCartItems.Contains(cartItemIdGuidResult.Value))
+            {
+                return NotFoundError.GetResult(nameof(cartItemId), "Cart item not found");
+            }
+
+            if (cartItems.ContainsKey(cartItemId))
+            {
+                cartItems[cartItemId] += cartItemCommand.Quantity;
+            }
+            else
+            {
+                cartItems.Add(cartItemId, cartItemCommand.Quantity);
+            }
+        }
+
+        var success = await _userRepository.UpdateCartAsync(userId.Value, cartItems);
+
+        if (success)
+        {
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result.Ok();
+        }
+
+        return InternalError.GetResult("Couldn't update cart");
     }
-
-    var success = await _userRepository.UpdateCartAsync(userId.Value, cartItems);
-
-    if (success)
-    {
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return Result.Ok();
-    }
-
-    return InternalError.GetResult("Couldn't update cart");
-  }
 }

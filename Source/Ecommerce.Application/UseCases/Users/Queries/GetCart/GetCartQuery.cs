@@ -8,6 +8,6 @@ namespace Ecommerce.Application.UseCases.Users.Queries.GetCartItems;
 
 public record GetCartQuery(int pageNumber, int pageSize) : IRequest<Result<CartResult>>, IPaginated
 {
-  public int PageNumber { get; init; } = pageNumber;
-  public int PageSize { get; init; } = pageSize;
+    public int PageNumber { get; init; } = pageNumber;
+    public int PageSize { get; init; } = pageSize;
 }

@@ -6,5 +6,5 @@ namespace Ecommerce.Application.Common.Mapping;
 
 public class ImageMappingProfile : Profile
 {
-  public ImageMappingProfile() { }
+    public ImageMappingProfile() { }
 }

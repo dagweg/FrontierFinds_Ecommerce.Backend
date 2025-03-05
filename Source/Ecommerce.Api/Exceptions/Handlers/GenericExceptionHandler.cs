@@ -10,37 +10,37 @@ namespace Ecommerce.Api.Exceptions.Handlers;
 
 public class GenericExceptionHandler : IExceptionHandler
 {
-  private readonly ILogger<GenericExceptionHandler> _logger;
+    private readonly ILogger<GenericExceptionHandler> _logger;
 
-  public GenericExceptionHandler(ILogger<GenericExceptionHandler> logger)
-  {
-    _logger = logger;
-  }
-
-  public async ValueTask<bool> TryHandleAsync(
-    HttpContext context,
-    Exception ex,
-    CancellationToken cancellationToken
-  )
-  {
-    // This handler will handle all exceptions that are not handled by other handlers.
-    var problemDetails = new ProblemDetails
+    public GenericExceptionHandler(ILogger<GenericExceptionHandler> logger)
     {
-      Status = StatusCodes.Status500InternalServerError,
-      Type = "InternalServerFailure",
-      Title = "Internal Server Error",
-      Detail = "An internal server error has occurred. Please try again later or contact support.",
-      Extensions = { { "traceId", context.TraceIdentifier } },
-    };
+        _logger = logger;
+    }
 
-    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-    context.Response.Headers.Add("X-Trace-ID", context.TraceIdentifier);
+    public async ValueTask<bool> TryHandleAsync(
+      HttpContext context,
+      Exception ex,
+      CancellationToken cancellationToken
+    )
+    {
+        // This handler will handle all exceptions that are not handled by other handlers.
+        var problemDetails = new ProblemDetails
+        {
+            Status = StatusCodes.Status500InternalServerError,
+            Type = "InternalServerFailure",
+            Title = "Internal Server Error",
+            Detail = "An internal server error has occurred. Please try again later or contact support.",
+            Extensions = { { "traceId", context.TraceIdentifier } },
+        };
 
-    await context.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.Headers.Add("X-Trace-ID", context.TraceIdentifier);
 
-    _logger.LogFormattedError(ex, context.TraceIdentifier);
+        await context.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 
-    // Return true to indicate that the exception was handled.
-    return true;
-  }
+        _logger.LogFormattedError(ex, context.TraceIdentifier);
+
+        // Return true to indicate that the exception was handled.
+        return true;
+    }
 }

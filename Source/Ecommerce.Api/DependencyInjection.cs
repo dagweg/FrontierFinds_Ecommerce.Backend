@@ -11,37 +11,37 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 public static class DependencyInjection
 {
-  public static IServiceCollection AddApi(this IServiceCollection services)
-  {
-    services.AddExceptionHandlers();
-
-    services.AddControllers(options =>
+    public static IServiceCollection AddApi(this IServiceCollection services)
     {
-      // Register global action filters
-      options.Filters.Add<FluentResultsActionFilter>();
-      options.Filters.Add<ModelBindingErrorActionFilter>();
-    });
+        services.AddExceptionHandlers();
 
-    services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-    services.AddTransient(typeof(IPasswordHasher<>), typeof(PasswordHasher<>));
+        services.AddControllers(options =>
+        {
+            // Register global action filters
+            options.Filters.Add<FluentResultsActionFilter>();
+            options.Filters.Add<ModelBindingErrorActionFilter>();
+        });
 
-    services.Configure<ApiBehaviorOptions>(options =>
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddTransient(typeof(IPasswordHasher<>), typeof(PasswordHasher<>));
+
+        services.Configure<ApiBehaviorOptions>(options =>
+        {
+            options.SuppressModelStateInvalidFilter = true;
+        });
+
+        services.AddScoped<IUserContextService, UserContextService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
     {
-      options.SuppressModelStateInvalidFilter = true;
-    });
+        services.AddSingleton<ExceptionHandlerFactory>();
+        services.AddSingleton<KeyNotFoundExceptionHandler>();
+        services.AddSingleton<UnauthorizedAccessExceptionHandler>();
+        services.AddSingleton<GenericExceptionHandler>();
 
-    services.AddScoped<IUserContextService, UserContextService>();
-
-    return services;
-  }
-
-  public static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
-  {
-    services.AddSingleton<ExceptionHandlerFactory>();
-    services.AddSingleton<KeyNotFoundExceptionHandler>();
-    services.AddSingleton<UnauthorizedAccessExceptionHandler>();
-    services.AddSingleton<GenericExceptionHandler>();
-
-    return services;
-  }
+        return services;
+    }
 }

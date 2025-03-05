@@ -5,8 +5,8 @@ namespace Ecommerce.Application.Behaviors.Strategies.ProductImageStrategies;
 
 public class FrontImageStrategy : IProductImageStrategy
 {
-  public void Apply(ProductImages productImages, ProductImage productImage)
-  {
-    productImages.WithFrontImage(productImage);
-  }
+    public void Apply(ProductImages productImages, ProductImage productImage)
+    {
+        productImages.WithFrontImage(productImage);
+    }
 }

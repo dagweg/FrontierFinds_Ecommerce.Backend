@@ -17,56 +17,56 @@ namespace Ecommerce.Api.Controllers;
 [Route("products")]
 public class ProductController : ControllerBase
 {
-  private readonly ISender _mediator;
-  private readonly IMapper _mapper;
-  private readonly ILogger<ProductController> _logger;
+    private readonly ISender _mediator;
+    private readonly IMapper _mapper;
+    private readonly ILogger<ProductController> _logger;
 
-  public ProductController(ISender mediator, IMapper mapper, ILogger<ProductController> logger)
-  {
-    _mediator = mediator;
-    _mapper = mapper;
-    _logger = logger;
-  }
-
-  [HttpPost]
-  public async Task<IActionResult> CreateProduct(
-    [FromForm] CreateProductRequest createProductRequest
-  )
-  {
-    var result = await _mediator.Send(_mapper.Map<CreateProductCommand>(createProductRequest));
-    if (result.IsFailed)
+    public ProductController(ISender mediator, IMapper mapper, ILogger<ProductController> logger)
     {
-      _logger.LogError("Failed to create product: {@result}", result);
-      return new ObjectResult(result);
-    }
-    return Created();
-  }
-
-  [HttpGet]
-  public async Task<IActionResult> GetProducts([FromQuery] PaginationParams paginationParams)
-  {
-    var result = await _mediator.Send(
-      new GetAllProductsQuery(paginationParams.PageNumber, paginationParams.PageSize)
-    );
-
-    if (result.IsFailed)
-    {
-      _logger.LogError("Failed to get all products: {@result}", result);
-      return new ObjectResult(result);
+        _mediator = mediator;
+        _mapper = mapper;
+        _logger = logger;
     }
 
-    return Ok(_mapper.Map<ProductsResponse>(result.Value));
-  }
-
-  [HttpDelete("{productId}")]
-  public async Task<IActionResult> DeleteProduct(string productId)
-  {
-    var result = await _mediator.Send(new DeleteProductCommand(productId));
-    if (result.IsFailed)
+    [HttpPost]
+    public async Task<IActionResult> CreateProduct(
+      [FromForm] CreateProductRequest createProductRequest
+    )
     {
-      _logger.LogError("Failed to delete product: {@result}", result);
-      return new ObjectResult(result);
+        var result = await _mediator.Send(_mapper.Map<CreateProductCommand>(createProductRequest));
+        if (result.IsFailed)
+        {
+            _logger.LogError("Failed to create product: {@result}", result);
+            return new ObjectResult(result);
+        }
+        return Created();
     }
-    return NoContent();
-  }
+
+    [HttpGet]
+    public async Task<IActionResult> GetProducts([FromQuery] PaginationParams paginationParams)
+    {
+        var result = await _mediator.Send(
+          new GetAllProductsQuery(paginationParams.PageNumber, paginationParams.PageSize)
+        );
+
+        if (result.IsFailed)
+        {
+            _logger.LogError("Failed to get all products: {@result}", result);
+            return new ObjectResult(result);
+        }
+
+        return Ok(_mapper.Map<ProductsResponse>(result.Value));
+    }
+
+    [HttpDelete("{productId}")]
+    public async Task<IActionResult> DeleteProduct(string productId)
+    {
+        var result = await _mediator.Send(new DeleteProductCommand(productId));
+        if (result.IsFailed)
+        {
+            _logger.LogError("Failed to delete product: {@result}", result);
+            return new ObjectResult(result);
+        }
+        return NoContent();
+    }
 }
