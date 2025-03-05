@@ -22,6 +22,7 @@ using Ecommerce.Infrastructure.Persistence.EfCore.Options;
 using Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 using Ecommerce.Infrastructure.Services.Authentication;
 using Ecommerce.Infrastructure.Services.Processors;
+using Ecommerce.Infrastructure.Services.Providers.Smtp;
 using Ecommerce.Infrastructure.Services.Storage;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
@@ -53,6 +54,8 @@ public static class DependencyInjection
     services.AddAuth(configuration);
 
     services.AddInterceptors();
+
+    services.AddSmtp();
 
     // register persistence (sql server, ef core, repositories)
     services.AddPersistence(configuration);
@@ -222,6 +225,12 @@ public static class DependencyInjection
 
     services.AddScoped<ICloudinaryResourceTracker, CloudinaryResourceTracker>();
     services.AddScoped<IExternalResourceTracker, CloudinaryResourceTracker>();
+    return services;
+  }
+
+  public static IServiceCollection AddSmtp(this IServiceCollection services)
+  {
+    services.AddScoped<ISmtpClientWrapper, SmtpClientWrapper>();
     return services;
   }
 }
