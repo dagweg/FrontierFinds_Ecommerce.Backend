@@ -13,7 +13,8 @@ namespace Ecommerce.Application.UseCases.Stmp.Commands.SendEmail;
 
 public class SendEmailCommandHandler(
   IOptions<EmailSettings> emailSettings,
-  ILogger<SendEmailCommandHandler> logger
+  ILogger<SendEmailCommandHandler> logger,
+  ISmtpClientWrapper smtpClientWrapper
 ) : IRequestHandler<SendEmailCommand, Result>
 {
   private readonly EmailSettings _emailSettings = emailSettings.Value;
@@ -27,14 +28,17 @@ public class SendEmailCommandHandler(
     mail.Body = command.Body;
     mail.IsBodyHtml = true;
 
-    SmtpClient smtp = new SmtpClient(_emailSettings.Host);
-    smtp.Port = _emailSettings.Port;
-    smtp.Credentials = new NetworkCredential(_emailSettings.UserName, _emailSettings.Password);
-    smtp.EnableSsl = _emailSettings.EnableSsl;
+    smtpClientWrapper.Host = _emailSettings.Host;
+    smtpClientWrapper.Port = _emailSettings.Port;
+    smtpClientWrapper.Credentials = new NetworkCredential(
+      _emailSettings.UserName,
+      _emailSettings.Password
+    );
+    smtpClientWrapper.EnableSsl = _emailSettings.EnableSsl;
 
     var tcs = new TaskCompletionSource<Result>();
 
-    smtp.SendCompleted += (sender, e) =>
+    smtpClientWrapper.SendCompleted += (sender, e) =>
     {
       if (e.Cancelled)
       {
@@ -57,7 +61,7 @@ public class SendEmailCommandHandler(
       }
     };
 
-    smtp.SendAsync(mail, null);
+    smtpClientWrapper.SendAsync(mail, null);
 
     return await tcs.Task;
   }
