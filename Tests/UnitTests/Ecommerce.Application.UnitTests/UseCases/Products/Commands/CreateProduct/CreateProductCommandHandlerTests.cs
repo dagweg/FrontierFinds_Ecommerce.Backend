@@ -10,7 +10,6 @@ using Ecommerce.Application.Common.Interfaces.Providers.Forex;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
 using Ecommerce.Application.Common.Interfaces.Strategies;
 using Ecommerce.Application.Common.Interfaces.Validation;
-using Ecommerce.Application.UnitTests.UseCases.Products.Commands.TestUtils;
 using Ecommerce.Application.UseCases.Images.Common;
 using Ecommerce.Application.UseCases.Images.CreateImage;
 using Ecommerce.Application.UseCases.Products.Common;
@@ -18,11 +17,13 @@ using Ecommerce.Application.UseCases.Products.CreateUser.Commands;
 using Ecommerce.Application.UseCases.Users.Commands.RegisterUser;
 using Ecommerce.Domain.Common.Enums;
 using Ecommerce.Domain.Common.ValueObjects;
+using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.ProductAggregate.Enums;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using Ecommerce.UnitTests.Ecommerce.Application.UnitTests.UseCases;
 using FluentAssertions;
 using FluentResults;
 using MediatR;
@@ -31,7 +32,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
 using Moq;
-using static Ecommerce.Application.UnitTests.UseCases.Users.TestUtils.Constants;
 
 namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProduct
 {
@@ -74,7 +74,7 @@ namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProdu
     public async Task HandlerShould_ReturnFailed_WhenUserIsNotLoggedIn()
     {
       // arrange
-      var command = CreateProductTestUtils.CreateCommand();
+      var command = Utils.Product.CreateCommand();
 
       string errMsg = "User id not found";
       // configure the userContextMock to return failed
@@ -91,7 +91,7 @@ namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProdu
     public async Task HandlerShould_ReturnFailed_WhenCurrencyIsInvalid()
     {
       //arrange
-      var command = CreateProductTestUtils.CreateCommand() with
+      var command = Utils.Product.CreateCommand() with
       {
         PriceCurrency = "invalid_currency",
       };
@@ -109,7 +109,7 @@ namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProdu
     public async Task HandlerShould_ReturnOk_WhenCommandIsValid()
     {
       //arrange
-      var command = CreateProductTestUtils.CreateCommand();
+      var command = Utils.Product.CreateCommand();
 
       _userContextServiceMock.Setup(x => x.GetValidUserId()).Returns(Result.Ok());
       _forexServiceMock
