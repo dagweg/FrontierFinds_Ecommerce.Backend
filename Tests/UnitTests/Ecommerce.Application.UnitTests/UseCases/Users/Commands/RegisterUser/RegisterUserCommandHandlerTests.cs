@@ -7,6 +7,7 @@ using Ecommerce.Application.UseCases.Users.Commands.RegisterUser;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using Ecommerce.UnitTests.Ecommerce.Application.UnitTests.UseCases;
 using FluentAssertions;
 using FluentResults;
 using Microsoft.AspNetCore.Identity;
@@ -43,7 +44,7 @@ public class RegisterUserCommandHandlerTests
   public async Task HandlerShould_ReturnError_WhenEmailValidationFails()
   {
     // Arrange
-    var command = RegisterUserCommandUtils.CreateCommand();
+    var command = Utils.User.CreateRegisterUserCommand();
 
     _userValidationServiceMock
       .Setup(x => x.CheckIfUserAlreadyExistsAsync(It.IsAny<Email>()))
@@ -60,7 +61,7 @@ public class RegisterUserCommandHandlerTests
   public async Task HandlerShould_ReturnOk_WhenRegisterIsSuccessful()
   {
     // Arrange
-    var command = RegisterUserCommandUtils.CreateCommand();
+    var command = Utils.User.CreateRegisterUserCommand();
 
     _userValidationServiceMock
       .Setup(x => x.CheckIfUserAlreadyExistsAsync(It.IsAny<Email>()))
