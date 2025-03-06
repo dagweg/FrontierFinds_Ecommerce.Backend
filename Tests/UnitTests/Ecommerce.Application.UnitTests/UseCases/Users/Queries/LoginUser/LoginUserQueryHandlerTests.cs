@@ -4,12 +4,12 @@ using Ecommerce.Application.Common.Errors;
 using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
-using Ecommerce.Application.UnitTests.UseCases.Users.TestUtils;
 using Ecommerce.Application.UseCases.Users.Common;
 using Ecommerce.Application.UseCases.Users.Queries.LoginUser;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using Ecommerce.UnitTests.Ecommerce.Application.UnitTests.UseCases;
 using FluentAssertions;
 using FluentResults;
 using Microsoft.AspNetCore.Identity;
@@ -61,11 +61,11 @@ public class LoginUserQueryHandlerTests
   public async Task HandlerShould_ReturnError_WhenPasswordIsIncorrect()
   {
     // Arrange
-    var query = LoginUserQueryUtils.CreateQuery();
+    var query = Utils.User.CreateLoginUserQuery();
 
     _userRepositoryMock
       .Setup(x => x.GetByEmailAsync(It.IsAny<Email>()))
-      .ReturnsAsync(Constants.User.Create());
+      .ReturnsAsync(Utils.User.Create());
 
     _passwordHasherMock
       .Setup(x => x.VerifyHashedPassword(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -87,12 +87,11 @@ public class LoginUserQueryHandlerTests
   public async Task HandlerShould_ReturnOk_WhenLoginIsSuccessful()
   {
     // Arrange
-
-    var query = LoginUserQueryUtils.CreateQuery();
+    var query = Utils.User.CreateLoginUserQuery();
 
     _userRepositoryMock
       .Setup(x => x.GetByEmailAsync(It.IsAny<Email>()))
-      .ReturnsAsync(Constants.User.Create());
+      .ReturnsAsync(Utils.User.Create());
 
     _passwordHasherMock
       .Setup(x => x.VerifyHashedPassword(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -111,9 +110,9 @@ public class LoginUserQueryHandlerTests
         {
           Email = query.Email,
           Token = "jwtToken",
-          Id = Constants.User.Id,
-          FirstName = Constants.User.FirstName,
-          LastName = Constants.User.LastName,
+          Id = Utils.User.Id,
+          FirstName = Utils.User.FirstName,
+          LastName = Utils.User.LastName,
         }
       );
 
