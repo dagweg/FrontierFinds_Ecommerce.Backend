@@ -23,7 +23,7 @@ using Ecommerce.Domain.ProductAggregate.Enums;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
-using Ecommerce.UnitTests.Ecommerce.Application.UnitTests.UseCases;
+using Ecommerce.UnitTests;
 using FluentAssertions;
 using FluentResults;
 using MediatR;

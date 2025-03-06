@@ -9,7 +9,7 @@ using Ecommerce.Application.UseCases.Users.Queries.LoginUser;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
-using Ecommerce.UnitTests.Ecommerce.Application.UnitTests.UseCases;
+using Ecommerce.UnitTests;
 using FluentAssertions;
 using FluentResults;
 using Microsoft.AspNetCore.Identity;

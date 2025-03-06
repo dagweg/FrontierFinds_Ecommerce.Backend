@@ -6,7 +6,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
 
-namespace Ecommerce.UnitTests.Ecommerce.Api.UnitTests.Services;
+namespace Ecommerce.UnitTests.Api.Services;
 
 public class UserContextServiceTests
 {

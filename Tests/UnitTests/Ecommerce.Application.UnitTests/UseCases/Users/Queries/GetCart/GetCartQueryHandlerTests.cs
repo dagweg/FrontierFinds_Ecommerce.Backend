@@ -10,7 +10,7 @@ using FluentAssertions;
 using FluentResults;
 using Moq;
 
-namespace Ecommerce.UnitTests.Ecommerce.Application.UnitTests.UseCases.Users.Queries.GetCart;
+namespace Ecommerce.UnitTests.Application.UseCases.Users.Queries.GetCart;
 
 public class GetCartQueryHandlerTests
 {

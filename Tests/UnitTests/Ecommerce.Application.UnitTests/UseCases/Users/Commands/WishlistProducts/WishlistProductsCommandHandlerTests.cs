@@ -8,7 +8,7 @@ using FluentAssertions;
 using FluentResults;
 using Moq;
 
-namespace Ecommerce.UnitTests.Ecommerce.Application.UnitTests.UseCases.Users.Commands.WishlistProducts;
+namespace Ecommerce.UnitTests.Application.UseCases.Users.Commands.WishlistProducts;
 
 public class WishlistProductsCommandHandlerTests
 {
