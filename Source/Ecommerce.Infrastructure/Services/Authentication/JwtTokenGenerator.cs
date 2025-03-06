@@ -2,6 +2,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Ecommerce.Application.Common.Errors;
 using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.Common.Interfaces.Providers.Date;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
@@ -48,7 +49,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     if (_jwtSettings.SecretKey is null)
     {
       _logger.LogError("Jwt secret key is null");
-      return Result.Fail<string>("An internal error occurred. Please try again later.");
+      return InternalError.GetResult("An internal error occurred. Please try again later.");
     }
 
     // Create a signing credential using HMACSHA256 algorithm and a Symmetric Security Key
