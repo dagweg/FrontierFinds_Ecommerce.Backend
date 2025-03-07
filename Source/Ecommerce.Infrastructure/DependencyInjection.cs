@@ -10,10 +10,13 @@ using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Processors;
 using Ecommerce.Application.Common.Interfaces.Providers.Date;
+using Ecommerce.Application.Common.Interfaces.Providers.Forex;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
 using Ecommerce.Application.Common.Interfaces.Storage;
 using Ecommerce.Application.Services.Storage;
+using Ecommerce.Application.UseCases.Smtp.Commands.SendEmail;
 using Ecommerce.Infrastructure.Common;
+using Ecommerce.Infrastructure.Common.Interfaces.Providers.Forex;
 using Ecommerce.Infrastructure.Common.Providers;
 using Ecommerce.Infrastructure.Common.Providers.Localization;
 using Ecommerce.Infrastructure.Persistence.EfCore;
@@ -22,6 +25,7 @@ using Ecommerce.Infrastructure.Persistence.EfCore.Options;
 using Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 using Ecommerce.Infrastructure.Services.Authentication;
 using Ecommerce.Infrastructure.Services.Processors;
+using Ecommerce.Infrastructure.Services.Providers.Forex;
 using Ecommerce.Infrastructure.Services.Providers.Smtp;
 using Ecommerce.Infrastructure.Services.Storage;
 using IdentityModel;
@@ -55,7 +59,7 @@ public static class DependencyInjection
 
     services.AddInterceptors();
 
-    services.AddSmtp();
+    services.AddSmtp(configuration);
 
     // register persistence (sql server, ef core, repositories)
     services.AddPersistence(configuration);
@@ -77,25 +81,58 @@ public static class DependencyInjection
     IConfigurationManager configuration
   )
   {
-    // load in sql server configurations
-    services.Configure<SqlServerOptions>(configuration.GetSection(SqlServerOptions.SectionName));
-
     services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-    services.AddDbContext<EfCoreContext>(
-      (sp, options) =>
-      {
-        // Connect to SqlServer using the connection string.
-        options
-          .UseSqlServer(configuration[$"{SqlServerOptions.SectionName}:ConnectionString"])
-          .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>())
-          .EnableDetailedErrors(true);
-      }
-    );
+    var dbOptions = configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>();
+
+    if (dbOptions is null)
+    {
+      throw new InvalidOperationException("Database options are null!");
+    }
+
+    if (dbOptions.Provider == DatabaseOptions.Providers.SqlServer)
+    {
+      services.AddDbContext<EfCoreContext>(
+        (sp, options) =>
+        {
+          // Connect to SqlServer using the connection string.
+          options
+            .UseSqlServer(
+              configuration[
+                $"{DatabaseOptions.SectionName}:{SqlServerOptions.SectionName}:ConnectionString"
+              ]
+            )
+            .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>())
+            .EnableDetailedErrors(true);
+        }
+      );
+    }
+    else if (dbOptions.Provider == DatabaseOptions.Providers.PgSql)
+    {
+      services.AddDbContext<EfCoreContext>(
+        (sp, options) =>
+        {
+          // Connect to PgSql using the connection string.
+          options
+            .UseNpgsql(
+              configuration[
+                $"{DatabaseOptions.SectionName}:{PgSqlOptions.SectionName}:ConnectionString"
+              ]
+            )
+            .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>())
+            .EnableDetailedErrors(true);
+        }
+      );
+    }
+    else
+    {
+      throw new InvalidOperationException("Database provider is not supported!");
+    }
 
     // Register Repositories
     services.AddScoped<IUserRepository, UserRepository>();
     services.AddScoped<IProductRepository, ProductRepository>();
+    services.AddScoped<IOrderRepository, OrderRepository>();
 
     return services;
   }
@@ -193,6 +230,8 @@ public static class DependencyInjection
     IConfigurationManager configuration
   )
   {
+    services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SectionName));
+
     services.Configure<CookieSettings>(configuration.GetSection(CookieSettings.SectionName));
     services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
     services.Configure<CloudinarySettings>(
@@ -206,6 +245,9 @@ public static class DependencyInjection
     services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
     services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
     services.AddSingleton<IImageProcessor, ImageProcessor>();
+
+    services.AddSingleton<IExchangeApiClient, ExchangeApiClient>();
+    services.AddSingleton<IForexSerivce, ForexService>();
     return services;
   }
 
@@ -228,9 +270,22 @@ public static class DependencyInjection
     return services;
   }
 
-  public static IServiceCollection AddSmtp(this IServiceCollection services)
+  public static IServiceCollection AddSmtp(
+    this IServiceCollection services,
+    IConfigurationManager configuration
+  )
   {
-    services.AddScoped<ISmtpClientWrapper, SmtpClientWrapper>();
+    services.AddScoped<ISmtpClientWrapper>(sp =>
+    {
+      string? host = configuration.GetConnectionString($"{EmailSettings.SectionName}:Host");
+
+      if (host is null)
+      {
+        Log.Warning("Smtp host is not configured. Email sending will be disabled.");
+      }
+
+      return new SmtpClientWrapper(host ?? "");
+    });
     return services;
   }
 }
