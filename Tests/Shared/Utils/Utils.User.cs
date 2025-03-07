@@ -2,7 +2,7 @@ using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Application.UseCases.Users.Commands.RegisterUser;
 using Ecommerce.Application.UseCases.Users.Queries.LoginUser;
 
-namespace Ecommerce.UnitTests;
+namespace Ecommerce.Tests.Shared;
 
 public partial class Utils
 {

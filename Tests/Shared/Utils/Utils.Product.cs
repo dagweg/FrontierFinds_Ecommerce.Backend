@@ -5,7 +5,7 @@ using Ecommerce.Application.UseCases.Products.CreateUser.Commands;
 using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
 
-namespace Ecommerce.UnitTests;
+namespace Ecommerce.Tests.Shared;
 
 public partial class Utils
 {

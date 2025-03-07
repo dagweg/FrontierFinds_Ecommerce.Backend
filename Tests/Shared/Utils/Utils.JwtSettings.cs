@@ -1,4 +1,4 @@
-namespace Ecommerce.UnitTests;
+namespace Ecommerce.Tests.Shared;
 
 public partial class Utils
 {

@@ -2,7 +2,7 @@ using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Application.UseCases.Users.Queries.GetCartItems;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 
-namespace Ecommerce.UnitTests;
+namespace Ecommerce.Tests.Shared;
 
 public partial class Utils
 {
