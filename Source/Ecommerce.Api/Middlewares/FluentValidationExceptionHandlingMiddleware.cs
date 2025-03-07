@@ -31,7 +31,7 @@ public class FluentValidationExceptionHandlingMiddleware
       {
         Status = StatusCodes.Status400BadRequest,
         Title = "Validation Error",
-        Type = "ValidationFailure",
+        Type = typeof(ValidationException).Name,
         Detail = "One or more validation errors has occured.",
       };
 
