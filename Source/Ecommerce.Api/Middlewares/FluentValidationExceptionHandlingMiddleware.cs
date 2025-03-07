@@ -45,7 +45,7 @@ public class FluentValidationExceptionHandlingMiddleware
       context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
       await context.Response.WriteAsJsonAsync(problemDetails);
-      _logger.LogFormattedError(ex, context.TraceIdentifier);
+      _logger.LogFormattedError(ex, context.TraceIdentifier, context.Response.StatusCode);
     }
   }
 }

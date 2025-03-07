@@ -2,7 +2,7 @@
   Entry Point of our program
 */
 
-namespace Api;
+namespace Ecommerce.Api;
 
 using Ecommerce.Api;
 using Ecommerce.Api.Mapping;
