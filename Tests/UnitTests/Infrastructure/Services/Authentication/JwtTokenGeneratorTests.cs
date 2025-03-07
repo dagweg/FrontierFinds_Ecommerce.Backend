@@ -1,5 +1,6 @@
 using Ecommerce.Application.Common.Interfaces.Providers.Date;
 using Ecommerce.Infrastructure.Services.Authentication;
+using Ecommerce.Tests.Shared;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

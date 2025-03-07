@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\Source\Ecommerce.Application\Ecommerce.Application.csproj" />
     <ProjectReference Include="..\..\Source\Ecommerce.Domain\Ecommerce.Domain.csproj" />
     <ProjectReference Include="..\..\Source\Ecommerce.Infrastructure\Ecommerce.Infrastructure.csproj" />
+    <ProjectReference Include="..\Shared\Ecommerce.Tests.Shared.csproj" />
   </ItemGroup>
 
 

@@ -4,6 +4,7 @@ using Ecommerce.Application.Common.Interfaces.Providers.Context;
 using Ecommerce.Application.UseCases.Users.Commands.WishlistProducts;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using Ecommerce.Tests.Shared;
 using FluentAssertions;
 using FluentResults;
 using Moq;

@@ -6,6 +6,7 @@ using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Application.UseCases.Users.Queries.GetCartItems;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using Ecommerce.Tests.Shared;
 using FluentAssertions;
 using FluentResults;
 using Moq;

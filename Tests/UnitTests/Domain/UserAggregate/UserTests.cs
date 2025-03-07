@@ -4,6 +4,7 @@ using Ecommerce.Domain.UserAggregate;
 using Ecommerce.Domain.UserAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.Events;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using Ecommerce.Tests.Shared;
 using FluentAssertions;
 using FluentResults;
 using Microsoft.AspNetCore.Identity;
