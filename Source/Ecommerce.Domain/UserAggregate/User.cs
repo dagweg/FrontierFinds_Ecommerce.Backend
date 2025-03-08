@@ -5,6 +5,7 @@ using Ecommerce.Domain.Common.Models;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.NotificationAggregate;
 using Ecommerce.Domain.OrderAggregate;
+using Ecommerce.Domain.OrderAggregate.ValueObjects;
 using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.UserAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.Events;
@@ -22,6 +23,7 @@ public class User : AggregateRoot<UserId>
   public UserAddress? Address { get; private set; }
   public Wishlist Wishlist { get; private set; }
   public Cart Cart { get; private set; }
+  public BillingAddress? BillingAddress { get; private set; }
 
   private List<Order> _orders = [];
   private List<Product> _products = [];
@@ -112,6 +114,12 @@ public class User : AggregateRoot<UserId>
   public User WithNotifications(List<Notification> notifications)
   {
     _notifications = notifications;
+    return this;
+  }
+
+  public User WithBillingAddress(BillingAddress billingAddress)
+  {
+    BillingAddress = billingAddress;
     return this;
   }
 
