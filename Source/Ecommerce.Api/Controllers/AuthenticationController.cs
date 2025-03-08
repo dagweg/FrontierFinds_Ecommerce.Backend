@@ -42,9 +42,7 @@ public class AuthenticationController : ControllerBase
 
     var result = await _mediator.Send(command);
 
-    return result.IsFailed
-      ? new ObjectResult(result)
-      : Ok(_mapper.Map<AuthenticationResponse>(result.Value));
+    return result.IsFailed ? new ObjectResult(result) : Created();
   }
 
   [HttpPost("login")]
