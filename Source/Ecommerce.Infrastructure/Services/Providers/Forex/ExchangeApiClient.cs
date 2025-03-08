@@ -15,8 +15,11 @@ public class ExchangeApiClient(ILogger<ExchangeApiClient> logger) : IExchangeApi
     Currency toCurrency
   )
   {
+    string to = toCurrency.ToString().ToLower();
+    string from = fromCurrency.ToString().ToLower();
+
     string baseUrl =
-      $"https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{fromCurrency}.json";
+      $"https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{from}.json";
 
     using HttpClient client = new();
     client.BaseAddress = new Uri(baseUrl);
@@ -33,11 +36,9 @@ public class ExchangeApiClient(ILogger<ExchangeApiClient> logger) : IExchangeApi
         using JsonDocument document = JsonDocument.Parse(content);
         JsonElement root = document.RootElement;
 
-        if (root.TryGetProperty(fromCurrency.ToString(), out JsonElement fromCurrencyElement))
+        if (root.TryGetProperty(from.ToString(), out JsonElement fromElement))
         {
-          if (
-            fromCurrencyElement.TryGetProperty(toCurrency.ToString(), out JsonElement rateElement)
-          )
+          if (fromElement.TryGetProperty(to.ToString(), out JsonElement rateElement))
           {
             if (rateElement.TryGetDecimal(out decimal rate))
             {
@@ -51,18 +52,14 @@ public class ExchangeApiClient(ILogger<ExchangeApiClient> logger) : IExchangeApi
           }
           else
           {
-            logger.LogError(
-              "Exchange rate for {ToCurrency} not found for {FromCurrency}.",
-              toCurrency,
-              fromCurrency
-            );
-            return InternalError.GetResult($"Exchange rate for {toCurrency} not found.");
+            logger.LogError("Exchange rate for {to} not found for {from}.", to, from);
+            return InternalError.GetResult($"Exchange rate for {to} not found.");
           }
         }
         else
         {
-          logger.LogError("Exchange rates for {FromCurrency} not found.", fromCurrency);
-          return InternalError.GetResult($"Exchange rates for {fromCurrency} not found.");
+          logger.LogError("Exchange rates for {from} not found.", from);
+          return InternalError.GetResult($"Exchange rates for {from} not found.");
         }
       }
       else
