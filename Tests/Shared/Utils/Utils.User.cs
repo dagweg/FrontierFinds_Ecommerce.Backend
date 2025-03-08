@@ -1,6 +1,8 @@
 using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Application.UseCases.Users.Commands.RegisterUser;
 using Ecommerce.Application.UseCases.Users.Queries.LoginUser;
+using Ecommerce.Contracts.Authentication;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Ecommerce.Tests.Shared;
 
@@ -47,6 +49,24 @@ public partial class Utils
     public static LoginUserQuery CreateLoginUserQuery()
     {
       return new LoginUserQuery(Utils.User.Email, Utils.User.Password);
+    }
+
+    public static RegisterRequest CreateRegisterRequest()
+    {
+      return new RegisterRequest(
+        FirstName: FirstName,
+        LastName: LastName,
+        Email: Email,
+        Password: Password,
+        ConfirmPassword: Password,
+        PhoneNumber: PhoneNumber,
+        CountryCode: int.Parse(CountryCode)
+      );
+    }
+
+    public static LoginRequest CreateLoginRequest()
+    {
+      return new LoginRequest(Email: Email, Password: Password);
     }
   }
 }

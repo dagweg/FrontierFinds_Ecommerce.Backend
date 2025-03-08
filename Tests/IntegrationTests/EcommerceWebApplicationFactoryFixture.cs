@@ -1,10 +1,12 @@
+using System.Data;
 using Ecommerce.Infrastructure.Persistence.EfCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Ecommerce.IntegrationTests.Utils.Fixtures;
+namespace Ecommerce.IntegrationTests;
 
 public class EcommerceWebApplicationFactoryFixture : WebApplicationFactory<Ecommerce.Api.Program>
 {
@@ -41,11 +43,14 @@ public class EcommerceWebApplicationFactoryFixture : WebApplicationFactory<Ecomm
       services.AddDbContext<EfCoreContext>(options =>
       {
         // options.UseNpgsql(
-        //   "Host=localhost;Database=frontierfinds_test;Username=postgres;Password=123;Port=5432"
+        //   "Host=localhost;Database=FrontierFinds_TestDb;Username=postgres;Password=123;Port=5432"
         // );
+
         options.UseSqlServer(
-          "Server=EVOO-EG-LP7\\SQLEXPRESS;Database=ecommerce;Trusted_Connection=True;TrustServerCertificate=True;"
+          "Server=EVOO-EG-LP7\\SQLEXPRESS;Database=FrontierFinds_TestDb;Trusted_Connection=True;TrustServerCertificate=True;"
         );
+
+        // options.UseInMemoryDatabase("FrontierFinds_TestDb");
       });
 
       var sp = services.BuildServiceProvider();
@@ -55,6 +60,7 @@ public class EcommerceWebApplicationFactoryFixture : WebApplicationFactory<Ecomm
       try // Add try-catch block
       {
         var dbContext = scope.ServiceProvider.GetRequiredService<EfCoreContext>();
+        dbContext.Database.EnsureDeleted();
         dbContext.Database.EnsureCreated();
         Console.WriteLine("Database EnsureCreated() successful."); // Log success
       }
@@ -78,7 +84,7 @@ public class EcommerceWebApplicationFactoryFixture : WebApplicationFactory<Ecomm
         var scopedServices = scope.ServiceProvider;
         var context = scopedServices.GetRequiredService<EfCoreContext>();
         await context.Database.EnsureDeletedAsync(); // Delete database
-        Console.WriteLine("Test database deleted.");
+        Console.WriteLine("\nTest database deleted.\n");
       }
     }
     catch (Exception ex)
@@ -87,5 +93,14 @@ public class EcommerceWebApplicationFactoryFixture : WebApplicationFactory<Ecomm
     }
 
     await base.DisposeAsync();
+  }
+
+  public async Task InitializeAsync()
+  {
+    using var scope = Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<EfCoreContext>();
+    await dbContext.Database.EnsureDeletedAsync();
+    await dbContext.Database.EnsureCreatedAsync();
+    Console.WriteLine("\nTest database Created.\n");
   }
 }
