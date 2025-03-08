@@ -100,7 +100,11 @@ public static class DependencyInjection
             .UseSqlServer(
               configuration[
                 $"{DatabaseOptions.SectionName}:{SqlServerOptions.SectionName}:ConnectionString"
-              ]
+              ],
+              sqlOptions =>
+              {
+                sqlOptions.EnableRetryOnFailure();
+              }
             )
             .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>())
             .EnableDetailedErrors(true);
