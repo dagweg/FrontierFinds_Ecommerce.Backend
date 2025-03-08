@@ -6,15 +6,19 @@ using FluentResults;
 
 public sealed record CardNumber
 {
-  public string Value { get; }
+  public string Last4Digits
+  {
+    get => this.ToString();
+    init => Last4Digits = value;
+  }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
   private CardNumber() { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-  private CardNumber(string value)
+  private CardNumber(string last4Digits)
   {
-    Value = value;
+    Last4Digits = last4Digits;
   }
 
   public static Result<CardNumber> Create(string value)
@@ -37,7 +41,9 @@ public sealed record CardNumber
     if (!IsValidLuhn(cleaned))
       return FormatError.GetResult(nameof(value), "Card number is not valid.");
 
-    return new CardNumber(value);
+    var last4Digits = cleaned.Substring(cleaned.Length - 5);
+
+    return new CardNumber(last4Digits);
   }
 
   private static bool IsValidLuhn(string number)
@@ -62,9 +68,9 @@ public sealed record CardNumber
   // Returns a masked version of the card number (e.g. "************1234")
   public override string ToString()
   {
-    if (Value.Length <= 4)
-      return Value;
+    if (Last4Digits.Length <= 4)
+      return Last4Digits;
 
-    return new string('*', Value.Length - 4) + Value.Substring(Value.Length - 4);
+    return new string('*', Last4Digits.Length - 4) + Last4Digits.Substring(Last4Digits.Length - 4);
   }
 }

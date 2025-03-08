@@ -19,15 +19,12 @@ public sealed class Order : AggregateRoot<OrderId>
   public IReadOnlyList<OrderItem> OrderItems => _orderItems.AsReadOnly();
   public DateTime OrderDate { get; set; }
 
-  public PaymentInformation PaymentInformation { get; set; }
-
   private Order(
     OrderId orderId,
     List<OrderItem> orderItems,
     OrderTotal total,
     ShippingAddress shippingAddress,
     BillingAddress billingAddress,
-    PaymentInformation paymentInformation,
     DateTime orderDate
   )
     : base(orderId)
@@ -36,7 +33,7 @@ public sealed class Order : AggregateRoot<OrderId>
     ShippingAddress = shippingAddress;
     BillingAddress = billingAddress;
     _orderItems = orderItems;
-    PaymentInformation = paymentInformation;
+
     OrderDate = orderDate;
   }
 
@@ -44,8 +41,7 @@ public sealed class Order : AggregateRoot<OrderId>
     List<OrderItem> orderItems,
     OrderTotal total,
     ShippingAddress shippingAddress,
-    BillingAddress billingAddress,
-    PaymentInformation paymentInformation
+    BillingAddress billingAddress
   )
   {
     Order order = new(
@@ -54,7 +50,7 @@ public sealed class Order : AggregateRoot<OrderId>
       total,
       shippingAddress,
       billingAddress,
-      paymentInformation,
+      // paymentInformation,
       DateTime.UtcNow
     );
 

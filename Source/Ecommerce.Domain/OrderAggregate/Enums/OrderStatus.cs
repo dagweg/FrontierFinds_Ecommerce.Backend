@@ -1,10 +1,11 @@
 namespace Ecommerce.Domain.OrderAggregate.Enums;
 
+// (processing -> success -> shipped )| cancelled| failed
 public enum OrderStatus
 {
-  None,
+  Failed = 0,
   Processing,
+  Success,
   Shipped,
-  Delivered,
   Cancelled,
 }
