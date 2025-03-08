@@ -1,3 +1,4 @@
+using AutoMapper;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Domain.Common.ValueObjects;
@@ -15,7 +16,8 @@ namespace Ecommerce.Application.UseCases.Orders.Commands.CreateOrder;
 public class CreateOrderCommandHandler(
   IOrderRepository orderRepository,
   IProductRepository productRepository,
-  IUnitOfWork unitOfWork
+  IUnitOfWork unitOfWork,
+  IMapper mapper
 ) : IRequestHandler<CreateOrderCommand, Result>
 {
   public async Task<Result> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -54,48 +56,23 @@ public class CreateOrderCommandHandler(
       {
         totalPrice += p.Value.Price.Value; // accumulate totalPrice (OrderTotal)
 
-        // p.Key  and the 2nd arg is the productId and quantity (respectively) w/c we precomputed previously
+        // p.Key  and the 2nd arg is the productId:quantity  w/c we precomputed previously
         return OrderItem.Create(p.Key, orderProductKeysWithQuantity[p.Key], p.Value.Price);
       })
       .ToList();
 
     OrderTotal orderTotal = OrderTotal.Create(totalPrice, currency: Price.BASE_CURRENCY);
 
-    ShippingAddress shippingAddress = ShippingAddress.Create(
-      street: request.ShippingAddress.Street,
-      city: request.ShippingAddress.City,
-      state: request.ShippingAddress.State,
-      country: request.ShippingAddress.Country,
-      zipCode: request.ShippingAddress.ZipCode
-    );
+    ShippingAddress shippingAddress = mapper.Map<ShippingAddress>(request.ShippingAddress);
 
-    BillingAddress billingAddress = BillingAddress.Create(
-      street: request.ShippingAddress.Street,
-      city: request.ShippingAddress.City,
-      state: request.ShippingAddress.State,
-      country: request.ShippingAddress.Country,
-      zipCode: request.ShippingAddress.ZipCode
-    );
+    BillingAddress billingAddress = mapper.Map<BillingAddress>(request.BillingAddress);
 
-    PaymentInformation paymentInformation = PaymentInformation.Create(
-      cardHolderName: Name.Create(request.PaymentInformation.CardHolderName),
-      cardNumber: cardNumberResult.Value,
-      expiryMonth: monthResult.Value,
-      expiryYear: yearResult.Value,
-      cvv: cvvResult.Value
-    );
+    var order = Order.Create(orderItems, orderTotal, shippingAddress, billingAddress);
 
     // TODO: Make use of an external payment service (stripe, paypal ..)
     // var paymentResult = await paymentService.Process(...);
 
 
-    var order = Order.Create(
-      orderItems,
-      orderTotal,
-      shippingAddress,
-      billingAddress,
-      paymentInformation
-    );
 
     await orderRepository.AddAsync(order);
 
