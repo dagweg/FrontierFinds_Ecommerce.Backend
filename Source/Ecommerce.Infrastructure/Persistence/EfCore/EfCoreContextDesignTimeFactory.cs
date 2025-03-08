@@ -15,12 +15,12 @@ public class EfCoreContextDesignTimeFactory : IDesignTimeDbContextFactory<EfCore
   {
     var optionsBuilder = new DbContextOptionsBuilder<EfCoreContext>();
 
-    optionsBuilder.UseNpgsql(
-      "Host=localhost;Database=ecommerce;Username=postgres;Password=123;Port=5432;"
-    );
-    // optionsBuilder.UseSqlServer(
-    //   "Server=EVOO-EG-LP7\\SQLEXPRESS;Database=ecommerce;Trusted_Connection=True;TrustServerCertificate=True;"
+    // optionsBuilder.UseNpgsql(
+    //   "Host=localhost;Database=ecommerce;Username=postgres;Password=123;Port=5432;"
     // );
+    optionsBuilder.UseSqlServer(
+      "Server=EVOO-EG-LP7\\SQLEXPRESS;Database=ecommerce;Trusted_Connection=True;TrustServerCertificate=True;"
+    );
 
     return new EfCoreContext(optionsBuilder.Options);
   }
