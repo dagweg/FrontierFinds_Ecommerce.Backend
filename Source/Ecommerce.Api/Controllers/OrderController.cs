@@ -35,6 +35,14 @@ public class OrderController(ISender sender) : ControllerBase
           Street = createOrderRequest.ShippingAddress.Street,
           ZipCode = createOrderRequest.ShippingAddress.ZipCode,
         },
+        BillingAddress = new BillingAddressCommand
+        {
+          City = createOrderRequest.BillingAddress.City,
+          Country = createOrderRequest.BillingAddress.Country,
+          State = createOrderRequest.BillingAddress.State,
+          Street = createOrderRequest.BillingAddress.Street,
+          ZipCode = createOrderRequest.BillingAddress.ZipCode,
+        },
       }
     );
 
