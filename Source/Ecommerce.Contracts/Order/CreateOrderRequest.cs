@@ -11,5 +11,8 @@ public class CreateOrderRequest
   public ShippingAddressRequest ShippingAddress { get; set; } = null!;
 
   [Required]
+  public BillingAddressRequest BillingAddress { get; set; } = null!;
+
+  [Required]
   public PaymentInformationRequest PaymentInformation { get; set; } = null!;
 }
