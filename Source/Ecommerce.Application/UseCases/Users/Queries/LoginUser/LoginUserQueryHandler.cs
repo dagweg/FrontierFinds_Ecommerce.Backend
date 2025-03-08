@@ -9,6 +9,7 @@ using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
 using FluentResults;
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -50,9 +51,7 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, Result<Auth
     var user = await _userRepository.GetByEmailAsync(Email.Create(query.Email));
 
     if (user is null)
-      return Result.Fail(
-        new AuthenticationError(nameof(Email), _authValidationMessages.UserNotFound)
-      );
+      return Result.Fail(new NotFoundError(nameof(Email), _authValidationMessages.UserNotFound));
 
     // 2. Check if the password is correct
     if (
