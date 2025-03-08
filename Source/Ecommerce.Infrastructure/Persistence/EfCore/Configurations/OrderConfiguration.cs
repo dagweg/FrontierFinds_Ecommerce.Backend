@@ -80,7 +80,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
       .Property(o => o.Status)
       .HasColumnName("Status")
       .IsRequired()
-      .HasConversion(s => s.ToString(), s => s.ConvertTo<OrderStatus>() ?? OrderStatus.None);
+      .HasConversion(s => s.ToString(), s => s.ConvertTo<OrderStatus>() ?? OrderStatus.Failed);
 
     builder.OwnsMany(
       o => o.OrderItems,
@@ -120,37 +120,6 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             //   .HasConversion(c => c.ToString(), c => c.ConvertTo<Currency>() ?? Currency.None);
           }
         );
-      }
-    );
-
-    builder.OwnsOne(
-      b => b.PaymentInformation,
-      (pib) =>
-      {
-        pib.Property(p => p.CardHolderName)
-          .HasColumnName("CardHolderName")
-          .IsRequired()
-          .HasConversion(n => n.Value, v => Name.Create(v));
-
-        pib.Property(p => p.CardNumber)
-          .HasColumnName("CardNumber")
-          .IsRequired()
-          .HasConversion(cn => cn.Value, v => CardNumber.Create(v).Value);
-
-        pib.Property(p => p.ExpiryMonth)
-          .HasColumnName("CardExpiryMonth")
-          .IsRequired()
-          .HasConversion(m => m.Value, v => Month.Create(v).Value);
-
-        pib.Property(p => p.ExpiryYear)
-          .HasColumnName("CardExpiryYear")
-          .IsRequired()
-          .HasConversion(y => y.Value, v => Year.Create(v).Value);
-
-        pib.Property(p => p.CVV)
-          .HasColumnName("CardCVV")
-          .IsRequired()
-          .HasConversion(c => c.Value, v => CVV.Create(v).Value);
       }
     );
 

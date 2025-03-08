@@ -86,6 +86,18 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
     );
 
     builder.OwnsOne(
+      u => u.BillingAddress,
+      b =>
+      {
+        b.Property(x => x.Country).HasColumnName("BillingAddress_Country");
+        b.Property(x => x.State).HasColumnName("BillingAddress_State");
+        b.Property(x => x.City).HasColumnName("BillingAddress_City");
+        b.Property(x => x.Street).HasColumnName("BillingAddress_Street");
+        b.Property(x => x.ZipCode).HasColumnName("BillingAddress_ZipCode");
+      }
+    );
+
+    builder.OwnsOne(
       u => u.EmailVerificationOtp,
       ob =>
       {
