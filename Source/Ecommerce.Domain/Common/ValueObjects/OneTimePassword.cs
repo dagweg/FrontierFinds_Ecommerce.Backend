@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using Ecommerce.Domain.Common.Errors;
 using Ecommerce.Domain.Common.Models;
@@ -5,7 +6,10 @@ using FluentResults;
 
 namespace Ecommerce.Domain.Common.ValueObjects;
 
-public class OneTimePassword : ValueObject
+public class OneTimePassword
+  : ValueObject,
+    IEquatable<OneTimePassword>,
+    IComparable<OneTimePassword>
 {
   #region Constants
 
@@ -100,6 +104,24 @@ public class OneTimePassword : ValueObject
       yield return item;
     }
     yield return Expiry;
+  }
+
+  public bool Equals(OneTimePassword? other)
+  {
+    if (ReferenceEquals(null, other))
+      return false;
+    if (ReferenceEquals(this, other))
+      return true;
+    return Value.SequenceEqual(other.Value) && Expiry.Equals(other.Expiry);
+  }
+
+  public int CompareTo(OneTimePassword? other)
+  {
+    if (ReferenceEquals(null, other))
+      return 1;
+    if (ReferenceEquals(this, other))
+      return 0;
+    return Expiry.CompareTo(other.Expiry);
   }
 
   #endregion
