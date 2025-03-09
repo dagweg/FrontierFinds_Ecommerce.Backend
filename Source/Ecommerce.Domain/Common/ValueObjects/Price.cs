@@ -8,17 +8,17 @@ using FluentResults;
 
 public sealed class Price : ValueObject
 {
-  public decimal Value { get; }
+  public long ValueInCents { get; }
 
-  public static Price Empty => new(decimal.Zero);
+  public static Price Empty => new(0);
 
   public const Currency BASE_CURRENCY = Currency.ETB;
 
   private Price() { }
 
-  private Price(decimal value)
+  private Price(long valueInCents)
   {
-    Value = value;
+    ValueInCents = valueInCents;
   }
 
   /// <summary>
@@ -26,12 +26,12 @@ public sealed class Price : ValueObject
   /// </summary>
   /// <param name="valueInBaseCurrency"></param>
   /// <returns></returns>
-  public static Price CreateInBaseCurrency(decimal valueInBaseCurrency)
+  public static Price CreateInBaseCurrency(long valueInBaseCurrencyCents)
   {
-    return new(valueInBaseCurrency);
+    return new(valueInBaseCurrencyCents);
   }
 
-  public static implicit operator decimal(Price price) => price.Value;
+  public static implicit operator decimal(Price price) => price.ValueInCents;
 
   public static bool IsValidCurrency(string currency)
   {
@@ -50,6 +50,6 @@ public sealed class Price : ValueObject
 
   public override IEnumerable<object> GetEqualityComponents()
   {
-    yield return Value;
+    yield return ValueInCents;
   }
 }
