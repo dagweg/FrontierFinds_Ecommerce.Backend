@@ -28,7 +28,7 @@ public class ProductMappingProfile : Profile
       .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.Id.Value))
       .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Name.Value))
       .ForMember(dest => dest.ProductDescription, opt => opt.MapFrom(src => src.Description.Value))
-      .ForMember(dest => dest.PriceValue, opt => opt.MapFrom(src => src.Price.Value))
+      .ForMember(dest => dest.PriceValueInCents, opt => opt.MapFrom(src => src.Price.ValueInCents))
       .ForMember(dest => dest.StockQuantity, opt => opt.MapFrom(src => src.Stock.Quantity))
       .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags))
       .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
