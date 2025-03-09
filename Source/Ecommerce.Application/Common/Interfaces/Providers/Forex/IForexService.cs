@@ -10,8 +10,6 @@ public interface IForexSerivce
   ///  - The base currency is the currency that the application uses for all its calculations
   ///  - This should be used before saving the amount to the database (since the db stores the amount in the base currency)
   /// </summary>
-  /// <param name="amount"></param>
-  /// <param name="fromCurrency"></param>
   /// <returns></returns>
-  Task<Result<decimal>> ConvertToBaseCurrencyAsync(decimal amount, Currency fromCurrency);
+  Task<Result<long>> ConvertToBaseCurrencyAsync(long amountInCents, Currency fromCurrency);
 }
