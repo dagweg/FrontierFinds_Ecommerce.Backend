@@ -2,7 +2,7 @@ namespace Ecommerce.Application.UseCases.Smtp.Commands.SendEmail;
 
 public class EmailSettings
 {
-  public const string SectionName = nameof(EmailSettings);
+  public const string SectionName = "EmailSettings";
 
   public required string Host { get; set; }
   public required string DisplayName { get; set; }
