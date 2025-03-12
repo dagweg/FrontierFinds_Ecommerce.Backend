@@ -20,8 +20,8 @@ public class CreateProductRequest
   public int StockQuantity { get; init; }
 
   [Required]
-  [Range(1, double.MaxValue, ErrorMessage = "Price value must be greater than 1")]
-  public decimal PriceValue { get; init; }
+  [Range(1, long.MaxValue, ErrorMessage = "Price value must be greater than 1")]
+  public long PriceValueInCents { get; init; }
 
   [Required]
   [NotNull]
