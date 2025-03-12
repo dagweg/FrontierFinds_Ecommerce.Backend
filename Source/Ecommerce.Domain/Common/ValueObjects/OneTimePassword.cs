@@ -6,10 +6,7 @@ using FluentResults;
 
 namespace Ecommerce.Domain.Common.ValueObjects;
 
-public class OneTimePassword
-  : ValueObject,
-    IEquatable<OneTimePassword>,
-    IComparable<OneTimePassword>
+public class OneTimePassword : ValueObject
 {
   #region Constants
 
@@ -19,13 +16,18 @@ public class OneTimePassword
   [NotMapped]
   public const int EXPIRY_MINUTES = 10;
 
+  [NotMapped]
+  public const int RESEND_DELAY_MULTIPLIER = 3;
+
   #endregion
 
   #region Properties
 
-  public int[] Value { get; private set; }
+  public int[]? Value { get; private set; }
   public DateTime Expiry { get; private set; }
+  public DateTime NextResendValidAt { get; private set; }
 
+  public int ResendFailStreak { get; private set; } = 0; // for tracking resend attempts and increasing delay over time
   #endregion
 
 
@@ -35,6 +37,7 @@ public class OneTimePassword
   {
     Value = value;
     Expiry = expiry;
+    NextResendValidAt = DateTime.MinValue; // valid for resending immediately
   }
 
   public static OneTimePassword CreateNew()
@@ -69,16 +72,37 @@ public class OneTimePassword
     return this;
   }
 
+  public void SetValue(int[]? value, DateTime? expiry = null)
+  {
+    Value = value ?? Value;
+    Expiry = expiry ?? DateTime.Now.AddMinutes(EXPIRY_MINUTES);
+  }
+
+  public void Revoke()
+  {
+    Value = new int[OTP_LENGTH];
+    Expiry = DateTime.MinValue;
+  }
+
+  public Result AddResendDelay(int mul = 1)
+  {
+    NextResendValidAt = DateTime.Now.AddMinutes(
+      0.1 * mul * (ResendFailStreak + 1) * RESEND_DELAY_MULTIPLIER
+    );
+    ResendFailStreak++;
+    return Result.Ok();
+  }
+
   public Result Validate(OneTimePassword otp)
   {
-    if (otp.Value.Length != OTP_LENGTH)
+    if (otp?.Value?.Length != OTP_LENGTH)
     {
       return InvalidOtpError.GetResult(nameof(otp), "The OTP is not valid.");
     }
 
     for (int i = 0; i < OTP_LENGTH; i++)
     {
-      if (Value[i] != otp.Value[i])
+      if (Value?[i] != otp.Value[i])
       {
         return InvalidOtpError.GetResult(nameof(otp), "The OTP is not correct.");
       }
@@ -92,36 +116,21 @@ public class OneTimePassword
     return Result.Ok();
   }
 
-  public static implicit operator string(OneTimePassword otp)
+  public static implicit operator string(OneTimePassword otp) => otp.ToString();
+
+  public override string ToString()
   {
-    return string.Join("", otp.Value);
+    return string.Join("", Value ?? []);
   }
 
   public override IEnumerable<object> GetEqualityComponents()
   {
-    foreach (var item in Value)
-    {
-      yield return item;
-    }
+    if (Value is not null)
+      foreach (var item in Value)
+      {
+        yield return item;
+      }
     yield return Expiry;
-  }
-
-  public bool Equals(OneTimePassword? other)
-  {
-    if (ReferenceEquals(null, other))
-      return false;
-    if (ReferenceEquals(this, other))
-      return true;
-    return Value.SequenceEqual(other.Value) && Expiry.Equals(other.Expiry);
-  }
-
-  public int CompareTo(OneTimePassword? other)
-  {
-    if (ReferenceEquals(null, other))
-      return 1;
-    if (ReferenceEquals(this, other))
-      return 0;
-    return Expiry.CompareTo(other.Expiry);
   }
 
   #endregion

@@ -1,5 +1,6 @@
 namespace Ecommerce.Domain.Common.ValueObjects;
 
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.RegularExpressions;
 using Ecommerce.Domain.Common.Errors;
 using Ecommerce.Domain.Common.Models;
@@ -11,11 +12,20 @@ public sealed class Password : ValueObject
 
   public static Password Empty => new(string.Empty);
 
-  private const int MIN_PASSWORD_LENGTH = 8;
-  private const int MIN_SPECIAL_CHARS = 1;
-  private const int MIN_LOWERCASE_CHARS = 1;
-  private const int MIN_UPPERCASE_CHARS = 1;
-  private const int MIN_NUMERIC = 1;
+  [NotMapped]
+  public const int MIN_PASSWORD_LENGTH = 8;
+
+  [NotMapped]
+  public const int MIN_SPECIAL_CHARS = 1;
+
+  [NotMapped]
+  public const int MIN_LOWERCASE_CHARS = 1;
+
+  [NotMapped]
+  public const int MIN_UPPERCASE_CHARS = 1;
+
+  [NotMapped]
+  public const int MIN_NUMERIC = 1;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
   public Password() { }
@@ -108,7 +118,8 @@ public sealed class Password : ValueObject
     yield return ValueHash;
   }
 
-  private static readonly HashSet<char> SpecialChars = new HashSet<char>
+  [NotMapped]
+  public static readonly HashSet<char> SpecialChars = new HashSet<char>
   {
     '~',
     '!',
