@@ -9,7 +9,7 @@ public record CreateProductCommand(
   string ProductName,
   string ProductDescription,
   int StockQuantity,
-  decimal PriceValue,
+  long PriceValueInCents,
   string PriceCurrency,
   CreateImageCommand Thumbnail,
   CreateImageCommand? LeftImage = null,

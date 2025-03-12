@@ -14,7 +14,7 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
 
     RuleFor(x => x.StockQuantity).NotEmpty().GreaterThan(0);
 
-    RuleFor(x => x.PriceValue).NotEmpty().GreaterThan(0);
+    RuleFor(x => x.PriceValueInCents).NotEmpty().GreaterThan(0);
 
     RuleFor(x => x.PriceCurrency).NotEmpty().MaximumLength(3);
 

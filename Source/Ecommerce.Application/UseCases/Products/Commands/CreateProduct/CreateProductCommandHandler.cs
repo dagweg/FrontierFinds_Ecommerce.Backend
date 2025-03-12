@@ -75,14 +75,18 @@ public class CreateProductCommandHandler
     if (currency.IsFailed)
       return currency.ToResult();
 
-    // convert the price to base currency before creating the product
-    var forexExchangeResult = await _forexService.ConvertToBaseCurrencyAsync(
-      command.PriceValue,
-      currency.Value
-    );
+    var forexExchangeResult = Result.Ok(command.PriceValueInCents);
+    if (currency.Value != Price.BASE_CURRENCY)
+    {
+      // convert the price to base currency before creating the product
+      forexExchangeResult = await _forexService.ConvertToBaseCurrencyAsync(
+        command.PriceValueInCents,
+        currency.Value
+      );
 
-    if (forexExchangeResult.IsFailed)
-      return forexExchangeResult.ToResult();
+      if (forexExchangeResult.IsFailed)
+        return forexExchangeResult.ToResult();
+    }
 
     var priceInBaseCurrency = Price.CreateInBaseCurrency(forexExchangeResult.Value);
 
