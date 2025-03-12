@@ -1,6 +1,6 @@
 namespace Ecommerce.Application.Common.Models;
 
-public class GetAllResult<TObject>
+public class GetResult<TObject>
 {
   public IEnumerable<TObject> Items { get; set; } = [];
   public required int TotalItems { get; set; }

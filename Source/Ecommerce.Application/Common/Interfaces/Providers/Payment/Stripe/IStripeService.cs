@@ -14,9 +14,9 @@ public interface IStripeService
 
 public record CheckoutSessionRequest
 {
-  public List<OrderItemCheckout> lineItems { get; init; } = [];
-  public PaymentMethod paymentMethod { get; init; }
-  public PaymentMode paymentMode { get; init; }
+  public required List<OrderItemCheckout> lineItems { get; init; } = [];
+  public required PaymentMethod paymentMethod { get; init; }
+  public required PaymentMode paymentMode { get; init; }
 }
 
 public record OrderItemCheckout(string productName, int quantity, long amountInCents);

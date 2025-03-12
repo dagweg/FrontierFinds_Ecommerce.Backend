@@ -1,4 +1,5 @@
 using Ecommerce.Application.Common.Errors;
+using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using FluentResults;
 
 namespace Ecommerce.Application.Common.Utilities;
@@ -64,5 +65,21 @@ public static class ConversionUtility
       sb.Append(pascalCase[i]);
     }
     return sb.ToString();
+  }
+
+  public static Result<List<ProductId>> ToProductIds(List<string> productIds)
+  {
+    List<ProductId> result = new();
+
+    foreach (var pidGuidResult in productIds.Select(ToGuid))
+    {
+      if (pidGuidResult.IsFailed)
+        return pidGuidResult.ToResult();
+
+      var productId = ProductId.Convert(pidGuidResult.Value);
+      result.Add(productId);
+    }
+
+    return result;
   }
 }

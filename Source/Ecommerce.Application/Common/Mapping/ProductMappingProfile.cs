@@ -10,6 +10,9 @@ public class ProductMappingProfile : Profile
 {
   public ProductMappingProfile()
   {
+    CreateMap<ProductImage, ProductImageResult>()
+      .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.Url));
+
     CreateMap<ProductImages, ProductImagesResult>()
       .ForMember(dest => dest.Thumbnail, opt => opt.MapFrom(src => src.Thumbnail))
       .ForMember(dest => dest.FrontImage, opt => opt.MapFrom(src => src.FrontImage))
@@ -18,9 +21,6 @@ public class ProductMappingProfile : Profile
       .ForMember(dest => dest.RightImage, opt => opt.MapFrom(src => src.RightImage))
       .ForMember(dest => dest.TopImage, opt => opt.MapFrom(src => src.TopImage))
       .ForMember(dest => dest.BottomImage, opt => opt.MapFrom(src => src.BottomImage));
-
-    CreateMap<ProductImage, ProductImageResult>()
-      .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.Url));
 
     CreateMap<ProductTag, TagResult>();
 
@@ -31,6 +31,7 @@ public class ProductMappingProfile : Profile
       .ForMember(dest => dest.PriceValueInCents, opt => opt.MapFrom(src => src.Price.ValueInCents))
       .ForMember(dest => dest.StockQuantity, opt => opt.MapFrom(src => src.Stock.Quantity))
       .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags))
+      .ForMember(dest => dest.SellerId, opt => opt.MapFrom(src => src.SellerId))
       .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
   }
 }

@@ -12,19 +12,19 @@ public interface ICloudStorageService
   /// <returns>
   //  <see cref="UploadImageResult"/>
   // </returns>
-  Task<Result<UploadImageResult>> UploadImageAsync(UploadImageParams uploadImageParams);
+  Task<Result<UploadImageResult>> UploadImageAsync(UploadFileParams uploadImageParams);
 
   /// <summary>
   /// Deletes an image from the cloud storage
   /// </summary>
   /// <param name="deleteImageParams"></param>
   /// <returns></returns>
-  Task<Result> DeleteImageAsync(DeleteImageParams deleteImageParams);
+  Task<Result> DeleteImageAsync(DeleteFileParams deleteImageParams);
 
   /// <summary>
   /// Deletes an image from the cloud storage
   /// </summary>
   /// <param name="deleteImageParams"></param>
   /// <returns></returns>
-  Task<Result> DeleteImagesAsync(IEnumerable<DeleteImageParams> deleteImagesParams);
+  Task<Result> DeleteImagesAsync(IEnumerable<DeleteFileParams> deleteImagesParams);
 }
