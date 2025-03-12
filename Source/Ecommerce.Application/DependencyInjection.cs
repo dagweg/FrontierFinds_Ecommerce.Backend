@@ -6,6 +6,7 @@ using Ecommerce.Application.Common;
 using Ecommerce.Application.Common.Interfaces.Storage;
 using Ecommerce.Application.Common.Interfaces.Validation;
 using Ecommerce.Application.Services.Validation;
+using Ecommerce.Application.Services.Workers.Common;
 using Ecommerce.Application.UseCases.Images.CreateImage;
 using Ecommerce.Application.UseCases.Smtp.Commands.SendEmail;
 using FluentValidation;
@@ -32,6 +33,9 @@ public static class DependencyInjection
 
     services.AddScoped<IUserValidationService, UserValidationService>();
     services.AddScoped<IProductValidationService, ProductValidationService>();
+
+    services.AddHostedService<QueuedHostedService>();
+    services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 
     return services;
   }
