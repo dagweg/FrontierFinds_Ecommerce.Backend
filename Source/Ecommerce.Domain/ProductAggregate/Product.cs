@@ -7,7 +7,7 @@ using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
 
-public sealed class Product : AggregateRoot<ProductId>
+public class Product : AggregateRoot<ProductId>
 {
   public ProductName Name { get; private set; } = ProductName.Empty;
   public ProductDescription Description { get; private set; } = ProductDescription.Empty;
@@ -27,7 +27,7 @@ public sealed class Product : AggregateRoot<ProductId>
   public Rating AverageRating { get; private set; }
   public Promotion Promotion { get; private set; }
 
-  private Product(
+  protected Product(
     ProductId productId,
     ProductName name,
     ProductDescription description,

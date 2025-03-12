@@ -1,5 +1,6 @@
 namespace Ecommerce.Domain.UserAggregate;
 
+using System.ComponentModel.DataAnnotations.Schema;
 using Ecommerce.Domain.Common.Errors;
 using Ecommerce.Domain.Common.Models;
 using Ecommerce.Domain.Common.ValueObjects;
@@ -24,6 +25,7 @@ public class User : AggregateRoot<UserId>
   public Wishlist Wishlist { get; private set; }
   public Cart Cart { get; private set; }
   public BillingAddress? BillingAddress { get; private set; }
+  public bool AccountVerified { get; set; }
 
   private List<Order> _orders = [];
   private List<Product> _products = [];
@@ -75,6 +77,8 @@ public class User : AggregateRoot<UserId>
       phoneNumber,
       countryCode
     );
+
+    user.EmailVerificationOtp = OneTimePassword.CreateNew(); // first time
 
     user.AddDomainEvent(new UserCreatedDomainEvent(user));
 
@@ -132,9 +136,13 @@ public class User : AggregateRoot<UserId>
   /// Sets the email verification OTP for the user. Pass in null to revoke otp.
   /// </summary>
   /// <param name="oneTimePassword"></param>
-  public void SetEmailVerificationOtp(OneTimePassword? oneTimePassword)
+  public void SetEmailVerificationOtp(int[]? oneTimePassword = null)
   {
-    EmailVerificationOtp = oneTimePassword;
+    EmailVerificationOtp?.SetValue(oneTimePassword);
+    if (oneTimePassword is not null) // if its not null we'll assume its a resend attempt
+    {
+      EmailVerificationOtp?.AddResendDelay();
+    }
   }
 
   /// <summary>
@@ -159,6 +167,7 @@ public class User : AggregateRoot<UserId>
       return result;
 
     EmailVerificationOtp = null;
+    AccountVerified = true;
     return Result.Ok();
   }
 
