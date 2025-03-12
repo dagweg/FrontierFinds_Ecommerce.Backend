@@ -113,7 +113,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
           oi => oi.Price,
           pb =>
           {
-            pb.Property(p => p.Value).HasColumnName("PriceValue").IsRequired();
+            pb.Property(p => p.ValueInCents).HasColumnName("PriceValue").IsRequired();
             // pb.Property(p => p.Currency)
             //   .HasColumnName("PriceCurrency")
             //   .IsRequired()

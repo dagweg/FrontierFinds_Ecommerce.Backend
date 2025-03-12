@@ -75,17 +75,6 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
     );
 
     builder.OwnsOne(
-      u => u.PasswordResetOtp,
-      ob =>
-      {
-        ob.Property(a => a.Value)
-          .HasConversion(v => string.Join("", v), s => ConversionUtility.ToIntArray(s).Value)
-          .IsRequired();
-        ob.Property(a => a.Expiry).IsRequired();
-      }
-    );
-
-    builder.OwnsOne(
       u => u.BillingAddress,
       b =>
       {
@@ -105,6 +94,22 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
           .HasConversion(v => string.Join("", v), s => ConversionUtility.ToIntArray(s).Value)
           .IsRequired();
         ob.Property(a => a.Expiry).IsRequired();
+        ob.Property(a => a.NextResendValidAt)
+          .HasColumnName("EmailVerificationOtpNextResendValidAt");
+        ob.Property(a => a.ResendFailStreak);
+      }
+    );
+
+    builder.OwnsOne(
+      u => u.PasswordResetOtp,
+      ob =>
+      {
+        ob.Property(a => a.Value)
+          .HasConversion(v => string.Join("", v), s => ConversionUtility.ToIntArray(s).Value)
+          .IsRequired();
+        ob.Property(a => a.Expiry).IsRequired();
+        ob.Property(a => a.NextResendValidAt).HasColumnName("PasswordResetOtpNextResendValidAt");
+        ob.Property(a => a.ResendFailStreak);
       }
     );
 

@@ -23,7 +23,7 @@ internal sealed class PaymentConfigurations : IEntityTypeConfiguration<Payment>
       p => p.Price,
       pb =>
       {
-        pb.Property(p => p.Value).HasColumnName("PriceValue").IsRequired();
+        pb.Property(p => p.ValueInCents).IsRequired();
       }
     );
 
