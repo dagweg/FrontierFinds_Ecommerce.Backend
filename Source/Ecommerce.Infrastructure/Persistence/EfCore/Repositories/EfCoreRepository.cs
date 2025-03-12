@@ -25,14 +25,14 @@ public abstract class EfCoreRepository<TEntity, TId>(EfCoreContext context)
     return entityEntry != null;
   }
 
-  public async Task<GetAllResult<TEntity>> GetAllAsync(PaginationParameters pagination)
+  public async Task<GetResult<TEntity>> GetAllAsync(PaginationParameters pagination)
   {
     var query = context.Set<TEntity>().AsQueryable();
 
     var totalCount = query.Count();
     var entities = await query.Paginate(pagination).ToListAsync();
 
-    return new GetAllResult<TEntity>
+    return new GetResult<TEntity>
     {
       Items = entities,
       TotalItems = totalCount,

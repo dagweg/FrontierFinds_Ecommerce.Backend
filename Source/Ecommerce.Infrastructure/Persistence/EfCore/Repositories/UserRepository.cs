@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using AutoMapper;
+using Ecommerce.Application.Common.Errors;
 using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Models;
@@ -14,6 +15,7 @@ using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
 using Ecommerce.Domain.UserAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 
 public class UserRepository(
@@ -70,12 +72,12 @@ public class UserRepository(
     };
   }
 
-  public async Task<bool> AddToCartRangeAsync(UserId userId, List<CartItem> cartItems)
+  public async Task<Result> AddToCartRangeAsync(UserId userId, List<CartItem> cartItems)
   {
     var user = await GetByIdAsync(userId);
 
     if (user is null)
-      return false;
+      return NotFoundError.GetResult(nameof(userId), "User not found");
 
     var cartDict = user.Cart.Items.ToDictionary(kvp => kvp.ProductId, kvp => kvp);
 
@@ -85,6 +87,16 @@ public class UserRepository(
 
     foreach (var cartItem in cartItems)
     {
+      if (
+        productBulk.ContainsKey(cartItem.ProductId)
+        && productBulk[cartItem.ProductId].SellerId == userId
+      )
+      {
+        return BadRequestError.GetResult(
+          nameof(cartItem.ProductId),
+          "You cannot add your own product to cart"
+        );
+      }
       if (cartDict.ContainsKey(cartItem.ProductId) && productBulk.ContainsKey(cartItem.ProductId))
       {
         var availableStockQuantity = productBulk[cartItem.ProductId].Stock.Quantity;
@@ -109,7 +121,7 @@ public class UserRepository(
     // update the user
     Update(user);
 
-    return true;
+    return Result.Ok();
   }
 
   public async Task<bool> RemoveFromCartRangeAsync(UserId userId, HashSet<CartItemId> cartItemIds)
@@ -151,7 +163,9 @@ public class UserRepository(
     if (user is null)
       return false;
 
-    user.Wishlist.AddProductsRange(productIds);
+    user.Wishlist.AddProductsRange(
+      productIds.Where(pi => user.Products.All(p => p.Id != pi)).ToList()
+    );
 
     Update(user);
 
