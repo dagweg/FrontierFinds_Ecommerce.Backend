@@ -6,13 +6,14 @@ namespace Ecommerce.Application.UseCases.Products.Common;
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 public class ProductResult
 {
-  public string ProductId { get; set; }
-  public string ProductName { get; set; }
-  public string ProductDescription { get; set; }
-  public int StockQuantity { get; set; }
-  public decimal PriceValue { get; set; }
-  public string PriceCurrency { get; set; }
-  public ProductImagesResult Images { get; set; }
-  public List<TagResult>? Tags { get; set; }
+  public required string ProductId { get; set; }
+  public required string ProductName { get; set; }
+  public required string ProductDescription { get; set; }
+  public required int StockQuantity { get; set; }
+  public required long PriceValueInCents { get; set; }
+  public required string PriceCurrency { get; set; }
+  public required ProductImagesResult Images { get; set; }
+  public required List<TagResult>? Tags { get; set; }
+  public Guid SellerId { get; set; }
 }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.

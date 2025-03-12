@@ -1,5 +1,6 @@
 using AutoMapper;
 using Ecommerce.Application.Common.Interfaces.Persistence;
+using Ecommerce.Application.Common.Interfaces.Providers.Context;
 using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.UseCases.Products.Common;
 using FluentResults;
@@ -11,11 +12,18 @@ public class GetAllProductsQueryHandler
   : IRequestHandler<GetAllProductsQuery, Result<ProductsResult>>
 {
   private readonly IProductRepository _productRepository;
+  private readonly IUserContextService _userContextService;
+
   private readonly IMapper _mapper;
 
-  public GetAllProductsQueryHandler(IProductRepository productRepository, IMapper mapper)
+  public GetAllProductsQueryHandler(
+    IProductRepository productRepository,
+    IMapper mapper,
+    IUserContextService contextService
+  )
   {
     _productRepository = productRepository;
+    _userContextService = contextService;
     _mapper = mapper;
   }
 
@@ -24,7 +32,12 @@ public class GetAllProductsQueryHandler
     CancellationToken cancellationToken
   )
   {
-    var products = await _productRepository.GetAllAsync(
+    var userIdR = _userContextService.GetValidUserId();
+    if (userIdR.IsFailed)
+      return userIdR.ToResult();
+
+    var products = await _productRepository.GetAllProductsSellerNotListedAsync(
+      userIdR.Value,
       new PaginationParameters(request.PageNumber, request.PageSize)
     );
 
