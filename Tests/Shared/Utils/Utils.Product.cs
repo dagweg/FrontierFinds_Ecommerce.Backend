@@ -2,8 +2,11 @@ using System.Text;
 using Ecommerce.Application.UseCases.Images.CreateImage;
 using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Application.UseCases.Products.CreateUser.Commands;
+using Ecommerce.Contracts.Image;
+using Ecommerce.Contracts.Product;
 using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using Microsoft.AspNetCore.Http;
 
 namespace Ecommerce.Tests.Shared;
 
@@ -15,7 +18,7 @@ public partial class Utils
     public const string ProductName = "Product Name";
     public const string ProductDescription = "Product Description";
     public const int StockQuantity = 10;
-    public const decimal PriceValue = 2000;
+    public const long PriceValue = 2000;
     public const string PriceCurrency = "ETB";
 
     public static string ProductNameFromIndex(int i) => $"{ProductName} {i}";
@@ -28,7 +31,7 @@ public partial class Utils
         ProductName: Utils.Product.ProductNameFromIndex(i),
         ProductDescription: Utils.Product.ProductDescriptionFromIndex(i),
         StockQuantity: Utils.Product.StockQuantity,
-        PriceValue: Utils.Product.PriceValue,
+        PriceValueInCents: Utils.Product.PriceValue,
         PriceCurrency: Utils.Product.PriceCurrency,
         Thumbnail: Utils.Product.Thumbnail.CreateCommand(i),
         LeftImage: Utils.Product.LeftImage.CreateCommand(i),
@@ -69,6 +72,40 @@ public partial class Utils
         );
     }
 
+    public static MultipartFormDataContent CreateProductRequest(int i = 0)
+    {
+      // return new CreateProductRequest
+      // {
+      //   ProductName = Utils.Product.ProductNameFromIndex(i),
+      //   ProductDescription = Utils.Product.ProductDescriptionFromIndex(i),
+      //   StockQuantity = Utils.Product.StockQuantity,
+      //   PriceValue = Utils.Product.PriceValue,
+      //   PriceCurrency = Utils.Product.PriceCurrency,
+      //   Thumbnail = Utils.Product.Thumbnail.CreateImageRequest(i),
+      //   LeftImage = Utils.Product.LeftImage.CreateImageRequest(i),
+      //   RightImage = Utils.Product.RightImage.CreateImageRequest(i),
+      //   FrontImage = Utils.Product.FrontImage.CreateImageRequest(i),
+      //   BackImage = Utils.Product.BackImage.CreateImageRequest(i),
+      // };
+
+      var multipart = new MultipartFormDataContent();
+
+      multipart.Add(new StringContent(Utils.Product.ProductNameFromIndex(i)), nameof(ProductName));
+      multipart.Add(
+        new StringContent(Utils.Product.ProductDescriptionFromIndex(i)),
+        nameof(ProductDescription)
+      );
+      multipart.Add(
+        new StringContent(Utils.Product.StockQuantity.ToString()),
+        nameof(StockQuantity)
+      );
+      multipart.Add(new StringContent(Utils.Product.PriceValue.ToString()), nameof(PriceValue));
+
+      multipart.Add(new StringContent(Utils.Product.PriceCurrency), nameof(PriceCurrency));
+      // multipart.Add(new StringContent(Utils.Product.Thumbnail.CreateImageRequest(i)), nameof(PriceCurrency));
+      return multipart;
+    }
+
     public static ProductImage CreateProductImage(string url, string oid)
     {
       return ProductImage.Create(url, oid);
@@ -91,7 +128,7 @@ public partial class Utils
         ProductName = product.Name.Value,
         ProductDescription = product.Description.Value,
         StockQuantity = product.Stock.Quantity,
-        PriceValue = product.Price.Value,
+        PriceValueInCents = product.Price.ValueInCents,
         PriceCurrency = Ecommerce.Domain.Common.ValueObjects.Price.BASE_CURRENCY.ToString(),
         Images = new ProductImagesResult
         {
@@ -131,6 +168,18 @@ public partial class Utils
       {
         return new ProductImageResult { Url = Url };
       }
+
+      public static CreateImageRequest CreateImageRequest(int i = 0)
+      {
+        var formFile = new FormFile(ImageStream, 0, ImageStream.Length, "", FileName)
+        {
+          Headers = new HeaderDictionary(),
+        };
+
+        formFile.ContentType = "image/jpeg";
+
+        return new CreateImageRequest { FileName = $"{FileName} {i}", ImageFile = formFile };
+      }
     }
 
     public record LeftImage
@@ -156,6 +205,18 @@ public partial class Utils
       public static ProductImageResult CreateProductImageResult()
       {
         return new ProductImageResult { Url = Url };
+      }
+
+      public static CreateImageRequest CreateImageRequest(int i = 0)
+      {
+        var formFile = new FormFile(ImageStream, 0, ImageStream.Length, "", FileName)
+        {
+          Headers = new HeaderDictionary(),
+        };
+
+        formFile.ContentType = "image/jpeg";
+
+        return new CreateImageRequest { FileName = $"{FileName} {i}", ImageFile = formFile };
       }
     }
 
@@ -183,6 +244,18 @@ public partial class Utils
       {
         return new ProductImageResult { Url = Url };
       }
+
+      public static CreateImageRequest CreateImageRequest(int i = 0)
+      {
+        var formFile = new FormFile(ImageStream, 0, ImageStream.Length, "", FileName)
+        {
+          Headers = new HeaderDictionary(),
+        };
+
+        formFile.ContentType = "image/jpeg";
+
+        return new CreateImageRequest { FileName = $"{FileName} {i}", ImageFile = formFile };
+      }
     }
 
     public record BackImage
@@ -208,6 +281,18 @@ public partial class Utils
       public static ProductImageResult CreateProductImageResult()
       {
         return new ProductImageResult { Url = Url };
+      }
+
+      public static CreateImageRequest CreateImageRequest(int i = 0)
+      {
+        var formFile = new FormFile(ImageStream, 0, ImageStream.Length, "", FileName)
+        {
+          Headers = new HeaderDictionary(),
+        };
+
+        formFile.ContentType = "image/jpeg";
+
+        return new CreateImageRequest { FileName = $"{FileName} {i}", ImageFile = formFile };
       }
     }
 
@@ -235,6 +320,18 @@ public partial class Utils
       {
         return new ProductImageResult { Url = Url };
       }
+
+      public static CreateImageRequest CreateImageRequest(int i = 0)
+      {
+        var formFile = new FormFile(ImageStream, 0, ImageStream.Length, "", FileName)
+        {
+          Headers = new HeaderDictionary(),
+        };
+
+        formFile.ContentType = "image/jpeg";
+
+        return new CreateImageRequest { FileName = $"{FileName} {i}", ImageFile = formFile };
+      }
     }
 
     public record TopImage
@@ -261,6 +358,18 @@ public partial class Utils
       {
         return new ProductImageResult { Url = Url };
       }
+
+      public static CreateImageRequest CreateImageRequest(int i = 0)
+      {
+        var formFile = new FormFile(ImageStream, 0, ImageStream.Length, "", FileName)
+        {
+          Headers = new HeaderDictionary(),
+        };
+
+        formFile.ContentType = "image/jpeg";
+
+        return new CreateImageRequest { FileName = $"{FileName} {i}", ImageFile = formFile };
+      }
     }
 
     public record BottomImage
@@ -286,6 +395,18 @@ public partial class Utils
       public static ProductImageResult CreateProductImageResult()
       {
         return new ProductImageResult { Url = Url };
+      }
+
+      public static CreateImageRequest CreateImageRequest(int i = 0)
+      {
+        var formFile = new FormFile(ImageStream, 0, ImageStream.Length, "", FileName)
+        {
+          Headers = new HeaderDictionary(),
+        };
+
+        formFile.ContentType = "image/jpeg";
+
+        return new CreateImageRequest { FileName = $"{FileName} {i}", ImageFile = formFile };
       }
     };
 

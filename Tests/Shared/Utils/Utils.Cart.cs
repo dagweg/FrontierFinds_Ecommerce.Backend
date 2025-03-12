@@ -19,7 +19,7 @@ public partial class Utils
     public static CartResult CreateCartResult(int i = 1)
     {
       var cartItemResults = CartItem.CreateCartItemResults(i);
-      var totalPrice = cartItemResults.Sum(x => x.Product.PriceValue * x.Quantity);
+      var totalPrice = cartItemResults.Sum(x => x.Product.PriceValueInCents * x.Quantity);
       return new CartResult
       {
         Items = CartItem.CreateCartItemResults(i),

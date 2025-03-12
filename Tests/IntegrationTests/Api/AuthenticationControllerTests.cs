@@ -17,6 +17,7 @@ using Xunit.Sdk;
 
 namespace Ecommerce.IntegrationTests.Api;
 
+[Collection("Sequential")]
 public class AuthenticationControllerTests : IntegrationTestBase
 {
   public AuthenticationControllerTests(EcommerceWebApplicationFactoryFixture factoryFixture)

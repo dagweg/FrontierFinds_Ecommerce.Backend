@@ -1,4 +1,6 @@
+using System.Numerics;
 using System.Threading.Tasks;
+using Castle.Core.Logging;
 using Ecommerce.Application.Common.Interfaces.Authentication;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
@@ -10,7 +12,9 @@ using Ecommerce.Domain.UserAggregate.ValueObjects;
 using Ecommerce.Tests.Shared;
 using FluentAssertions;
 using FluentResults;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Ecommerce.UnitTests.Application.UseCases.Users.Commands.RegisterUser;
@@ -18,6 +22,7 @@ namespace Ecommerce.UnitTests.Application.UseCases.Users.Commands.RegisterUser;
 public class RegisterUserCommandHandlerTests
 {
   private readonly RegisterUserCommandHandler _registerUserCommandHandler;
+  private readonly Mock<ISender> _senderMock = new Mock<ISender>();
   private readonly Mock<IUserRepository> _userRepositoryMock = new Mock<IUserRepository>();
   private readonly Mock<IJwtTokenGenerator> _jwtTokenGeneratorMock = new Mock<IJwtTokenGenerator>();
   private readonly Mock<IAuthenticationMessages> _authValidationMessagesMock =
@@ -27,16 +32,20 @@ public class RegisterUserCommandHandlerTests
   private readonly Mock<IUnitOfWork> _unitOfWorkMock = new Mock<IUnitOfWork>();
   private readonly Mock<IPasswordHasher<User>> _passwordHasherMock =
     new Mock<IPasswordHasher<User>>();
+  private readonly Mock<ILogger<RegisterUserCommandHandler>> _loggerMock =
+    new Mock<ILogger<RegisterUserCommandHandler>>();
 
   public RegisterUserCommandHandlerTests()
   {
     _registerUserCommandHandler = new RegisterUserCommandHandler(
+      _senderMock.Object,
       userRespository: _userRepositoryMock.Object,
       jwtTokenGenerator: _jwtTokenGeneratorMock.Object,
       authValidationMessages: _authValidationMessagesMock.Object,
       userValidationService: _userValidationServiceMock.Object,
       unitOfWork: _unitOfWorkMock.Object,
-      passwordHasher: _passwordHasherMock.Object
+      passwordHasher: _passwordHasherMock.Object,
+      _loggerMock.Object
     );
   }
 

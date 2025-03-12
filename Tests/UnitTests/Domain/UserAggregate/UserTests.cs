@@ -55,7 +55,7 @@ public class UserTests
   {
     // Arrange
     var validOtp = OneTimePassword.Convert([1, 2, 3, 4, 5, 6]).Value;
-    _user.SetEmailVerificationOtp(validOtp); // make sure email verification otp is set (not null)
+    _user.SetEmailVerificationOtp(validOtp.Value); // make sure email verification otp is set (not null)
 
     var invalidOtp = OneTimePassword.Convert([1, 2, 3, 4, 5, 7]).Value;
     // Act

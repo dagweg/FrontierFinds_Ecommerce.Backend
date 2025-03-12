@@ -113,7 +113,7 @@ namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProdu
 
       _userContextServiceMock.Setup(x => x.GetValidUserId()).Returns(Result.Ok());
       _forexServiceMock
-        .Setup(x => x.ConvertToBaseCurrencyAsync(It.IsAny<decimal>(), It.IsAny<Currency>()))
+        .Setup(x => x.ConvertToBaseCurrencyAsync(It.IsAny<long>(), It.IsAny<Currency>()))
         .ReturnsAsync(Result.Ok());
 
       _mapperMock
@@ -123,7 +123,7 @@ namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProdu
             Domain.ProductAggregate.Product.Create(
               ProductName.Create(cmd.ProductName),
               ProductDescription.Create(cmd.ProductDescription),
-              Price.CreateInBaseCurrency(100m),
+              Price.CreateInBaseCurrency(100),
               Stock.Create(Quantity.Create(cmd.StockQuantity)),
               UserId.CreateUnique(),
               ProductImage.Create("", "")
@@ -161,13 +161,13 @@ namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProdu
           }
         );
 
-      _mapperMock
-        .Setup(x => x.Map<ProductResult>(It.IsAny<Product>()))
-        .Returns(
-          new ProductResult
-          { /* Populate as needed */
-          }
-        );
+      // _mapperMock
+      //   .Setup(x => x.Map<ProductResult>(It.IsAny<Product>()))
+      //   .Returns(
+      //     new ProductResult
+      //     { /* Populate as needed */
+      //     }
+      //   );
 
       //act
       var result = await _createProductCommandHandler.Handle(command, default);

@@ -55,7 +55,7 @@ public class JwtTokenGeneratorTests
         {
           Audience = Utils.JwtSettings.Audience,
           Issuer = Utils.JwtSettings.Issuer,
-          SecretKey = null, // Set SecretKey to null
+          SecretKey = null!, // Set SecretKey to null
           ExpiryMinutes = Utils.JwtSettings.ExpiryMinutes,
         }
       );
