@@ -2,23 +2,28 @@ using Ecommerce.Application.Common.Errors;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
 using Ecommerce.Application.Common.Interfaces.Validation;
+using Ecommerce.Application.UseCases.Stmp.Commands.SendEmail;
 using Ecommerce.Application.UseCases.Users.Common;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
 using FluentResults;
+using MediatR;
 
 namespace Ecommerce.Application.Services.Validation;
 
 public class UserValidationService : IUserValidationService
 {
+  private readonly ISender _sender;
   private readonly IUserRepository _userRepository;
   private readonly IAuthenticationMessages _authValidationMessages;
 
   public UserValidationService(
+    ISender sender,
     IUserRepository userRepository,
     IAuthenticationMessages authValidationMessages
   )
   {
+    _sender = sender;
     _userRepository = userRepository;
     _authValidationMessages = authValidationMessages;
   }
