@@ -62,7 +62,10 @@ public class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, Result>
     }
 
     // add to the user cart
-    await _userRepository.AddToCartRangeAsync(userIdResult.Value, cartItems);
+    var result = await _userRepository.AddToCartRangeAsync(userIdResult.Value, cartItems);
+
+    if (result.IsFailed)
+      return result;
 
     // persist to db
     await _unitOfWork.SaveChangesAsync();
