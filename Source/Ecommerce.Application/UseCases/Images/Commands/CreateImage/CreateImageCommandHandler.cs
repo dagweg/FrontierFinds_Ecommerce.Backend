@@ -27,7 +27,7 @@ public class CreateImageCommandHandler(
     Stream compressedImageStream = compressionResult.Value;
 
     var uploadResult = await cloudStorageService.UploadImageAsync(
-      new UploadImageParams { ImageStream = compressedImageStream, FileName = request.FileName }
+      new UploadFileParams { FileStream = compressedImageStream, FileName = request.FileName }
     );
 
     if (uploadResult.IsFailed)

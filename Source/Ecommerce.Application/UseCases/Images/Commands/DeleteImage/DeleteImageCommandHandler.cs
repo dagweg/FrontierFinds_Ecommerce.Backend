@@ -28,7 +28,7 @@ public class DeleteImageCommandHandler : IRequestHandler<DeleteImageCommand, Res
   public async Task<Result> Handle(DeleteImageCommand command, CancellationToken cancellationToken)
   {
     var deletionResult = await _cloudStorage.DeleteImageAsync(
-      new DeleteImageParams(command.ObjectIdentifier)
+      new DeleteFileParams(command.ObjectIdentifier)
     );
     return deletionResult;
   }
