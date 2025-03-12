@@ -5,6 +5,7 @@ using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using FluentResults;
 using MediatR;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Ecommerce.Application.UseCases.Users.Commands.WishlistProducts;
 
@@ -37,18 +38,15 @@ public class WishlistProductsCommandHandler : IRequestHandler<WishlistProductsCo
     if (userIdResult.IsFailed)
       return userIdResult.ToResult();
 
-    List<ProductId> productIds = [];
+    Result<List<ProductId>> productIdsR = ConversionUtility.ToProductIds(request.ProductIds);
 
-    foreach (var pidGuidResult in request.ProductIds.Select(ConversionUtility.ToGuid))
-    {
-      if (pidGuidResult.IsFailed)
-        return pidGuidResult.ToResult();
+    if (productIdsR.IsFailed)
+      return productIdsR.ToResult();
 
-      var productId = ProductId.Convert(pidGuidResult.Value);
-      productIds.Add(productId);
-    }
-
-    var success = await _userRepository.AddToWishlistRangeAsync(userIdResult.Value, productIds);
+    var success = await _userRepository.AddToWishlistRangeAsync(
+      userIdResult.Value,
+      productIdsR.Value
+    );
 
     if (success)
     {
