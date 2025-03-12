@@ -27,8 +27,6 @@ public class StripeService(
 
     // If there are other payment method types from the request -- add to the hashset
 
-
-
     var options = new SessionCreateOptions
     {
       PaymentMethodTypes = paymentMethodTypes.ToList(),
