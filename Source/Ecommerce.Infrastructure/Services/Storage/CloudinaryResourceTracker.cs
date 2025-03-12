@@ -19,9 +19,12 @@ public class CloudinaryResourceTracker(ICloudinaryService cloudinaryService)
 
   public async Task RollbackAsync()
   {
+    if (UploadedImagesPublicIds.Count == 0)
+      return;
+
     // Delete all uploaded images
     await cloudinaryService.DeleteImagesAsync(
-      UploadedImagesPublicIds.Select(p => new DeleteImageParams(p))
+      UploadedImagesPublicIds.Select(p => new DeleteFileParams(p))
     );
     UploadedImagesPublicIds.Clear(); // Clear the list
   }

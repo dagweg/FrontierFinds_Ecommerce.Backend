@@ -4,6 +4,7 @@ using CloudinaryDotNet.Actions;
 using Ecommerce.Application.Common.Errors;
 using Ecommerce.Application.Common.Interfaces.Storage;
 using Ecommerce.Application.Common.Models.Storage;
+using Ecommerce.Domain.Common.Entities;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,7 +19,7 @@ public class CloudinaryService(
 {
   public string ImagesFolder => $"{cloudinarySettings.Value.Folder}/images";
 
-  public async Task<Result> DeleteImageAsync(DeleteImageParams deleteImageParams)
+  public async Task<Result> DeleteImageAsync(DeleteFileParams deleteImageParams)
   {
     var deleteResult = await cloudinary.DestroyAsync(
       new DeletionParams(deleteImageParams.ObjectIdentifier)
@@ -33,7 +34,7 @@ public class CloudinaryService(
     return Result.Ok();
   }
 
-  public async Task<Result> DeleteImagesAsync(IEnumerable<DeleteImageParams> deleteImagesParams)
+  public async Task<Result> DeleteImagesAsync(IEnumerable<DeleteFileParams> deleteImagesParams)
   {
     var deleteResult = await cloudinary.DeleteResourcesAsync(
       deleteImagesParams.Select(p => p.ObjectIdentifier).ToArray()
@@ -48,14 +49,14 @@ public class CloudinaryService(
     return Result.Ok();
   }
 
-  public async Task<Result<UploadImageResult>> UploadImageAsync(UploadImageParams uploadImageParams)
+  public async Task<Result<UploadImageResult>> UploadImageAsync(UploadFileParams uploadImageParams)
   {
-    uploadImageParams.ImageStream.Position = 0; // Reset stream position
+    uploadImageParams.FileStream.Position = 0; // Reset stream position
     var fileName = uploadImageParams.FileName ?? $"image_{Guid.NewGuid()}.png";
     var uploadResult = await cloudinary.UploadAsync(
       new ImageUploadParams
       {
-        File = new FileDescription(fileName, uploadImageParams.ImageStream),
+        File = new FileDescription(fileName, uploadImageParams.FileStream),
         PublicId = uploadImageParams.ObjectIdentifier ?? Guid.NewGuid().ToString(),
         Folder = ImagesFolder,
       }
