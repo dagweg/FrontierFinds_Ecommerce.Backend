@@ -4,6 +4,7 @@ using Ecommerce.Infrastructure.Persistence.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerce.Infrastructure.Migrations
 {
     [DbContext(typeof(EfCoreContext))]
-    partial class EfCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250311233239_otp-nextresendvalidatprop")]
+    partial class otpnextresendvalidatprop
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1125,9 +1128,6 @@ namespace Ecommerce.Infrastructure.Migrations
                                 .HasColumnType("datetime2")
                                 .HasColumnName("EmailVerificationOtpNextResendValidAt");
 
-                            b1.Property<int>("ResendFailStreak")
-                                .HasColumnType("int");
-
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
@@ -1151,9 +1151,6 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.Property<DateTime>("NextResendValidAt")
                                 .HasColumnType("datetime2")
                                 .HasColumnName("PasswordResetOtpNextResendValidAt");
-
-                            b1.Property<int>("ResendFailStreak")
-                                .HasColumnType("int");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
