@@ -7,4 +7,5 @@ public class AuthenticationResult
   public required string LastName { get; set; }
   public required string Email { get; set; }
   public required string Token { get; set; }
+  public bool AlreadyExistsButUnverified { get; set; } = false;
 }

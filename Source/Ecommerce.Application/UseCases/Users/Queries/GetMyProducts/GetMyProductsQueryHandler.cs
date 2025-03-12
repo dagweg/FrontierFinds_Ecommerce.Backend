@@ -3,6 +3,7 @@ using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Providers.Context;
 using Ecommerce.Application.Common.Models;
+using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.UseCases.Products.Common;
 using FluentResults;
 using MediatR;
@@ -41,6 +42,8 @@ public class GetMyProductsQueryHandler : IRequestHandler<GetMyProductsQuery, Res
       sellerId.Value,
       new PaginationParameters(request.PageNumber, request.PageSize)
     );
+
+    LogPretty.Log(myProducts);
 
     var result = new ProductsResult
     {
