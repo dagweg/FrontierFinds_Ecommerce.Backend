@@ -12,7 +12,9 @@ using Ecommerce.Application.Common.Interfaces.Processors;
 using Ecommerce.Application.Common.Interfaces.Providers.Date;
 using Ecommerce.Application.Common.Interfaces.Providers.Forex;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
+using Ecommerce.Application.Common.Interfaces.Providers.Payment.Stripe;
 using Ecommerce.Application.Common.Interfaces.Storage;
+using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.Services.Storage;
 using Ecommerce.Application.UseCases.Smtp.Commands.SendEmail;
 using Ecommerce.Infrastructure.Common;
@@ -26,6 +28,8 @@ using Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 using Ecommerce.Infrastructure.Services.Authentication;
 using Ecommerce.Infrastructure.Services.Processors;
 using Ecommerce.Infrastructure.Services.Providers.Forex;
+using Ecommerce.Infrastructure.Services.Providers.Payment;
+using Ecommerce.Infrastructure.Services.Providers.Payment.Stripe;
 using Ecommerce.Infrastructure.Services.Providers.Smtp;
 using Ecommerce.Infrastructure.Services.Storage;
 using IdentityModel;
@@ -72,6 +76,9 @@ public static class DependencyInjection
 
     // Register Cloud Services
     services.AddCloudinary(configuration);
+
+    // stripe, paypal .. etc
+    services.AddPaymentGateways();
 
     return services;
   }
@@ -216,6 +223,8 @@ public static class DependencyInjection
               context.Token = token;
             }
 
+            LogPretty.Log(context.HttpContext.Request.Cookies);
+
             return Task.CompletedTask;
           },
         };
@@ -235,6 +244,10 @@ public static class DependencyInjection
   )
   {
     services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SectionName));
+
+    services.Configure<PaymentOptions>(configuration.GetSection(PaymentOptions.SectionName));
+
+    services.Configure<ClientSettings>(configuration.GetSection(ClientSettings.SectionName));
 
     services.Configure<CookieSettings>(configuration.GetSection(CookieSettings.SectionName));
     services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
@@ -288,8 +301,14 @@ public static class DependencyInjection
         Log.Warning("Smtp host is not configured. Email sending will be disabled.");
       }
 
-      return new SmtpClientWrapper(host ?? "");
+      return new SmtpClientWrapper(host ?? "smtp.gmail.com");
     });
+    return services;
+  }
+
+  public static IServiceCollection AddPaymentGateways(this IServiceCollection services)
+  {
+    services.AddTransient<IStripeService, StripeService>();
     return services;
   }
 }
