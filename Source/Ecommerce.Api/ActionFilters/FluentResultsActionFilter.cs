@@ -49,6 +49,8 @@ public class FluentResultsActionFilter : IActionFilter
             case PasswordMatchError:
             case IncorrectCurrentPasswordError:
             case ExpiryError:
+            case ResendError:
+            case BadRequestError:
               status = StatusCodes.Status400BadRequest;
               break;
             case AlreadyExistsError:

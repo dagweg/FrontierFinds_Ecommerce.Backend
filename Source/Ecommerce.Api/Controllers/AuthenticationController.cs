@@ -2,7 +2,10 @@ namespace Ecommerce.Api.Controllers;
 
 using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
+using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.UseCases.Users.Commands.RegisterUser;
+using Ecommerce.Application.UseCases.Users.Commands.ResendEmailOtp;
+using Ecommerce.Application.UseCases.Users.Commands.VerifyAccount;
 using Ecommerce.Application.UseCases.Users.Queries.LoginUser;
 using Ecommerce.Contracts.Authentication;
 using Ecommerce.Infrastructure.Services.Authentication;
@@ -42,7 +45,7 @@ public class AuthenticationController : ControllerBase
 
     var result = await _mediator.Send(command);
 
-    return result.IsFailed ? new ObjectResult(result) : Created();
+    return result.IsFailed ? new ObjectResult(result) : Ok(result.Value);
   }
 
   [HttpPost("login")]
@@ -67,6 +70,8 @@ public class AuthenticationController : ControllerBase
       return StatusCode(500, "An error occured trying to log you in. Please contact support.");
     }
 
+    _logger.LogInformation($"CookieSettings.Secure value: {_cookieSettings.Secure}"); // **ADD THIS LINE**
+
     // Set the http-only cookie
     HttpContext.Response.Cookies.Append(
       _cookieSettings.CookieKey,
@@ -74,12 +79,33 @@ public class AuthenticationController : ControllerBase
       new CookieOptions
       {
         HttpOnly = _cookieSettings.HttpOnly,
-        Secure = _cookieSettings.Secure,
+        // Secure = _cookieSettings.Secure,
+        Secure = true,
         Expires = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expClaim.Value)),
-        SameSite = _cookieSettings.SameSite,
+        // SameSite = _cookieSettings.SameSite,
+        SameSite = SameSiteMode.None,
+        Path = "/",
       }
     );
 
     return Ok(_mapper.Map<AuthenticationResponse>(result.Value));
+  }
+
+  [HttpPost("verify")]
+  public async Task<IActionResult> VerifyAccount([FromBody] VerifyAccountRequest verifyRequest)
+  {
+    var result = await _mediator.Send(
+      new VerifyAccountCommand(verifyRequest.UserId, verifyRequest.Otp)
+    );
+
+    return result.IsFailed ? new ObjectResult(result) : Ok(new { });
+  }
+
+  [HttpPost("verify/resendOtp")]
+  public async Task<IActionResult> ResendOtp([FromBody] ResendEmailOtpRequest resendRequest)
+  {
+    var result = await _mediator.Send(new ResendEmailOtpCommand(resendRequest.UserId));
+
+    return result.IsFailed ? new ObjectResult(result) : Ok(result.Value);
   }
 }

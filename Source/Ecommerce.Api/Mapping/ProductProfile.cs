@@ -27,6 +27,7 @@ public class ProductProfile : Profile
     CreateMap<ProductImagesResult, ProductImagesResponse>();
 
     CreateMap<ProductResult, ProductResponse>();
+
     CreateMap<ProductsResult, ProductsResponse>()
       .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.Products))
       .ForMember(dest => dest.TotalCount, opt => opt.MapFrom(src => src.TotalCount))

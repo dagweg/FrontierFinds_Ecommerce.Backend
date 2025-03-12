@@ -15,6 +15,7 @@ using Ecommerce.Application.UseCases.Users.Commands.ResetPasswordVerify;
 using Ecommerce.Application.UseCases.Users.Commands.UpdateCart;
 using Ecommerce.Application.UseCases.Users.Commands.WishlistProducts;
 using Ecommerce.Application.UseCases.Users.Queries.GetCartItems;
+using Ecommerce.Application.UseCases.Users.Queries.GetMyProducts;
 using Ecommerce.Application.UseCases.Users.Queries.LoginUser;
 using Ecommerce.Contracts.Authentication;
 using Ecommerce.Contracts.Cart;
@@ -206,7 +207,7 @@ public class UserController : ControllerBase
   public async Task<IActionResult> GetMyProducts([FromQuery] PaginationParams paginationParams)
   {
     var result = await _mediator.Send(
-      new GetAllProductsQuery(paginationParams.PageNumber, paginationParams.PageSize)
+      new GetMyProductsQuery(paginationParams.PageNumber, paginationParams.PageSize)
     );
 
     if (result.IsFailed)
@@ -215,7 +216,7 @@ public class UserController : ControllerBase
       return new ObjectResult(result);
     }
 
-    return Ok(_mapper.Map<ProductsResponse>(result.Value));
+    return Ok(result.Value);
   }
 
   [HttpPost("wishlist")]

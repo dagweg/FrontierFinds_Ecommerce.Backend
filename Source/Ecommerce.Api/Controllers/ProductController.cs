@@ -58,10 +58,10 @@ public class ProductController : ControllerBase
     return Ok(_mapper.Map<ProductsResponse>(result.Value));
   }
 
-  [HttpDelete("{productId}")]
-  public async Task<IActionResult> DeleteProduct(string productId)
+  [HttpDelete]
+  public async Task<IActionResult> DeleteProduct(DeleteProductRequest deleteProductRequest)
   {
-    var result = await _mediator.Send(new DeleteProductCommand(productId));
+    var result = await _mediator.Send(new DeleteProductCommand(deleteProductRequest.ProductIds));
     if (result.IsFailed)
     {
       _logger.LogError("Failed to delete product: {@result}", result);
