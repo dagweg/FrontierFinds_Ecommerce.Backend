@@ -25,7 +25,7 @@ public interface IRepository<TEntity, TId>
   /// <param name="pagination"></param>
   /// <returns>
   /// </returns>
-  Task<GetAllResult<TEntity>> GetAllAsync(PaginationParameters pagination);
+  Task<GetResult<TEntity>> GetAllAsync(PaginationParameters pagination);
 
   /// <summary>
   /// Adds the given entity to the change tracker
