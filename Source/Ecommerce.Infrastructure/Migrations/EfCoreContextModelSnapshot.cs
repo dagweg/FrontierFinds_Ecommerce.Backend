@@ -163,13 +163,6 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.Property<bool>("AccountVerified")
                         .HasColumnType("bit");
 
-                    b.Property<string>("CountryCode")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(3)
-                        .HasColumnType("nvarchar(3)")
-                        .HasDefaultValue("251");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
