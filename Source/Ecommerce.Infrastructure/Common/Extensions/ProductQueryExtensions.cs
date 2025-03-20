@@ -7,6 +7,6 @@ public static class ProductQueryExtensions
 {
   public static IQueryable<Product> IncludeEverything(this IQueryable<Product> query)
   {
-    return query.Include(p => p.Images).Include(p => p.Tags);
+    return query.Include(p => p.Images).Include(p => p.Tags).Include(p => p.Categories);
   }
 }
