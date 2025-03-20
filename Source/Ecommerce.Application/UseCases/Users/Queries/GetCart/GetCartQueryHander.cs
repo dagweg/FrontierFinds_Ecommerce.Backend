@@ -37,7 +37,7 @@ public class GetCartQueryHandler : IRequestHandler<GetCartQuery, Result<CartResu
     // get the user cart items
     var result = await _userRepository.GetCartAsync(
       userIdResult.Value,
-      new PaginationParameters(request.PageNumber, request.PageSize)
+      new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize }
     );
 
     if (result is null)
