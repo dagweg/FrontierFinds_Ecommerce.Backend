@@ -17,7 +17,6 @@ public partial class Utils
     public const string Password = "abcd1234!@#$ABCD";
     public const string ConfirmPassword = "abcd1234!@#$ABCD";
     public const string PhoneNumber = "0911223344";
-    public const string CountryCode = "251";
 
     public static Ecommerce.Domain.UserAggregate.User Create()
     {
@@ -28,8 +27,7 @@ public partial class Utils
         Ecommerce
           .Domain.Common.ValueObjects.Password.Create(Utils.User.Password, Utils.User.Password)
           .Value,
-        Ecommerce.Domain.Common.ValueObjects.PhoneNumber.Create(Utils.User.PhoneNumber),
-        Utils.User.CountryCode
+        Ecommerce.Domain.Common.ValueObjects.PhoneNumber.Create(Utils.User.PhoneNumber)
       );
     }
 
@@ -41,8 +39,7 @@ public partial class Utils
         Utils.User.Email,
         Utils.User.Password,
         Utils.User.ConfirmPassword,
-        Utils.User.PhoneNumber,
-        Utils.User.CountryCode
+        Utils.User.PhoneNumber
       );
     }
 
@@ -59,8 +56,7 @@ public partial class Utils
         Email: Email,
         Password: Password,
         ConfirmPassword: Password,
-        PhoneNumber: PhoneNumber,
-        CountryCode: int.Parse(CountryCode)
+        PhoneNumber: PhoneNumber
       );
     }
 

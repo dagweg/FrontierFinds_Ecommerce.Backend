@@ -26,8 +26,7 @@ public class UserTests
       lastName: Name.Create(Utils.User.LastName),
       email: Email.Create(Utils.User.Email),
       password: Password.Create("", Utils.User.Password).Value, // unhashed
-      phoneNumber: PhoneNumber.Create(Utils.User.PhoneNumber),
-      countryCode: Utils.User.CountryCode
+      phoneNumber: PhoneNumber.Create(Utils.User.PhoneNumber)
     );
 
     _user.ChangePassword(

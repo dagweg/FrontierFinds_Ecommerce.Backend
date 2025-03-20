@@ -10,6 +10,7 @@ using Ecommerce.Application.Common.Interfaces.Providers.Forex;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
 using Ecommerce.Application.Common.Interfaces.Strategies;
 using Ecommerce.Application.Common.Interfaces.Validation;
+using Ecommerce.Application.Services.Utilities;
 using Ecommerce.Application.UseCases.Images.Common;
 using Ecommerce.Application.UseCases.Images.CreateImage;
 using Ecommerce.Application.UseCases.Products.Common;
@@ -46,6 +47,7 @@ namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProdu
     private readonly Mock<ILogger<CreateProductCommandHandler>> _loggerMock;
     private readonly Mock<IForexSerivce> _forexServiceMock;
     private readonly Mock<IProductImageStrategyResolver> _productImageStrategyResolver;
+    private readonly Mock<ISlugService<ProductId>> _slugServiceMock;
 
     public CreateProductCommandHandlerTests()
     {
@@ -57,10 +59,12 @@ namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProdu
       _loggerMock = new Mock<ILogger<CreateProductCommandHandler>>();
       _forexServiceMock = new Mock<IForexSerivce>();
       _productImageStrategyResolver = new Mock<IProductImageStrategyResolver>();
+      _slugServiceMock = new Mock<ISlugService<ProductId>>();
 
       _createProductCommandHandler = new(
         _mapperMock.Object,
         _productRepositoryMock.Object,
+        _slugServiceMock.Object,
         _unitOfWorkMock.Object,
         _userContextServiceMock.Object,
         _senderMock.Object,
@@ -122,6 +126,7 @@ namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProdu
           (CreateProductCommand cmd) =>
             Domain.ProductAggregate.Product.Create(
               ProductName.Create(cmd.ProductName),
+              "test-slug",
               ProductDescription.Create(cmd.ProductDescription),
               Price.CreateInBaseCurrency(100),
               Stock.Create(Quantity.Create(cmd.StockQuantity)),

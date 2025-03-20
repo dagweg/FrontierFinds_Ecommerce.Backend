@@ -37,7 +37,8 @@ public partial class Utils
         LeftImage: Utils.Product.LeftImage.CreateCommand(i),
         RightImage: Utils.Product.RightImage.CreateCommand(i),
         FrontImage: Utils.Product.FrontImage.CreateCommand(i),
-        BackImage: Utils.Product.BackImage.CreateCommand(i)
+        BackImage: Utils.Product.BackImage.CreateCommand(i),
+        Categories: []
       );
     }
 
@@ -49,6 +50,7 @@ public partial class Utils
           name: Ecommerce.Domain.ProductAggregate.ValueObjects.ProductName.Create(
             Utils.Product.ProductNameFromIndex(i)
           ),
+          slug: "test-slug",
           description: Ecommerce.Domain.ProductAggregate.ValueObjects.ProductDescription.Create(
             Utils.Product.ProductDescriptionFromIndex(i)
           ),
@@ -126,6 +128,7 @@ public partial class Utils
       {
         ProductId = product.Id.Value.ToString(),
         ProductName = product.Name.Value,
+        Slug = product.Slug,
         ProductDescription = product.Description.Value,
         StockQuantity = product.Stock.Quantity,
         PriceValueInCents = product.Price.ValueInCents,
@@ -141,6 +144,7 @@ public partial class Utils
           BottomImage = Utils.Product.BottomImage.CreateProductImageResult(),
         },
         Tags = Utils.Product.Tag.CreateTagResults(3),
+        Categories = [],
       };
     }
 
@@ -418,7 +422,7 @@ public partial class Utils
       {
         return new List<Ecommerce.Domain.ProductAggregate.Entities.ProductTag>
         {
-          Ecommerce.Domain.ProductAggregate.Entities.ProductTag.Create(Guid.NewGuid(), $"Tag {i}"),
+          Ecommerce.Domain.ProductAggregate.Entities.ProductTag.Create($"Tag {i}"),
         };
       }
 
