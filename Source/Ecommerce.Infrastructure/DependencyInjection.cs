@@ -114,7 +114,8 @@ public static class DependencyInjection
               }
             )
             .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>())
-            .EnableDetailedErrors(true);
+            .EnableDetailedErrors(true)
+            .EnableSensitiveDataLogging();
         }
       );
     }
@@ -131,7 +132,8 @@ public static class DependencyInjection
               ]
             )
             .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>())
-            .EnableDetailedErrors(true);
+            .EnableDetailedErrors(true)
+            .EnableSensitiveDataLogging();
         }
       );
     }
@@ -143,6 +145,7 @@ public static class DependencyInjection
     // Register Repositories
     services.AddScoped<IUserRepository, UserRepository>();
     services.AddScoped<IProductRepository, ProductRepository>();
+    services.AddScoped<IProductReviewRepository, ProductReviewRepository>();
     services.AddScoped<IOrderRepository, OrderRepository>();
 
     return services;
