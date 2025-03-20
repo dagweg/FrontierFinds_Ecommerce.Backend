@@ -1,5 +1,6 @@
 using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Application.Common.Utilities;
+using Ecommerce.Domain.Common.Entities;
 using Ecommerce.Domain.Common.Enums;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.NotificationAggregate;
@@ -61,7 +62,15 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
       .IsRequired()
       .HasMaxLength(50);
 
-    builder.Property(u => u.CountryCode).IsRequired().HasMaxLength(3).HasDefaultValue("251");
+    builder.OwnsOne(
+      u => u.ProfileImage,
+      b =>
+      {
+        b.HasIndex(x => x.ObjectIdentifier).IsUnique();
+        b.Property(x => x.Url);
+        b.Property(x => x.ObjectIdentifier);
+      }
+    );
 
     builder.OwnsOne(
       u => u.Address,
@@ -91,7 +100,10 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
       ob =>
       {
         ob.Property(a => a.Value)
-          .HasConversion(v => string.Join("", v), s => ConversionUtility.ToIntArray(s).Value)
+          .HasConversion(
+            v => v == null ? null : string.Join("", v),
+            s => s == null ? null : ConversionUtility.ToIntArray(s).Value
+          )
           .IsRequired();
         ob.Property(a => a.Expiry).IsRequired();
         ob.Property(a => a.NextResendValidAt)
@@ -105,7 +117,10 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
       ob =>
       {
         ob.Property(a => a.Value)
-          .HasConversion(v => string.Join("", v), s => ConversionUtility.ToIntArray(s).Value)
+          .HasConversion(
+            v => v == null ? null : string.Join("", v),
+            s => s == null ? null : ConversionUtility.ToIntArray(s).Value
+          )
           .IsRequired();
         ob.Property(a => a.Expiry).IsRequired();
         ob.Property(a => a.NextResendValidAt).HasColumnName("PasswordResetOtpNextResendValidAt");

@@ -1,3 +1,4 @@
+using Ecommerce.Domain.Common.Entities;
 using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
@@ -15,14 +16,11 @@ internal sealed class ProductCategoryConfigurations : IEntityTypeConfiguration<P
 
     builder.Property(p => p.Id).ValueGeneratedNever().IsRequired();
 
-    builder.OwnsOne(
-      p => p.Name,
-      pb =>
-        pb.Property(p => p.Value)
-          .HasConversion(p => p, p => ProductCategoryName.Create(p))
-          .HasColumnName("Name")
-          .IsRequired()
-          .HasMaxLength(255)
-    );
+    builder
+      .Property(x => x.ProductId)
+      .HasConversion(x => x.Value, v => ProductId.Convert(v))
+      .IsRequired();
+
+    builder.Property(x => x.CategoryId).IsRequired();
   }
 }

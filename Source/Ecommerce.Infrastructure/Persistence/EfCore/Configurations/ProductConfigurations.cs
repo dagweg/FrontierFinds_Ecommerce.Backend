@@ -1,4 +1,5 @@
 using Ecommerce.Application.Common.Extensions;
+using Ecommerce.Domain.Common.Entities;
 using Ecommerce.Domain.Common.Enums;
 using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.ProductAggregate.Entities;
@@ -16,6 +17,8 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
   {
     builder.ToTable("Products");
     builder.HasKey(p => p.Id);
+
+    builder.HasIndex(p => p.Slug).IsUnique();
 
     // Value Objects
     builder
@@ -65,25 +68,40 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
     // Collections
     // Configure categories many-to-many not-owned relationship
     builder
-      .HasMany<ProductCategory>()
+      .HasMany(x => x.Categories)
       .WithMany()
-      .UsingEntity(j => j.ToTable("ProductCategoryLink"));
+      .UsingEntity<ProductCategory>(b =>
+      {
+        b.ToTable("ProductCategories");
+        b.HasKey(pc => new { pc.ProductId, pc.CategoryId });
+
+        b.HasOne(x => x.Product)
+          .WithMany()
+          .HasForeignKey(pc => pc.ProductId)
+          .OnDelete(DeleteBehavior.ClientCascade);
+        b.HasOne(x => x.Category)
+          .WithMany()
+          .HasForeignKey(pc => pc.CategoryId)
+          .OnDelete(DeleteBehavior.Cascade);
+      });
 
     // configure tags one-to-many owned relationship
-    builder
-      .OwnsMany(
-        p => p.Tags,
-        tb =>
-        {
-          tb.ToTable("ProductTags");
-          tb.HasKey(nameof(ProductTag.Id), "ProductId");
-          tb.Property(t => t.Id).HasColumnName("TagId").IsRequired();
-          tb.Property(t => t.Name).HasColumnName("TagName").IsRequired().HasMaxLength(255);
-          tb.WithOwner().HasForeignKey("ProductId");
-        }
-      )
-      .Metadata.FindNavigation(nameof(Product.Tags))!
-      .SetPropertyAccessMode(PropertyAccessMode.Field);
+    // builder
+    //   .OwnsMany(
+    //     p => p.Tags,
+    //     tb =>
+    //     {
+    //       tb.ToTable("ProductTags");
+    //       tb.HasKey(nameof(ProductTag.Id), "ProductId");
+    //       tb.Property(t => t.Id).HasColumnName("TagId").IsRequired();
+    //       tb.Property(t => t.Name).HasColumnName("TagName").IsRequired().HasMaxLength(255);
+    //       tb.WithOwner().HasForeignKey("ProductId");
+    //     }
+    //   )
+    //   .Metadata.FindNavigation(nameof(Product.Tags))!
+    //   .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+
 
     // configure reviews one-to-many owned relationship
     builder
@@ -93,14 +111,15 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
         {
           rb.ToTable("ProductReviews");
           rb.HasKey(nameof(ProductReview.Id), "ProductId");
-          rb.Property(r => r.Id).HasColumnName("ReviewId").IsRequired();
+
+          rb.Property(r => r.Id).HasColumnName("ReviewId").IsRequired().ValueGeneratedNever();
           rb.OwnsOne(
-            r => r.AuthorId,
+            r => r.ReviewerId,
             ab =>
             {
               ab.Property(a => a.Value) // Access the 'Value' property of AuthorId
                 .HasConversion(a => a, a => UserId.Convert(a))
-                .HasColumnName("AuthorId")
+                .HasColumnName("ReviewerId")
                 .IsRequired();
             }
           );
