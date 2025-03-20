@@ -1,5 +1,9 @@
+using Ecommerce.Domain.Common.ValueObjects;
+using Ecommerce.Domain.OrderAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
+using Ecommerce.Domain.UserAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Infrastructure;
@@ -22,157 +26,159 @@ public static partial class Seeding
       Guid.Parse("f8f5d3c4-6f0f-4d4c-b3f2-5f0f7c8d9e1f")
     );
 
-    public static void Seed(ModelBuilder builder)
+    public static List<Domain.UserAggregate.User> GetSeed()
     {
-      // User Seeding
-      builder
-        .Entity<Domain.UserAggregate.User>()
-        .HasData(
-          new
-          {
-            Id = JohnDoeId, // Use the static field
-            FirstName = "John",
-            LastName = "Doe",
-            Email = "johndoe@example.com",
-            Password = "SecurePassword123!",
-            PhoneNumber = "+1234567890",
-            AccountVerified = true,
-            Address_City = "New York",
-            Address_State = "NY",
-            Address_Street = "123 Main St",
-            Address_ZipCode = "10001",
-            Address_Country = "US",
-            BillingAddress_Country = "US",
-            BillingAddress_State = "NY",
-            BillingAddress_City = "New York",
-            BillingAddress_Street = "456 Elm St",
-            BillingAddress_ZipCode = "10001",
-            EmailVerificationOtp_Value = "123456",
-            EmailVerificationOtp_Expiry = new DateTime(2025, 03, 14, 0, 0, 0),
-            EmailVerificationOtpNextResendValidAt = (DateTime?)null,
-            EmailVerificationOtp_ResendFailStreak = 0,
-            PasswordResetOtp_Value = "654321",
-            PasswordResetOtp_Expiry = new DateTime(2025, 03, 14, 0, 0, 0),
-            PasswordResetOtpNextResendValidAt = (DateTime?)null,
-            PasswordResetOtp_ResendFailStreak = 0,
-          },
-          new
-          {
-            Id = EmmaSmithId, // Use the static field
-            FirstName = "Emma",
-            LastName = "Smith",
-            Email = "emmasmith@example.com",
-            Password = "Password456!",
-            PhoneNumber = "+1987654321",
-            AccountVerified = true,
-            Address_City = "New York",
-            Address_State = "NY",
-            Address_Street = "123 Main St",
-            Address_ZipCode = "10001",
-            Address_Country = "US",
-            BillingAddress_Country = "US",
-            BillingAddress_State = "NY",
-            BillingAddress_City = "New York",
-            BillingAddress_Street = "456 Elm St",
-            BillingAddress_ZipCode = "10001",
-            EmailVerificationOtp_Value = "123456",
-            EmailVerificationOtp_Expiry = new DateTime(2025, 03, 14, 0, 0, 0),
-            EmailVerificationOtpNextResendValidAt = (DateTime?)null,
-            EmailVerificationOtp_ResendFailStreak = 0,
-            PasswordResetOtp_Value = "654321",
-            PasswordResetOtp_Expiry = new DateTime(2025, 03, 14, 0, 0, 0),
-            PasswordResetOtpNextResendValidAt = (DateTime?)null,
-            PasswordResetOtp_ResendFailStreak = 0,
-          },
-          new
-          {
-            Id = LiamJohnsonId, // Use the static field
-            FirstName = "Liam",
-            LastName = "Johnson",
-            Email = "liamjohnson@example.com",
-            Password = "Liam789!",
-            PhoneNumber = "+1123456789",
-            AccountVerified = true,
-            Address_City = "New York",
-            Address_State = "NY",
-            Address_Street = "123 Main St",
-            Address_ZipCode = "10001",
-            Address_Country = "US",
-            BillingAddress_Country = "US",
-            BillingAddress_State = "NY",
-            BillingAddress_City = "New York",
-            BillingAddress_Street = "456 Elm St",
-            BillingAddress_ZipCode = "10001",
-            EmailVerificationOtp_Value = "123456",
-            EmailVerificationOtp_Expiry = new DateTime(2025, 03, 14, 0, 0, 0),
-            EmailVerificationOtpNextResendValidAt = (DateTime?)null,
-            EmailVerificationOtp_ResendFailStreak = 0,
-            PasswordResetOtp_Value = "654321",
-            PasswordResetOtp_Expiry = new DateTime(2025, 03, 14, 0, 0, 0),
-            PasswordResetOtpNextResendValidAt = (DateTime?)null,
-            PasswordResetOtp_ResendFailStreak = 0,
-          },
-          new
-          {
-            Id = OliviaBrownId, // Use the static field
-            FirstName = "Olivia",
-            LastName = "Brown",
-            Email = "oliviabrown@example.com",
-            Password = "Olivia101!",
-            PhoneNumber = "+1098765432",
-            AccountVerified = true,
-            Address_City = "New York",
-            Address_State = "NY",
-            Address_Street = "123 Main St",
-            Address_ZipCode = "10001",
-            Address_Country = "US",
-            BillingAddress_Country = "US",
-            BillingAddress_State = "NY",
-            BillingAddress_City = "New York",
-            BillingAddress_Street = "456 Elm St",
-            BillingAddress_ZipCode = "10001",
-            EmailVerificationOtp_Value = "123456",
-            EmailVerificationOtp_Expiry = new DateTime(2025, 03, 14, 0, 0, 0),
-            EmailVerificationOtpNextResendValidAt = (DateTime?)null,
-            EmailVerificationOtp_ResendFailStreak = 0,
-            PasswordResetOtp_Value = "654321",
-            PasswordResetOtp_Expiry = new DateTime(2025, 03, 14, 0, 0, 0),
-            PasswordResetOtpNextResendValidAt = (DateTime?)null,
-            PasswordResetOtp_ResendFailStreak = 0,
-          }
-        );
-    }
+      var otp = OneTimePassword.CreateNew();
 
-    public static class Cart
-    {
-      public static void Seed(ModelBuilder builder)
-      {
-        // UserCarts Seeding
-        builder
-          .Entity<Domain.UserAggregate.Entities.Cart>()
-          .HasData(
-            new
-            {
-              UserId = JohnDoeId, // Use the static field
-              CartId = Guid.NewGuid(),
-            },
-            new
-            {
-              UserId = EmmaSmithId, // Use the static field
-              CartId = Guid.NewGuid(),
-            },
-            new
-            {
-              UserId = LiamJohnsonId, // Use the static field
-              CartId = Guid.NewGuid(),
-            },
-            new
-            {
-              UserId = OliviaBrownId, // Use the static field
-              CartId = Guid.NewGuid(),
-            }
-          );
-      }
+      var passwordHasher = new PasswordHasher<Domain.UserAggregate.User>();
+      // User Seeding
+#pragma warning disable CS0618 // Type or member is obsolete
+      return
+      [
+        Domain
+          .UserAggregate.User.Create(
+            firstName: Name.Create("John"),
+            lastName: Name.Create("Doe"),
+            email: Email.Create("johndoe@example.com"),
+            password: Password
+              .Create(
+                passwordHasher.HashPassword(null!, "SecurePassword123!"),
+                "SecurePassword123!"
+              )
+              .Value,
+            phoneNumber: PhoneNumber.Create("+1234567890")
+          )
+          .WithAddress(
+            UserAddress.Create(
+              street: "123 Main St",
+              city: "New York",
+              state: "NY",
+              zipCode: "10001",
+              country: "US"
+            )
+          )
+          .WithBillingAddress(
+            BillingAddress.Create(
+              street: "456 Elm St",
+              city: "New York",
+              state: "NY",
+              zipCode: "10001",
+              country: "US"
+            )
+          )
+          .WithCart(Cart.Create())
+          .WithAccountVerified(true)
+          .WithEmailVerificationOtp(OneTimePassword.CreateNew())
+          .WithPasswordResetOtp(OneTimePassword.CreateNew())
+          .WithUserId(JohnDoeId),
+        Domain
+          .UserAggregate.User.Create(
+            firstName: Name.Create("Emma"),
+            lastName: Name.Create("Smith"),
+            email: Email.Create("emmasmith@example.com"),
+            password: Password
+              .Create(
+                passwordHasher.HashPassword(null!, "SecurePassword123!"),
+                "SecurePassword123!"
+              )
+              .Value,
+            phoneNumber: PhoneNumber.Create("+1987654321")
+          )
+          .WithAddress(
+            UserAddress.Create(
+              street: "123 Main St",
+              city: "New York",
+              state: "NY",
+              zipCode: "10001",
+              country: "US"
+            )
+          )
+          .WithBillingAddress(
+            BillingAddress.Create(
+              street: "456 Elm St",
+              city: "New York",
+              state: "NY",
+              zipCode: "10001",
+              country: "US"
+            )
+          )
+          .WithCart(Cart.Create())
+          .WithAccountVerified(true)
+          .WithEmailVerificationOtp(OneTimePassword.CreateNew()) // Using CreateNew here
+          .WithPasswordResetOtp(OneTimePassword.CreateNew()) // Using CreateNew here
+          .WithUserId(EmmaSmithId),
+        Domain
+          .UserAggregate.User.Create(
+            firstName: Name.Create("Liam"),
+            lastName: Name.Create("Johnson"),
+            email: Email.Create("liamjohnson@example.com"),
+            password: Password
+              .Create(
+                passwordHasher.HashPassword(null!, "SecurePassword123!"),
+                "SecurePassword123!"
+              )
+              .Value,
+            phoneNumber: PhoneNumber.Create("+1123456789")
+          )
+          .WithAddress(
+            UserAddress.Create(
+              street: "123 Main St",
+              city: "New York",
+              state: "NY",
+              zipCode: "10001",
+              country: "US"
+            )
+          )
+          .WithBillingAddress(
+            BillingAddress.Create(
+              street: "456 Elm St",
+              city: "New York",
+              state: "NY",
+              zipCode: "10001",
+              country: "US"
+            )
+          )
+          .WithCart(Cart.Create())
+          .WithAccountVerified(true)
+          .WithEmailVerificationOtp(OneTimePassword.CreateNew()) // Using CreateNew here
+          .WithPasswordResetOtp(OneTimePassword.CreateNew())
+          .WithUserId(LiamJohnsonId), // Using CreateNew here
+        Domain
+          .UserAggregate.User.Create(
+            firstName: Name.Create("Olivia"),
+            lastName: Name.Create("Brown"),
+            email: Email.Create("oliviabrown@example.com"),
+            password: Password
+              .Create(passwordHasher.HashPassword(null!, "  "), "SecurePassword123!")
+              .Value,
+            phoneNumber: PhoneNumber.Create("+1098765432")
+          )
+          .WithAddress(
+            UserAddress.Create(
+              street: "123 Main St",
+              city: "New York",
+              state: "NY",
+              zipCode: "10001",
+              country: "US"
+            )
+          )
+          .WithBillingAddress(
+            BillingAddress.Create(
+              street: "456 Elm St",
+              city: "New York",
+              state: "NY",
+              zipCode: "10001",
+              country: "US"
+            )
+          )
+          .WithCart(Cart.Create())
+          .WithAccountVerified(true)
+          .WithEmailVerificationOtp(OneTimePassword.CreateNew()) // Using CreateNew here
+          .WithPasswordResetOtp(OneTimePassword.CreateNew())
+          .WithUserId(OliviaBrownId), // Using CreateNew here
+      ];
+
+#pragma warning restore CS0618 // Type or member is obsolete
     }
   }
 }
