@@ -32,7 +32,5 @@ public class ValidationMessageProvider : LocalizedMessageProvider, IValidationMe
 
   public string PhoneRequired => GetMessage(nameof(PhoneRequired));
 
-  public string CountryCodeRequired => GetMessage(nameof(CountryCodeRequired));
-
   public string ProductNotFound => GetMessage(nameof(ProductNotFound));
 }
