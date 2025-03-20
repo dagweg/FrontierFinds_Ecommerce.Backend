@@ -6,9 +6,9 @@ namespace Ecommerce.Domain.Common.Models;
 /// </summary>
 /// <typeparam name="TId"></typeparam>
 /// <param name="id"></param>
-public abstract class Entity<TId>(TId id) : IEquatable<Entity<TId>>, IHasDomainEvent
+public abstract class Entity<TId> : IEquatable<Entity<TId>>, IHasDomainEvent
 {
-  public TId Id { get; set; } = id;
+  public TId Id { get; set; }
 
   private readonly List<IDomainEvent> _domainEvents = [];
 
@@ -17,6 +17,15 @@ public abstract class Entity<TId>(TId id) : IEquatable<Entity<TId>>, IHasDomainE
   public bool Equals(Entity<TId>? other) => Equals((object?)other);
 
   public abstract IEnumerable<object> GetEqualityComponents();
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+  protected Entity() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+
+  protected Entity(TId id)
+  {
+    Id = id;
+  }
 
   public override bool Equals(object? obj)
   {
