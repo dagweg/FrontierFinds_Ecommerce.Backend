@@ -11,6 +11,7 @@ public class ProductResponse
   public required int StockQuantity { get; set; }
   public required long PriceValueInCents { get; set; }
   public required string PriceCurrency { get; set; }
+  public required decimal AverageRating { get; set; }
   public required ImageResponse Thumbnail { get; set; }
   public ProductImagesResponse? Images { get; set; }
   public List<TagResponse>? Tags { get; set; }

@@ -32,5 +32,11 @@ public class CreateProductRequest
   public CreateImageRequest? RightImage { get; init; }
   public CreateImageRequest? FrontImage { get; init; }
   public CreateImageRequest? BackImage { get; init; }
+  public CreateImageRequest? TopImage { get; init; }
+  public CreateImageRequest? BottomImage { get; init; }
+
   public List<string>? Tags { get; init; }
+
+  [Required]
+  public List<int> Categories { get; init; } = null!;
 }
