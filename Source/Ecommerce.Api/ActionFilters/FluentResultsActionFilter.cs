@@ -51,6 +51,8 @@ public class FluentResultsActionFilter : IActionFilter
             case ExpiryError:
             case ResendError:
             case BadRequestError:
+            case InvalidOperationError:
+            case FormatError:
               status = StatusCodes.Status400BadRequest;
               break;
             case AlreadyExistsError:
