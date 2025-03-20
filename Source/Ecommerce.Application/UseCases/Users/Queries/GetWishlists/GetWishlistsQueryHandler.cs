@@ -42,7 +42,7 @@ public record GetWishlistsQueryHandler : IRequestHandler<GetWishlistsQuery, Resu
 
     var result = await _userRepository.GetWishlistsAsync(
       userIdResult.Value,
-      new PaginationParameters(request.PageNumber, request.PageSize)
+      new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize }
     );
 
     return result is null
