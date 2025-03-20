@@ -4,7 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
 using Ecommerce.Api.Utilities;
+using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.UseCases.Products.Queries.GetAllProducts;
+using Ecommerce.Application.UseCases.Products.Queries.GetFilteredProducts;
 using Ecommerce.Application.UseCases.Users.Commands.AddToCart;
 using Ecommerce.Application.UseCases.Users.Commands.ChangePassword;
 using Ecommerce.Application.UseCases.Users.Commands.RegisterUser;
@@ -79,7 +81,7 @@ public class UserController : ControllerBase
       _logger.LogError("Failed to add product to cart: {@result}", result);
       return new ObjectResult(result);
     }
-    return Created();
+    return Ok(result.Value);
   }
 
   [HttpDelete("cart")]
@@ -204,10 +206,18 @@ public class UserController : ControllerBase
   }
 
   [HttpGet("products")]
-  public async Task<IActionResult> GetMyProducts([FromQuery] PaginationParams paginationParams)
+  public async Task<IActionResult> GetMyProducts(
+    [FromQuery] PaginationParams paginationParams,
+    [FromQuery] FilterProductsQuery? filterBy = null
+  )
   {
     var result = await _mediator.Send(
-      new GetMyProductsQuery(paginationParams.PageNumber, paginationParams.PageSize)
+      new GetMyProductsQuery
+      {
+        PageNumber = paginationParams.PageNumber,
+        PageSize = paginationParams.PageSize,
+        FilterQuery = filterBy,
+      }
     );
 
     if (result.IsFailed)
@@ -244,7 +254,11 @@ public class UserController : ControllerBase
   public async Task<IActionResult> GetWishlists([FromQuery] PaginationParams paginationParams)
   {
     var result = await _mediator.Send(
-      new GetWishlistsQuery(paginationParams.PageNumber, paginationParams.PageSize)
+      new GetWishlistsQuery
+      {
+        PageNumber = paginationParams.PageNumber,
+        PageSize = paginationParams.PageSize,
+      }
     );
 
     if (result.IsFailed)
