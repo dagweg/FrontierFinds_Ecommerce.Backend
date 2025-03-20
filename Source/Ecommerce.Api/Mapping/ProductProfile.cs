@@ -1,4 +1,5 @@
 using AutoMapper;
+using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.UseCases.Images.Common;
 using Ecommerce.Application.UseCases.Images.CreateImage;
 using Ecommerce.Application.UseCases.Products.Common;
@@ -22,6 +23,7 @@ public class ProductProfile : Profile
 
     CreateMap<ImageResult, ImageResponse>();
 
+    // Mapping from CreateProductRequest to CreateProductCommand
     CreateMap<CreateProductRequest, CreateProductCommand>();
 
     CreateMap<ProductImagesResult, ProductImagesResponse>();
@@ -34,5 +36,13 @@ public class ProductProfile : Profile
       .ForMember(dest => dest.FetchedCount, opt => opt.MapFrom(src => src.TotalFetchedCount));
 
     CreateMap<TagResult, TagResponse>();
+
+    CreateMap<ProductReview, ProductReviewResult>()
+      .ForMember(d => d.Rating, o => o.MapFrom(s => s.Rating.Value));
+
+    CreateMap<GetResult<ProductReviewResult>, ProductReviewsResult>()
+      .ForMember(d => d.TotalCount, o => o.MapFrom(s => s.TotalItems))
+      .ForMember(d => d.TotalFetchedCount, o => o.MapFrom(s => s.TotalItemsFetched))
+      .ForMember(d => d.ProductReviews, o => o.MapFrom(s => s.Items));
   }
 }
