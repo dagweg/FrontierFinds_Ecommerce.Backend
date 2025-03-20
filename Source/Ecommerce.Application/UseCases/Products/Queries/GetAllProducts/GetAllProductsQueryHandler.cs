@@ -2,7 +2,9 @@ using AutoMapper;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Providers.Context;
 using Ecommerce.Application.Common.Models;
+using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.UseCases.Products.Common;
+using Ecommerce.Domain.UserAggregate.ValueObjects;
 using FluentResults;
 using MediatR;
 
@@ -32,13 +34,14 @@ public class GetAllProductsQueryHandler
     CancellationToken cancellationToken
   )
   {
-    var userIdR = _userContextService.GetValidUserId();
-    if (userIdR.IsFailed)
-      return userIdR.ToResult();
+    var userId = _userContextService.GetValidUserId();
+
+    if (userId.IsFailed)
+      return userId.ToResult();
 
     var products = await _productRepository.GetAllProductsSellerNotListedAsync(
-      userIdR.Value,
-      new PaginationParameters(request.PageNumber, request.PageSize)
+      userId.Value, // unnecessary in our scenario ()
+      new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize }
     );
 
     var result = new ProductsResult
