@@ -10,6 +10,7 @@ using Ecommerce.Application.UseCases.Users.Queries.LoginUser;
 using Ecommerce.Contracts.Authentication;
 using Ecommerce.Infrastructure.Services.Authentication;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -107,5 +108,21 @@ public class AuthenticationController : ControllerBase
     var result = await _mediator.Send(new ResendEmailOtpCommand(resendRequest.UserId));
 
     return result.IsFailed ? new ObjectResult(result) : Ok(result.Value);
+  }
+
+  [Authorize]
+  [HttpGet("authorize")]
+  public IActionResult Authorize()
+  {
+    return Ok(new { });
+  }
+
+  [Authorize]
+  [HttpPost("logout")]
+  public IActionResult Logout()
+  {
+    HttpContext.Response.Cookies.Delete(_cookieSettings.CookieKey);
+
+    return Ok(new { });
   }
 }
