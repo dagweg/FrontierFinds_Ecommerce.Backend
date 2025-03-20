@@ -5,10 +5,12 @@ using Ecommerce.Application.Behaviors.Strategies.ProductImageStrategies;
 using Ecommerce.Application.Common;
 using Ecommerce.Application.Common.Interfaces.Storage;
 using Ecommerce.Application.Common.Interfaces.Validation;
+using Ecommerce.Application.Services.Utilities;
 using Ecommerce.Application.Services.Validation;
 using Ecommerce.Application.Services.Workers.Common;
 using Ecommerce.Application.UseCases.Images.CreateImage;
 using Ecommerce.Application.UseCases.Smtp.Commands.SendEmail;
+using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +25,8 @@ public static class DependencyInjection
   {
     // Load EmailSettings Configuration from appsettings.json
     services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
+
+    services.AddTransient<ISlugService<ProductId>, ProductSlugService>();
 
     services.AddMediatR(ApplicationAssembly.Assembly);
 
