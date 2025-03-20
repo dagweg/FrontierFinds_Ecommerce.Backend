@@ -11,6 +11,9 @@ public class Image : ValueObject
   [NotMapped]
   public const int SIZE_LIMIT_BYTES = 3 * 1024 * 1024; // 3MB
 
+  [NotMapped]
+  public const string SUPPORTED_FORMATS = "image/jpeg,image/png,image/webp";
+
   protected Image(string url, string objectIdentifier)
   {
     Url = url;
