@@ -6,6 +6,5 @@ public record RegisterRequest(
   string Email,
   string Password,
   string ConfirmPassword,
-  string PhoneNumber,
-  int CountryCode
+  string PhoneNumber
 );
