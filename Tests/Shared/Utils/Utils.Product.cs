@@ -126,6 +126,8 @@ public partial class Utils
     {
       return new ProductResult
       {
+        AverageRating = 0,
+        SellerId = product.SellerId,
         ProductId = product.Id.Value.ToString(),
         ProductName = product.Name.Value,
         Slug = product.Slug,

@@ -22,6 +22,7 @@ public partial class Utils
       var totalPrice = cartItemResults.Sum(x => x.Product.PriceValueInCents * x.Quantity);
       return new CartResult
       {
+        TotalItemsFetched = i,
         Items = CartItem.CreateCartItemResults(i),
         TotalItems = i,
         TotalPrice = totalPrice,
