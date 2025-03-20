@@ -2,6 +2,8 @@ using Ecommerce.Application.Common.Interfaces.Processors;
 using Ecommerce.Application.Common.Interfaces.Storage;
 using Ecommerce.Application.Common.Models.Storage;
 using Ecommerce.Application.UseCases.Images.Common;
+using Ecommerce.Domain.Common.Entities;
+using Ecommerce.Domain.Common.Errors;
 using FluentResults;
 using MediatR;
 
