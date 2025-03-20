@@ -5,6 +5,7 @@ using Ecommerce.Application.Common.Interfaces.Providers.Context;
 using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.UseCases.Products.Common;
+using Ecommerce.Application.UseCases.Products.Queries.GetFilteredProducts;
 using FluentResults;
 using MediatR;
 
@@ -40,10 +41,11 @@ public class GetMyProductsQueryHandler : IRequestHandler<GetMyProductsQuery, Res
     // get seller product listings
     var myProducts = await _productRepository.GetBySellerAsync(
       sellerId.Value,
-      new PaginationParameters(request.PageNumber, request.PageSize)
+      new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize },
+      request.FilterQuery
     );
 
-    LogPretty.Log(myProducts);
+    // LogPretty.Log(myProducts);
 
     var result = new ProductsResult
     {
