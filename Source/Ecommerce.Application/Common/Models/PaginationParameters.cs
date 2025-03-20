@@ -7,9 +7,15 @@ using Ecommerce.Application.UseCases.Common.Interfaces;
 
 namespace Ecommerce.Application.Common.Models
 {
-  public class PaginationParameters(int pageNumber = 1, int pageSize = 10) : IPaginated
+  public class PaginationParameters
   {
-    public int PageNumber { get; init; } = pageNumber;
-    public int PageSize { get; init; } = pageSize;
+    public int PageNumber { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+  }
+
+  public record PaginationParametersImmutable
+  {
+    public int PageNumber { get; init; } = 1;
+    public int PageSize { get; init; } = 10;
   }
 }
