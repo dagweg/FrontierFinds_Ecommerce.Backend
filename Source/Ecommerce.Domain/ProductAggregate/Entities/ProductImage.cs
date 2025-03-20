@@ -4,12 +4,18 @@ using Ecommerce.Domain.ProductAggregate.ValueObjects;
 
 namespace Ecommerce.Domain.ProductAggregate.Entities;
 
-public sealed class ProductImage : Image
+public sealed class ProductImage
 {
-  private ProductImage(string url, string objectIdentifier)
-    : base(url, objectIdentifier) { }
+  public string Url { get; private set; }
+  public string ObjectIdentifier { get; private set; }
 
-  public static new ProductImage Create(string url, string objectIdentifier)
+  private ProductImage(string url, string objectIdentifier)
+  {
+    Url = url;
+    ObjectIdentifier = objectIdentifier;
+  }
+
+  public static ProductImage Create(string url, string objectIdentifier)
   {
     return new ProductImage(url, objectIdentifier);
   }

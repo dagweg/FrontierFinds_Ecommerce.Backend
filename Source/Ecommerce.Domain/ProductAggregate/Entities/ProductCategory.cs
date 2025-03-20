@@ -1,27 +1,28 @@
 namespace Ecommerce.Domain.ProductAggregate.Entities;
 
+using Ecommerce.Domain.Common.Entities;
 using Ecommerce.Domain.Common.Models;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 
-public sealed class ProductCategory : Entity<Guid>
+public class ProductCategory : Entity<Guid>
 {
-  public ProductCategoryName Name { get; set; } = ProductCategoryName.Empty;
+  public ProductId ProductId { get; private set; }
+  public int CategoryId { get; private set; }
 
-  private ProductCategory()
-    : base(Guid.Empty) { }
+  public Product? Product { get; private set; }
+  public Category? Category { get; private set; }
 
-  private ProductCategory(Guid id, ProductCategoryName name)
-    : base(id)
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+  protected ProductCategory()
+    : base(Guid.NewGuid()) { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+
+  public ProductCategory(ProductId productId, int categoryId)
+    : base(Guid.NewGuid())
   {
-    Name = name;
+    ProductId = productId;
+    CategoryId = categoryId;
   }
-
-  public static ProductCategory Create(ProductCategoryName name)
-  {
-    return new ProductCategory(Guid.NewGuid(), name);
-  }
-
-  public static implicit operator string(ProductCategory category) => category.Name;
 
   public override IEnumerable<object> GetEqualityComponents()
   {
