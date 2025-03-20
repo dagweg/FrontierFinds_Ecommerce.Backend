@@ -39,7 +39,6 @@ public class Notification : AggregateRoot<Guid>
   }
 
   public static Notification Create(
-    Guid id,
     UserId userId,
     NotificationType notificationType,
     string title,
@@ -50,7 +49,7 @@ public class Notification : AggregateRoot<Guid>
   )
   {
     return new(
-      id,
+      Guid.NewGuid(),
       userId,
       notificationType,
       title,

@@ -13,13 +13,14 @@ public class Product : AggregateRoot<ProductId>
   public ProductDescription Description { get; private set; } = ProductDescription.Empty;
   public Price Price { get; private set; } = Price.Empty;
   public Stock Stock { get; private set; } = Stock.Empty;
+  public string Slug { get; private set; }
   public UserId SellerId { get; private set; } = UserId.Empty;
 
-  private readonly List<ProductCategory> _categories = [];
+  private readonly List<Category> _categories = [];
   private readonly List<ProductTag> _tags = [];
   private readonly List<ProductReview> _reviews = [];
 
-  public IReadOnlyList<ProductCategory> Categories => _categories.AsReadOnly();
+  public IReadOnlyList<Category> Categories => _categories.AsReadOnly();
   public IReadOnlyList<ProductTag> Tags => _tags.AsReadOnly();
   public IReadOnlyList<ProductReview> Reviews => _reviews.AsReadOnly();
 
@@ -30,6 +31,7 @@ public class Product : AggregateRoot<ProductId>
   protected Product(
     ProductId productId,
     ProductName name,
+    string slug,
     ProductDescription description,
     Price price,
     Stock stock,
@@ -42,17 +44,19 @@ public class Product : AggregateRoot<ProductId>
   {
     Id = productId;
     Name = name;
+    Slug = slug;
     Description = description;
     Price = price;
     Stock = stock;
     SellerId = sellerId;
     Promotion = Promotion.CreateEmpty();
     Images = ProductImages.Create(thumbnail);
-    AverageRating = Rating.Empty;
+    AverageRating = Rating.Create(0).Value;
   }
 
   public static Product Create(
     ProductName name,
+    string slug,
     ProductDescription description,
     Price price,
     Stock stock,
@@ -62,6 +66,7 @@ public class Product : AggregateRoot<ProductId>
     new(
       ProductId.CreateUnique(),
       name,
+      slug,
       description,
       price,
       stock,
@@ -71,7 +76,7 @@ public class Product : AggregateRoot<ProductId>
       DateTime.UtcNow
     );
 
-  public Product WithCategories(List<ProductCategory> categories)
+  public Product WithCategories(List<Category> categories)
   {
     _categories.AddRange(categories);
     return this;
@@ -107,6 +112,18 @@ public class Product : AggregateRoot<ProductId>
     return this;
   }
 
+  public Product WithProductId(ProductId productId)
+  {
+    Id = productId;
+    return this;
+  }
+
+  public Product WithSlug(string slug)
+  {
+    Slug = slug;
+    return this;
+  }
+
   public void UpdateName(ProductName name) => Name = name;
 
   public void UpdateDescription(ProductDescription description) => Description = description;
@@ -114,6 +131,15 @@ public class Product : AggregateRoot<ProductId>
   public void UpdatePrice(Price price) => Price = price;
 
   public void UpdateStock(Stock stock) => Stock = stock;
+
+  public void AddReview(ProductReview review) => _reviews.Add(review);
+
+  public void AddRating(Rating rating)
+  {
+    AverageRating = Rating
+      .Create(Math.Clamp((AverageRating.Value + rating.Value) / 2m, 1, 5))
+      .Value;
+  }
 
   public override IEnumerable<object> GetEqualityComponents()
   {
