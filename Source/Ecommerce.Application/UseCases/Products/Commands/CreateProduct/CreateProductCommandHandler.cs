@@ -8,6 +8,7 @@ using Ecommerce.Application.Common.Interfaces.Providers.Forex;
 using Ecommerce.Application.Common.Interfaces.Storage;
 using Ecommerce.Application.Common.Models.Storage;
 using Ecommerce.Application.Common.Utilities;
+using Ecommerce.Application.Services.Utilities;
 using Ecommerce.Application.UseCases.Images.Common;
 using Ecommerce.Application.UseCases.Images.CreateImage;
 using Ecommerce.Application.UseCases.Products.Common;
@@ -34,11 +35,13 @@ public class CreateProductCommandHandler
   private readonly IMediator _sender;
   private readonly ILogger<CreateProductCommandHandler> _logger;
   private readonly IForexSerivce _forexService;
+  private readonly ISlugService<ProductId> _slugService;
   private readonly IProductImageStrategyResolver _productImageStrategyResolver;
 
   public CreateProductCommandHandler(
     IMapper mapper,
     IProductRepository productRepository,
+    ISlugService<ProductId> slugService,
     IUnitOfWork unitOfWork,
     IUserContextService userContextService,
     IMediator sender,
@@ -50,6 +53,7 @@ public class CreateProductCommandHandler
     _mapper = mapper;
     _productRepository = productRepository;
     _unitOfWork = unitOfWork;
+    _slugService = slugService;
     _userContextService = userContextService;
     _sender = sender;
     _logger = logger;
@@ -99,6 +103,8 @@ public class CreateProductCommandHandler
       { ProductView.Right, command.RightImage },
       { ProductView.Front, command.FrontImage },
       { ProductView.Back, command.BackImage },
+      { ProductView.Top, command.TopImage },
+      { ProductView.Bottom, command.BottomImage },
     };
 
     ProductImages productImages = ProductImages.Create(ProductImage.Create("", ""));
@@ -131,21 +137,27 @@ public class CreateProductCommandHandler
       }
     }
 
+    var categories = await _productRepository.GetCategoriesById(command.Categories);
+    var tags = await _productRepository.GetOrCreateTags(command.Tags ?? []);
+
+    var slug = await _slugService.GenerateUniqueSlugAsync(name.Value ?? Guid.NewGuid().ToString());
+
     var product = Product
       .Create(
         name,
+        slug: slug.Value,
         description,
         priceInBaseCurrency,
         stock,
         sellerId.Value,
         productImages.Thumbnail
       )
-      .WithImages(productImages);
+      .WithImages(productImages)
+      .WithCategories(categories.ToList())
+      .WithTags(tags.ToList());
 
-    // add to repo
     await _productRepository.AddAsync(product);
 
-    // persist
     await _unitOfWork.SaveChangesAsync();
 
     return Result.Ok(_mapper.Map<ProductResult>(product));

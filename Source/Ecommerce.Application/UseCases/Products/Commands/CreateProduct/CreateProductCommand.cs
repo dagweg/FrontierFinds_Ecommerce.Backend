@@ -11,10 +11,13 @@ public record CreateProductCommand(
   int StockQuantity,
   long PriceValueInCents,
   string PriceCurrency,
+  List<int> Categories,
   CreateImageCommand Thumbnail,
   CreateImageCommand? LeftImage = null,
   CreateImageCommand? RightImage = null,
   CreateImageCommand? FrontImage = null,
   CreateImageCommand? BackImage = null,
+  CreateImageCommand? TopImage = null,
+  CreateImageCommand? BottomImage = null,
   List<string>? Tags = null
 ) : IRequest<Result<ProductResult>>;
