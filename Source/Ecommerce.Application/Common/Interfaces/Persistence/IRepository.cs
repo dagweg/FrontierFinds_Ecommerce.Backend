@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Ecommerce.Application.Common.Models;
 
 namespace Ecommerce.Application.Common.Interfaces.Persistence;
@@ -62,4 +63,11 @@ public interface IRepository<TEntity, TId>
   ///   True if entity exists otherwise false
   /// </returns>
   Task<bool> AnyAsync(TId id);
+
+  /// <summary>
+  /// Checks if an entity with the specified predicate exists
+  /// </summary>
+  /// <param name="predicate"></param>
+  /// <returns></returns>
+  Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate);
 }

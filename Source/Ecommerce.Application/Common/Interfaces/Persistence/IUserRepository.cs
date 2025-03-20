@@ -48,7 +48,7 @@ public interface IUserRepository : IRepository<User, UserId>
   /// <returns>
   ///   True if carts are added successfully, false if either user doesn't exist or problem in adding to cart
   /// </returns>
-  Task<Result> AddToCartRangeAsync(UserId userId, List<CartItem> cartItems);
+  // Task<Result> AddToCartRangeAsync(UserId userId, List<CartItem> cartItems);
 
   /// <summary>
   /// Removes a list of cart items from the user's cart
@@ -89,4 +89,11 @@ public interface IUserRepository : IRepository<User, UserId>
   /// <param name="pagination"></param>
   /// <returns></returns>
   Task<WishlistsResult?> GetWishlistsAsync(UserId userId, PaginationParameters pagination);
+
+  /// <summary>
+  /// Gets a list of users by their ids
+  /// </summary>
+  /// <param name="userIds"></param>
+  /// <returns></returns>
+  Task<IDictionary<Guid, User>> BulkGetById(IEnumerable<Guid> userIds);
 }
