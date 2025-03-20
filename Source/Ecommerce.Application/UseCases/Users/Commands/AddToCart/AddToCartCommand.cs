@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Ecommerce.Application.UseCases.Users.Commands.AddToCart;
 
-public record AddToCartCommand : IRequest<Result>
+public record AddToCartCommand : IRequest<Result<List<CartItemResult>>>
 {
   public List<CreateCartItemCommand> createCartItemCommands = [];
 }
