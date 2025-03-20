@@ -4,6 +4,7 @@ using Ecommerce.Infrastructure.Persistence.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerce.Infrastructure.Migrations
 {
     [DbContext(typeof(EfCoreContext))]
-    partial class EfCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250316072254_CategoryProducts")]
+    partial class CategoryProducts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,11 +33,10 @@ namespace Ecommerce.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("IsActive")
-                        .IsRequired()
+                    b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("True");
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -174,24 +176,6 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.ToTable("ProductCategories", (string)null);
                 });
 
-            modelBuilder.Entity("Ecommerce.Domain.ProductAggregate.Entities.ProductTag", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("ProductTags");
-                });
-
             modelBuilder.Entity("Ecommerce.Domain.ProductAggregate.Product", b =>
                 {
                     b.Property<Guid>("Id")
@@ -201,16 +185,9 @@ namespace Ecommerce.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("SellerId");
 
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("SellerId");
-
-                    b.HasIndex("Slug")
-                        .IsUnique();
 
                     b.ToTable("Products", (string)null);
                 });
@@ -251,21 +228,6 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users", (string)null);
-                });
-
-            modelBuilder.Entity("ProductTagLink", b =>
-                {
-                    b.Property<Guid>("ProductsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TagsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ProductsId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("ProductTagLink");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Common.Entities.Category", b =>
@@ -756,6 +718,7 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsMany("Ecommerce.Domain.ProductAggregate.Entities.ProductReview", "Reviews", b1 =>
                         {
                             b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
                                 .HasColumnType("uniqueidentifier")
                                 .HasColumnName("ReviewId");
 
@@ -796,7 +759,7 @@ namespace Ecommerce.Infrastructure.Migrations
                                         .HasForeignKey("ProductReviewId", "ProductReviewProductId");
                                 });
 
-                            b1.OwnsOne("Ecommerce.Domain.UserAggregate.ValueObjects.UserId", "ReviewerId", b2 =>
+                            b1.OwnsOne("Ecommerce.Domain.UserAggregate.ValueObjects.UserId", "AuthorId", b2 =>
                                 {
                                     b2.Property<Guid>("ProductReviewId")
                                         .HasColumnType("uniqueidentifier");
@@ -806,7 +769,7 @@ namespace Ecommerce.Infrastructure.Migrations
 
                                     b2.Property<Guid>("Value")
                                         .HasColumnType("uniqueidentifier")
-                                        .HasColumnName("ReviewerId");
+                                        .HasColumnName("AuthorId");
 
                                     b2.HasKey("ProductReviewId", "ProductReviewProductId");
 
@@ -816,11 +779,37 @@ namespace Ecommerce.Infrastructure.Migrations
                                         .HasForeignKey("ProductReviewId", "ProductReviewProductId");
                                 });
 
-                            b1.Navigation("Rating")
+                            b1.Navigation("AuthorId")
                                 .IsRequired();
 
-                            b1.Navigation("ReviewerId")
+                            b1.Navigation("Rating")
                                 .IsRequired();
+                        });
+
+                    b.OwnsMany("Ecommerce.Domain.ProductAggregate.Entities.ProductTag", "Tags", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("TagId");
+
+                            b1.Property<Guid>("ProductId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("nvarchar(255)")
+                                .HasColumnName("TagName");
+
+                            b1.HasKey("Id", "ProductId");
+
+                            b1.HasIndex("ProductId");
+
+                            b1.ToTable("ProductTags", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProductId");
                         });
 
                     b.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.Promotion", "Promotion", b1 =>
@@ -981,35 +970,12 @@ namespace Ecommerce.Infrastructure.Migrations
 
                     b.Navigation("Stock")
                         .IsRequired();
+
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.UserAggregate.User", b =>
                 {
-                    b.OwnsOne("Ecommerce.Domain.Common.Entities.Image", "ProfileImage", b1 =>
-                        {
-                            b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("ObjectIdentifier")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Url")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("UserId");
-
-                            b1.HasIndex("ObjectIdentifier")
-                                .IsUnique()
-                                .HasFilter("[ProfileImage_ObjectIdentifier] IS NOT NULL");
-
-                            b1.ToTable("Users");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
                     b.OwnsOne("Ecommerce.Domain.UserAggregate.Entities.Cart", "Cart", b1 =>
                         {
                             b1.Property<Guid>("Id")
@@ -1264,24 +1230,7 @@ namespace Ecommerce.Infrastructure.Migrations
 
                     b.Navigation("PasswordResetOtp");
 
-                    b.Navigation("ProfileImage");
-
                     b.Navigation("Wishlist")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ProductTagLink", b =>
-                {
-                    b.HasOne("Ecommerce.Domain.ProductAggregate.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Ecommerce.Domain.ProductAggregate.Entities.ProductTag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

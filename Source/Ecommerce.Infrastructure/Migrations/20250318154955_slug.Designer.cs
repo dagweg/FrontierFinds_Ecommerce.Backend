@@ -4,6 +4,7 @@ using Ecommerce.Infrastructure.Persistence.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerce.Infrastructure.Migrations
 {
     [DbContext(typeof(EfCoreContext))]
-    partial class EfCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250318154955_slug")]
+    partial class slug
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -756,6 +759,7 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsMany("Ecommerce.Domain.ProductAggregate.Entities.ProductReview", "Reviews", b1 =>
                         {
                             b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
                                 .HasColumnType("uniqueidentifier")
                                 .HasColumnName("ReviewId");
 
@@ -796,7 +800,7 @@ namespace Ecommerce.Infrastructure.Migrations
                                         .HasForeignKey("ProductReviewId", "ProductReviewProductId");
                                 });
 
-                            b1.OwnsOne("Ecommerce.Domain.UserAggregate.ValueObjects.UserId", "ReviewerId", b2 =>
+                            b1.OwnsOne("Ecommerce.Domain.UserAggregate.ValueObjects.UserId", "AuthorId", b2 =>
                                 {
                                     b2.Property<Guid>("ProductReviewId")
                                         .HasColumnType("uniqueidentifier");
@@ -806,7 +810,7 @@ namespace Ecommerce.Infrastructure.Migrations
 
                                     b2.Property<Guid>("Value")
                                         .HasColumnType("uniqueidentifier")
-                                        .HasColumnName("ReviewerId");
+                                        .HasColumnName("AuthorId");
 
                                     b2.HasKey("ProductReviewId", "ProductReviewProductId");
 
@@ -816,10 +820,10 @@ namespace Ecommerce.Infrastructure.Migrations
                                         .HasForeignKey("ProductReviewId", "ProductReviewProductId");
                                 });
 
-                            b1.Navigation("Rating")
+                            b1.Navigation("AuthorId")
                                 .IsRequired();
 
-                            b1.Navigation("ReviewerId")
+                            b1.Navigation("Rating")
                                 .IsRequired();
                         });
 
@@ -985,31 +989,6 @@ namespace Ecommerce.Infrastructure.Migrations
 
             modelBuilder.Entity("Ecommerce.Domain.UserAggregate.User", b =>
                 {
-                    b.OwnsOne("Ecommerce.Domain.Common.Entities.Image", "ProfileImage", b1 =>
-                        {
-                            b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("ObjectIdentifier")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Url")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("UserId");
-
-                            b1.HasIndex("ObjectIdentifier")
-                                .IsUnique()
-                                .HasFilter("[ProfileImage_ObjectIdentifier] IS NOT NULL");
-
-                            b1.ToTable("Users");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
                     b.OwnsOne("Ecommerce.Domain.UserAggregate.Entities.Cart", "Cart", b1 =>
                         {
                             b1.Property<Guid>("Id")
@@ -1263,8 +1242,6 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.Navigation("EmailVerificationOtp");
 
                     b.Navigation("PasswordResetOtp");
-
-                    b.Navigation("ProfileImage");
 
                     b.Navigation("Wishlist")
                         .IsRequired();
