@@ -107,8 +107,7 @@ public class RegisterUserCommandHandler
       lastName: Name.Create(command.LastName),
       email: email,
       password: Password.CreateRandom(),
-      phoneNumber: PhoneNumber.Create(command.PhoneNumber),
-      countryCode: command.CountryCode
+      phoneNumber: PhoneNumber.Create(command.PhoneNumber)
     );
 
     // hash the password using the user object as salt
