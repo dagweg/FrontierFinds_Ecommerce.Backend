@@ -1,4 +1,5 @@
 using Ecommerce.Application.Common.Interfaces.Persistence;
+using Ecommerce.Application.Common.Models.Persistence;
 using Ecommerce.Application.Common.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -79,5 +80,18 @@ public class UnitOfWork : IUnitOfWork
   public async ValueTask DisposeAsync()
   {
     await _context.DisposeAsync();
+  }
+
+  public IEnumerable<ChangeTrackerEntryInfo> GetChangeTrackerEntries()
+  {
+    return _context
+      .ChangeTracker.Entries()
+      .Select(entry => new ChangeTrackerEntryInfo
+      {
+        EntityTypeName = entry.Entity.GetType().Name,
+        State = entry.State.ToString(),
+        // Add more properties if you need to inspect key values etc.
+      })
+      .ToList();
   }
 }

@@ -1,11 +1,19 @@
+using Ecommerce.Domain.Common.Entities;
+using Ecommerce.Domain.Common.ValueObjects;
+using Ecommerce.Domain.NotificationAggregate;
 using Ecommerce.Domain.OrderAggregate;
+using Ecommerce.Domain.OrderAggregate.ValueObjects;
 using Ecommerce.Domain.PaymentAggregate;
 using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.ProductAggregate.Entities;
+using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
+using Ecommerce.Domain.UserAggregate.Entities;
+using Ecommerce.Domain.UserAggregate.ValueObjects;
 using Ecommerce.Infrastructure.Common;
-using Ecommerce.Infrastructure.Common.Providers;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 namespace Ecommerce.Infrastructure.Persistence.EfCore;
 
@@ -13,26 +21,33 @@ public class EfCoreContext : DbContext
 {
   public DbSet<User> Users { get; set; } = null!;
   public DbSet<Product> Products { get; set; } = null!;
-  public DbSet<ProductCategory> ProductCategories { get; set; } = null!;
+  public DbSet<ProductTag> ProductTags { get; set; } = null!;
+  public DbSet<Category> Categories { get; set; } = null!;
   public DbSet<Promotion> Promotions { get; set; } = null!;
   public DbSet<Order> Orders { get; set; } = null!;
   public DbSet<Payment> Payments { get; set; } = null!;
 
-  public EfCoreContext() { }
+  private readonly IWebHostEnvironment _env;
 
-  public EfCoreContext(DbContextOptions<EfCoreContext> options)
-    : base(options) { }
+  public EfCoreContext(IWebHostEnvironment env)
+  {
+    _env = env;
+  }
+
+  public EfCoreContext(DbContextOptions<EfCoreContext> options, IWebHostEnvironment env)
+    : base(options)
+  {
+    _env = env;
+  }
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
     optionsBuilder.EnableSensitiveDataLogging();
-
     base.OnConfiguring(optionsBuilder);
   }
 
   protected override void OnModelCreating(ModelBuilder builder)
   {
-    // Loads in the configurations that implement the IEntityTypeConfiguration and others
     builder.ApplyConfigurationsFromAssembly(InfrastructureAssembly.Assembly);
   }
 }
