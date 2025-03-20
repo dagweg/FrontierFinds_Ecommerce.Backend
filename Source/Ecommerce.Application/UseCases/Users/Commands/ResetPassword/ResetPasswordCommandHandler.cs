@@ -59,7 +59,7 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
       {
         To = user.Email.Value,
         Subject = "Reset your Password.",
-        Body = $"Your OTP is {string.Join("", user.PasswordResetOtp!.Value)}.",
+        Body = $"Your OTP is {string.Join("", user.PasswordResetOtp?.ToString())}.",
       }
     );
 
