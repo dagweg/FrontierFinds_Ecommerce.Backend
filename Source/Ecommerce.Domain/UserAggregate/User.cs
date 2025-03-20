@@ -1,6 +1,7 @@
 namespace Ecommerce.Domain.UserAggregate;
 
 using System.ComponentModel.DataAnnotations.Schema;
+using Ecommerce.Domain.Common.Entities;
 using Ecommerce.Domain.Common.Errors;
 using Ecommerce.Domain.Common.Models;
 using Ecommerce.Domain.Common.ValueObjects;
@@ -8,6 +9,7 @@ using Ecommerce.Domain.NotificationAggregate;
 using Ecommerce.Domain.OrderAggregate;
 using Ecommerce.Domain.OrderAggregate.ValueObjects;
 using Ecommerce.Domain.ProductAggregate;
+using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.Events;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
@@ -20,7 +22,6 @@ public class User : AggregateRoot<UserId>
   public Email Email { get; private set; }
   public Password Password { get; private set; }
   public PhoneNumber PhoneNumber { get; private set; }
-  public string CountryCode { get; private set; }
   public UserAddress? Address { get; private set; }
   public Wishlist Wishlist { get; private set; }
   public Cart Cart { get; private set; }
@@ -30,7 +31,6 @@ public class User : AggregateRoot<UserId>
   private List<Order> _orders = [];
   private List<Product> _products = [];
   private List<Notification> _notifications = [];
-
   public IReadOnlyCollection<Order> Orders => _orders.AsReadOnly();
   public IReadOnlyCollection<Product> Products => _products.AsReadOnly();
   public IReadOnlyCollection<Notification> Notifications => _notifications.AsReadOnly();
@@ -38,14 +38,15 @@ public class User : AggregateRoot<UserId>
   public OneTimePassword? EmailVerificationOtp { get; private set; }
   public OneTimePassword? PasswordResetOtp { get; private set; }
 
-  private User(
+  public Image? ProfileImage { get; private set; }
+
+  protected User(
     UserId id,
     Name firstName,
     Name lastName,
     Email email,
     Password password,
-    PhoneNumber phoneNumber,
-    string countryCode
+    PhoneNumber phoneNumber
   )
     : base(id)
   {
@@ -54,7 +55,6 @@ public class User : AggregateRoot<UserId>
     Email = email;
     Password = password;
     PhoneNumber = phoneNumber;
-    CountryCode = countryCode;
     Cart = Cart.Create();
     Wishlist = Wishlist.Create();
   }
@@ -64,25 +64,22 @@ public class User : AggregateRoot<UserId>
     Name lastName,
     Email email,
     Password password,
-    PhoneNumber phoneNumber,
-    string countryCode
+    PhoneNumber phoneNumber
   )
   {
-    var user = new User(
-      UserId.CreateUnique(),
-      firstName,
-      lastName,
-      email,
-      password,
-      phoneNumber,
-      countryCode
-    );
+    var user = new User(UserId.CreateUnique(), firstName, lastName, email, password, phoneNumber);
 
     user.EmailVerificationOtp = OneTimePassword.CreateNew(); // first time
 
     user.AddDomainEvent(new UserCreatedDomainEvent(user));
 
     return user;
+  }
+
+  public User WithUserId(UserId userId)
+  {
+    base.Id = userId;
+    return this;
   }
 
   public User WithAddress(UserAddress address)
@@ -127,9 +124,39 @@ public class User : AggregateRoot<UserId>
     return this;
   }
 
+  public User WithAccountVerified(bool accountVerified)
+  {
+    AccountVerified = accountVerified;
+    return this;
+  }
+
+  public User WithEmailVerificationOtp(OneTimePassword emailVerificationOtp)
+  {
+    EmailVerificationOtp = emailVerificationOtp;
+    return this;
+  }
+
+  public User WithPasswordResetOtp(OneTimePassword passwordResetOtp)
+  {
+    PasswordResetOtp = passwordResetOtp;
+    return this;
+  }
+
+  public User WithHashedPassword(string hashedPassword)
+  {
+    Password.ValueHash = hashedPassword;
+    return this;
+  }
+
   public void ChangePassword(Password newPassword)
   {
     Password = newPassword;
+  }
+
+  public User WithProfileImage(Image profileImage)
+  {
+    ProfileImage = profileImage;
+    return this;
   }
 
   /// <summary>

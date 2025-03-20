@@ -1,7 +1,11 @@
 namespace Ecommerce.Domain.UserAggregate.Entities;
 
+using Ecommerce.Domain.Common.Errors;
 using Ecommerce.Domain.Common.Models;
+using Ecommerce.Domain.ProductAggregate;
+using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using FluentResults;
 
 public class Cart : Entity<CartId>
 {
@@ -35,9 +39,48 @@ public class Cart : Entity<CartId>
     _items.Clear();
   }
 
-  public void AddItemsRange(List<CartItem> cartItems)
+  public Result AddItemsRange(
+    List<CartItem> cartItems,
+    IDictionary<ProductId, Product> productBulk,
+    UserId userId
+  )
   {
-    _items.AddRange(cartItems);
+    var cartDict = Items.ToDictionary(kvp => kvp.ProductId, kvp => kvp);
+
+    var newCartItems = new List<CartItem>();
+
+    foreach (var cartItem in cartItems)
+    {
+      if (
+        productBulk.ContainsKey(cartItem.ProductId)
+        && productBulk[cartItem.ProductId].SellerId == userId
+      )
+      {
+        return InvalidOperationError.GetResult(
+          nameof(cartItem.ProductId),
+          "You cannot add your own product to cart"
+        );
+      }
+      if (cartDict.ContainsKey(cartItem.ProductId) && productBulk.ContainsKey(cartItem.ProductId))
+      {
+        var availableStockQuantity = productBulk[cartItem.ProductId].Stock.Quantity;
+        var requestedQuantity = cartDict[cartItem.ProductId].Quantity + cartItem.Quantity;
+
+        if (requestedQuantity <= availableStockQuantity)
+          cartDict[cartItem.ProductId].SetQuantity(requestedQuantity);
+        else
+          cartDict[cartItem.ProductId].SetQuantity(availableStockQuantity);
+
+        newCartItems.Add(cartDict[cartItem.ProductId]);
+      }
+      else
+      {
+        newCartItems.Add(cartItem);
+      }
+    }
+    _items.AddRange(newCartItems);
+
+    return Result.Ok();
   }
 
   public override IEnumerable<object> GetEqualityComponents()
