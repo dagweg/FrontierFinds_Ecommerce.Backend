@@ -1,6 +1,7 @@
 namespace Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -56,6 +57,7 @@ public class UserRepository(
     return new CartResult
     {
       TotalItems = productBulk.Count,
+      TotalItemsFetched = cartItems.Count,
       TotalPrice = cartItems
         .Where(ci => productBulk.ContainsKey(ci.ProductId))
         .Sum(ci => productBulk[ci.ProductId].Price * ci.Quantity),
@@ -72,57 +74,57 @@ public class UserRepository(
     };
   }
 
-  public async Task<Result> AddToCartRangeAsync(UserId userId, List<CartItem> cartItems)
-  {
-    var user = await GetByIdAsync(userId);
+  // public async Task<Result> AddToCartRangeAsync(UserId userId, List<CartItem> cartItems)
+  // {
+  //   var user = await GetByIdAsync(userId);
 
-    if (user is null)
-      return NotFoundError.GetResult(nameof(userId), "User not found");
+  //   if (user is null)
+  //     return NotFoundError.GetResult(nameof(userId), "User not found");
 
-    var cartDict = user.Cart.Items.ToDictionary(kvp => kvp.ProductId, kvp => kvp);
+  //   var cartDict = user.Cart.Items.ToDictionary(kvp => kvp.ProductId, kvp => kvp);
 
-    var productBulk = await productRepository.BulkGetByIdAsync(cartDict.Keys);
+  //   var productBulk = await productRepository.BulkGetByIdAsync(cartDict.Keys);
 
-    var newCartItems = new List<CartItem>();
+  //   var newCartItems = new List<CartItem>();
 
-    foreach (var cartItem in cartItems)
-    {
-      if (
-        productBulk.ContainsKey(cartItem.ProductId)
-        && productBulk[cartItem.ProductId].SellerId == userId
-      )
-      {
-        return BadRequestError.GetResult(
-          nameof(cartItem.ProductId),
-          "You cannot add your own product to cart"
-        );
-      }
-      if (cartDict.ContainsKey(cartItem.ProductId) && productBulk.ContainsKey(cartItem.ProductId))
-      {
-        var availableStockQuantity = productBulk[cartItem.ProductId].Stock.Quantity;
-        var requestedQuantity = cartDict[cartItem.ProductId].Quantity + cartItem.Quantity;
+  //   foreach (var cartItem in cartItems)
+  //   {
+  //     if (
+  //       productBulk.ContainsKey(cartItem.ProductId)
+  //       && productBulk[cartItem.ProductId].SellerId == userId
+  //     )
+  //     {
+  //       return BadRequestError.GetResult(
+  //         nameof(cartItem.ProductId),
+  //         "You cannot add your own product to cart"
+  //       );
+  //     }
+  //     if (cartDict.ContainsKey(cartItem.ProductId) && productBulk.ContainsKey(cartItem.ProductId))
+  //     {
+  //       var availableStockQuantity = productBulk[cartItem.ProductId].Stock.Quantity;
+  //       var requestedQuantity = cartDict[cartItem.ProductId].Quantity + cartItem.Quantity;
 
-        if (requestedQuantity <= availableStockQuantity)
-          cartDict[cartItem.ProductId].SetQuantity(requestedQuantity);
-        else
-          cartDict[cartItem.ProductId].SetQuantity(availableStockQuantity);
+  //       if (requestedQuantity <= availableStockQuantity)
+  //         cartDict[cartItem.ProductId].SetQuantity(requestedQuantity);
+  //       else
+  //         cartDict[cartItem.ProductId].SetQuantity(availableStockQuantity);
 
-        newCartItems.Add(cartDict[cartItem.ProductId]);
-      }
-      else
-      {
-        newCartItems.Add(cartItem);
-      }
-    }
+  //       newCartItems.Add(cartDict[cartItem.ProductId]);
+  //     }
+  //     else
+  //     {
+  //       newCartItems.Add(cartItem);
+  //     }
+  //   }
 
-    // user.Cart.ClearCart();
-    user.Cart.AddItemsRange(newCartItems);
+  //   // user.Cart.ClearCart();
+  //   user.Cart.AddItemsRange(newCartItems);
 
-    // update the user
-    Update(user);
+  //   // update the user
+  //   Update(user);
 
-    return Result.Ok();
-  }
+  //   return Result.Ok();
+  // }
 
   public async Task<bool> RemoveFromCartRangeAsync(UserId userId, HashSet<CartItemId> cartItemIds)
   {
@@ -203,5 +205,25 @@ public class UserRepository(
     };
 
     return result;
+  }
+
+  public async Task<IDictionary<Guid, User>> BulkGetById(IEnumerable<Guid> userIds)
+  {
+    var userIdSet = userIds.ToArray();
+
+    // Expression<Func<User, bool>> predicate = user => false; // Start with false
+    // foreach (var userId in userIdSet)
+    // {
+    //   Expression<Func<User, bool>> singlePredicate = user => user.Id.Value == userId;
+    //   predicate = Expression.Lambda<Func<User, bool>>(
+    //     Expression.OrElse(predicate.Body, singlePredicate.Body),
+    //     predicate.Parameters
+    //   );
+    // }
+
+    return context
+      .Users.AsEnumerable()
+      .Where(x => userIds.Any(y => y == x.Id.Value))
+      .ToDictionary(k => k.Id.Value, v => v);
   }
 }

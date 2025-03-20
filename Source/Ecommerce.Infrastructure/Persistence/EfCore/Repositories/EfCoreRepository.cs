@@ -1,7 +1,9 @@
 namespace Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Application.Common.Interfaces.Persistence;
@@ -19,13 +21,13 @@ public abstract class EfCoreRepository<TEntity, TId>(EfCoreContext context)
   : IRepository<TEntity, TId>
   where TEntity : class
 {
-  public async Task<bool> AddAsync(TEntity entity)
+  public virtual async Task<bool> AddAsync(TEntity entity)
   {
     var entityEntry = await context.AddAsync(entity);
     return entityEntry != null;
   }
 
-  public async Task<GetResult<TEntity>> GetAllAsync(PaginationParameters pagination)
+  public virtual async Task<GetResult<TEntity>> GetAllAsync(PaginationParameters pagination)
   {
     var query = context.Set<TEntity>().AsQueryable();
 
@@ -40,28 +42,33 @@ public abstract class EfCoreRepository<TEntity, TId>(EfCoreContext context)
     };
   }
 
-  public async Task<TEntity?> GetByIdAsync(TId id)
+  public virtual async Task<TEntity?> GetByIdAsync(TId id)
   {
     var entity = await context.FindAsync<TEntity>(id);
 
     return entity;
   }
 
-  public bool Update(TEntity entity)
+  public virtual bool Update(TEntity entity)
   {
     var updated = context.Update(entity);
     return updated != null;
   }
 
-  public bool Delete(TEntity entity)
+  public virtual bool Delete(TEntity entity)
   {
     var deleted = context.Remove(entity);
     return deleted != null;
   }
 
-  public async Task<bool> AnyAsync(TId id)
+  public virtual async Task<bool> AnyAsync(TId id)
   {
     var entity = await context.FindAsync<TEntity>(id); // Try to find by ID
     return entity != null;
+  }
+
+  public virtual Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
+  {
+    return context.Set<TEntity>().AnyAsync(predicate);
   }
 }
