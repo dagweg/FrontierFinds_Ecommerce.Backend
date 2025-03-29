@@ -77,7 +77,7 @@ public class Program
 
         app.MapControllers();
 
-        // await SeedDatabase(app);
+        await SeedDatabase(app);
 
         app.Run();
       }

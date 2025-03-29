@@ -2,14 +2,14 @@
 . "$(dirname "$0")/_/husky.sh"
 
 
-echo "Husky.NET Started"
-echo "Running Pre-Commit Hook"
+# echo "Husky.NET Started"
+# echo "Running Pre-Commit Hook"
 
-dotnet tool restore
-dotnet tool run dotnet-csharpier ./Source/Ecommerce.Application/ ./Source/Ecommerce.Domain/ ./Source/Ecommerce.Infrastructure/ ./Source/Ecommerce.Api/ ./Source/Ecommerce.Contracts/ ./Tests/UnitTests/
+# dotnet tool restore
+# dotnet tool run dotnet-csharpier ./Source/Ecommerce.Application/ ./Source/Ecommerce.Domain/ ./Source/Ecommerce.Infrastructure/ ./Source/Ecommerce.Api/ ./Source/Ecommerce.Contracts/ ./Tests/UnitTests/
 
 
-echo "Husky.NET Finished"
+# echo "Husky.NET Finished"
 
 
 
