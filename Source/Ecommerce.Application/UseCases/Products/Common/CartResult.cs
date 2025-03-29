@@ -6,4 +6,5 @@ public class CartResult
   public required int TotalItemsFetched { get; set; }
   public required decimal TotalPrice { get; set; }
   public IEnumerable<CartItemResult> Items { get; set; } = [];
+  public int NotSeenCount => Items.Count(x => !x.Seen);
 }
