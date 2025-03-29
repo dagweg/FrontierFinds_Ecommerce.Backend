@@ -18,11 +18,11 @@ namespace Ecommerce_Platform.NET.Tests.IntegrationTests.Infrastructure.Services.
   {
     private readonly IStripeService _stripeService;
 
-    // private readonly Mock<IOptions<ClientSettings>> _clientSettingsMock;
-    // private readonly Mock<IOptions<PaymentOptions>> _paymentOptionsMock;
+    private readonly Mock<IOptions<ClientSettings>> _clientSettingsMock = new();
+    private readonly Mock<IOptions<PaymentOptions>> _paymentOptionsMock = new();
 
-    private readonly ClientSettings _clientSettings;
-    private readonly PaymentOptions _paymentOptions;
+    // private readonly IOptions<ClientSettings> _clientSettings;
+    // private readonly  _paymentOptions;
 
     public StripeServiceTests(
       IOptions<ClientSettings> clientSettings,
@@ -38,9 +38,26 @@ namespace Ecommerce_Platform.NET.Tests.IntegrationTests.Infrastructure.Services.
 
       // _paymentOptionsMock.Setup(x => paymentOptions);
 
-      _clientSettings = clientSettings.Value;
-      _paymentOptions = paymentOptions.Value;
-      _stripeService = new StripeService(clientSettings, paymentOptions);
+
+
+
+
+      _clientSettingsMock.SetupProperty(
+        x => x.Value,
+        new ClientSettings { ClientBaseUrl = "http://localhost:3000" }
+      );
+      _paymentOptionsMock.SetupProperty(
+        x => x.Value,
+        new PaymentOptions
+        {
+          StripeOptions = new StripeOptions
+          {
+            PublishableKey = "publishable-key",
+            SecretKey = "secret-key",
+          },
+        }
+      );
+      _stripeService = new StripeService(_clientSettingsMock.Object, _paymentOptionsMock.Object);
     }
 
     [Fact]
@@ -59,9 +76,7 @@ namespace Ecommerce_Platform.NET.Tests.IntegrationTests.Infrastructure.Services.
 
       // Assert
       result.IsSuccess.Should().BeTrue();
-      result
-        .Value.redirectUrl.Should()
-        .Be(_clientSettings.ClientBaseUrl + "/payment/checkout/success");
+      result.Value.redirectUrl.Should().Be("http://localhost:3000/payment/checkout/success");
       result.Value.sessionId.Should().NotBeNull();
     }
   }
