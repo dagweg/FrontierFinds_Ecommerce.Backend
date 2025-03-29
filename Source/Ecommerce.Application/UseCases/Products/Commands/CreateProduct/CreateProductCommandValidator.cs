@@ -1,5 +1,7 @@
 using Ecommerce.Application.Common.Interfaces.Processors;
 using Ecommerce.Application.UseCases.Images.CreateImage;
+using Ecommerce.Domain.ProductAggregate.ValueObjects;
+using Ecommerce.Domain.UserAggregate.ValueObjects;
 using FluentValidation;
 using Newtonsoft.Json;
 
@@ -9,9 +11,19 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
 {
   public CreateProductCommandValidator(IImageProcessor imageProcessor)
   {
-    RuleFor(x => x.ProductName).NotEmpty();
+    RuleFor(x => x.ProductName)
+      .NotEmpty()
+      .Must(x => x.Length >= Name.MIN_LENGTH && x.Length <= Name.MAX_LENGTH)
+      .WithMessage($"Name must be between {Name.MIN_LENGTH} and {Name.MAX_LENGTH} characters long");
 
-    RuleFor(x => x.ProductDescription).NotEmpty();
+    RuleFor(x => x.ProductDescription)
+      .NotEmpty()
+      .Must(x =>
+        x.Length >= ProductDescription.MIN_LENGTH && x.Length <= ProductDescription.MAX_LENGTH
+      )
+      .WithMessage(
+        $"Product description must be between {ProductDescription.MIN_LENGTH} and {ProductDescription.MAX_LENGTH} characters long"
+      );
 
     RuleFor(x => x.StockQuantity).NotEmpty().GreaterThan(0);
 
