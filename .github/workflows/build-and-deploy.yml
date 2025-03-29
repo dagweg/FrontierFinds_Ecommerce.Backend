@@ -60,8 +60,8 @@ jobs:
 
       - name: Run Database Migrations
         run: |
-          dotnet tool install --global dotnet-ef # Install dotnet ef globally
-          dotnet ef database update --project ${{ env.INFRASTRUCTURE_PROJECT_PATH }} --configuration Release --no-build --no-restore --verbosity normal
+          dotnet tool install --global  dotnet-ef --version 9.0.0 # Install dotnet ef globally
+          dotnet ef database update --project ${{ env.INFRASTRUCTURE_PROJECT_PATH }} --configuration Release --no-build
 
       - name: Deploy
         uses: azure/webapps-deploy@v2
