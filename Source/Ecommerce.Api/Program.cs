@@ -20,9 +20,11 @@ using Ecommerce.Domain.UserAggregate;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Common;
 using Ecommerce.Infrastructure.Persistence.EfCore;
+using Ecommerce.Infrastructure.Persistence.EfCore.Options;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 public class Program
 {
@@ -92,10 +94,11 @@ public class Program
     {
       var services = scope.ServiceProvider;
       var db = services.GetRequiredService<EfCoreContext>();
+      var dbOptions = services.GetRequiredService<IOptions<DatabaseOptions>>();
 
       try
       {
-        await SeedCategories(db);
+        await SeedCategories(db, dbOptions);
 
         if (app.Environment.IsDevelopment())
         {
@@ -168,7 +171,7 @@ public class Program
     Console.WriteLine($"Product seeding finished. Changes: {i}");
   }
 
-  public static async Task SeedCategories(EfCoreContext db)
+  public static async Task SeedCategories(EfCoreContext db, IOptions<DatabaseOptions> dbOptions)
   {
     Console.WriteLine("Seeding Categories");
     var seed = Seeding.Categories.GetSeed();
@@ -181,7 +184,8 @@ public class Program
       await uow.ExecuteTransactionAsync(async () =>
       {
         // Enable IDENTITY_INSERT
-        await db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Categories ON;");
+        if (dbOptions.Value.Provider == DatabaseOptions.Providers.SqlServer)
+          await db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Categories ON;");
 
         List<Category> categories = new();
         foreach (var category in seed)
@@ -218,8 +222,12 @@ public class Program
     }
     finally
     {
-      // Ensure IDENTITY_INSERT is turned off
-      await db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Categories OFF;");
+      // Ensure IDENTITY_INSERT is turned off (for sql server)
+      if (dbOptions.Value.Provider == DatabaseOptions.Providers.SqlServer)
+      {
+        Console.WriteLine("how is it here?");
+        await db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Categories OFF;");
+      }
     }
   }
 }
