@@ -49,6 +49,8 @@ public class GetMyProductsQueryHandler : IRequestHandler<GetMyProductsQuery, Res
 
     var result = new ProductsResult
     {
+      MinPriceValueInCents = myProducts.MinPriceValueInCents,
+      MaxPriceValueInCents = myProducts.MaxPriceValueInCents,
       Products = myProducts.Items.Select(p => _mapper.Map<ProductResult>(p)),
       TotalCount = myProducts.TotalItems,
       TotalFetchedCount = myProducts.TotalItemsFetched,
