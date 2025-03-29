@@ -11,6 +11,7 @@ using Ecommerce.Api;
 using Ecommerce.Api.Mapping;
 using Ecommerce.Api.Middlewares;
 using Ecommerce.Application;
+using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.UseCases.Images.Common;
 using Ecommerce.Application.UseCases.Images.CreateImage;
 using Ecommerce.Contracts.Image;
@@ -24,6 +25,7 @@ using Ecommerce.Infrastructure.Persistence.EfCore.Options;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 
 public class Program
@@ -63,6 +65,11 @@ public class Program
 
       var app = builder.Build();
       {
+        if (app.Environment.IsProduction())
+        {
+          app.UseHttpsRedirection();
+        }
+        app.UseRouting();
         app.UseCors();
         app.UseAuthentication().UseAuthorization();
 
