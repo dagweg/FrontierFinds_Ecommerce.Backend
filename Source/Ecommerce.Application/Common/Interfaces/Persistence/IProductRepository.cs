@@ -33,7 +33,7 @@ public interface IProductRepository : IRepository<Product, ProductId>
   /// <param name="sellerId"></param>
   /// <param name="paginationParameters"></param>
   /// <returns>Enumeration of the products</returns>
-  Task<GetResult<Product>> GetBySellerAsync(
+  Task<GetProductsResult> GetBySellerAsync(
     UserId sellerId,
     PaginationParameters paginationParameters,
     FilterProductsQuery? filterQuery = null
@@ -52,11 +52,13 @@ public interface IProductRepository : IRepository<Product, ProductId>
   /// </summary>
   /// <param name="paginationParameters"></param>
   /// <returns></returns>
-  Task<GetResult<Product>> GetAllProductsSellerNotListedAsync(
+  Task<GetProductsResult> GetAllProductsSellerNotListedAsync(
     UserId sellerId,
     PaginationParameters paginationParameters,
     FilterProductsQuery? filterQuery = null
   );
+
+  public new Task<GetProductsResult> GetAllAsync(PaginationParameters paginationParameters);
 
   /// <summary>
   /// Gets all supported categories
@@ -84,7 +86,7 @@ public interface IProductRepository : IRepository<Product, ProductId>
   /// <param name="filterProductsQuery"></param>
   /// <param name="paginationParameters"></param>
   /// <returns></returns>
-  Task<GetResult<Product>> GetFilteredProductsAsync(
+  Task<GetProductsResult> GetFilteredProductsAsync(
     FilterProductsQuery filterProductsQuery,
     PaginationParameters paginationParameters
   );

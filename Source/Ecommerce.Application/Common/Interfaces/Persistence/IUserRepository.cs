@@ -4,6 +4,7 @@ using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Application.UseCases.Users.Common;
 using Ecommerce.Domain.Common.ValueObjects;
+using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
 using Ecommerce.Domain.UserAggregate.Entities;
@@ -38,7 +39,7 @@ public interface IUserRepository : IRepository<User, UserId>
   /// <returns>
   ///  CartResult if user is found, other wise null
   /// </returns>
-  Task<CartResult?> GetCartAsync(UserId userId, PaginationParameters pagination);
+  Task<CartResult?> GetCartAsync(UserId userId, PaginationParameters? pagination);
 
   /// <summary>
   /// Adds a list of cart items to the user's cart
@@ -58,13 +59,17 @@ public interface IUserRepository : IRepository<User, UserId>
   /// <returns></returns>
   Task<bool> RemoveFromCartRangeAsync(UserId userId, HashSet<CartItemId> cartItemIds);
 
-  /// <summary>
-  /// Updates the cart items for the specified user
-  /// </summary>
-  /// <param name="userId"></param>
-  /// <param name="cartItems"></param>
-  /// <returns></returns>
-  Task<bool> UpdateCartAsync(UserId userId, Dictionary<CartItemId, int> cartItems);
+  // /// <summary>
+  // /// Updates the cart items for the specified user
+  // /// </summary>
+  // /// <param name="userId"></param>
+  // /// <param name="cartItems"></param>
+  // /// <returns></returns>
+  // Task<bool> UpdateCartAsync(
+  //   UserId userId,
+  //   Dictionary<CartItemId, int> cartItems,
+  //   Dictionary<ProductId, Product> productBulk
+  // );
 
   /// <summary>
   /// Adds a list of products to the user's wishlist
