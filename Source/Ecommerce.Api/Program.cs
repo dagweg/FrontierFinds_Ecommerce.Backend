@@ -43,15 +43,12 @@ public class Program
       {
         builder.Services.AddCors(o =>
         {
+          var clientBaseUrl =
+            builder.Configuration[$"{ClientSettings.SectionName}:ClientBaseUrl"]
+            ?? "http://localhost:3000";
+
           o.AddDefaultPolicy(b =>
-            b.WithOrigins(
-                builder.Configuration.GetConnectionString(
-                  $"{ClientSettings.SectionName}:ClientBaseUrl"
-                ) ?? "http://localhost:3000"
-              )
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials()
+            b.WithOrigins(clientBaseUrl).AllowAnyHeader().AllowAnyMethod().AllowCredentials()
           );
         });
 
