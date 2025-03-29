@@ -5,4 +5,6 @@ public class UpdateCartItemCommand
   public string CartItemId { get; set; } = null!;
 
   public int Quantity { get; set; }
+
+  public bool Seen { get; set; } = false;
 }
