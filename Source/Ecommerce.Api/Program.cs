@@ -77,6 +77,8 @@ public class Program
 
         app.MapControllers();
 
+        await MigrateDatabase(app);
+
         await SeedDatabase(app);
 
         app.Run();
@@ -112,6 +114,21 @@ public class Program
         System.Console.WriteLine(ex);
         throw;
       }
+    }
+  }
+
+  public static async Task MigrateDatabase(WebApplication app)
+  {
+    try
+    {
+      Console.WriteLine("Performing Migrations");
+      using var scope = app.Services.CreateScope();
+      var db = scope.ServiceProvider.GetRequiredService<EfCoreContext>();
+      await db.Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine(ex);
     }
   }
 
