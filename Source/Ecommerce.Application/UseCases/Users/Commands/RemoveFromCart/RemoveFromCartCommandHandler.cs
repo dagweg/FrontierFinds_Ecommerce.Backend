@@ -3,13 +3,16 @@ using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Providers.Context;
 using Ecommerce.Application.Common.Utilities;
+using Ecommerce.Application.UseCases.Products.Common;
+using Ecommerce.Domain.UserAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
 using FluentResults;
 using MediatR;
 
 namespace Ecommerce.Application.UseCases.Users.Commands.RemoveFromCart;
 
-public class RemoveFromCartCommandHandler : IRequestHandler<RemoveFromCartCommand, Result>
+public class RemoveFromCartCommandHandler
+  : IRequestHandler<RemoveFromCartCommand, Result<CartResult>>
 {
   private readonly IUserRepository _userRepository;
   private readonly IUserContextService _userContext;
@@ -26,7 +29,7 @@ public class RemoveFromCartCommandHandler : IRequestHandler<RemoveFromCartComman
     _unitOfWork = unitOfWork;
   }
 
-  public async Task<Result> Handle(
+  public async Task<Result<CartResult>> Handle(
     RemoveFromCartCommand request,
     CancellationToken cancellationToken
   )
@@ -35,27 +38,34 @@ public class RemoveFromCartCommandHandler : IRequestHandler<RemoveFromCartComman
     if (userId.IsFailed)
       return userId.ToResult();
 
-    HashSet<CartItemId> cartItemIds = [];
+    var user = await _userRepository.GetByIdAsync(userId.Value);
 
-    foreach (var cartItem in request.CartItemIds)
+    if (user is null)
     {
-      var cartItemIdGuidResult = ConversionUtility.ToGuid(cartItem);
-
-      if (cartItemIdGuidResult.IsSuccess)
-      {
-        var cartItemId = CartItemId.Convert(cartItemIdGuidResult.Value);
-        cartItemIds.Add(cartItemId);
-      }
+      return NotFoundError.GetResult(nameof(user), "User not found");
     }
 
-    var success = await _userRepository.RemoveFromCartRangeAsync(userId.Value, cartItemIds);
+    var cartItemIdGuidResult = ConversionUtility.ToGuid(request.CartItemId);
 
-    if (success)
+    if (cartItemIdGuidResult.IsFailed)
+      return cartItemIdGuidResult.ToResult();
+
+    var cartItemId = CartItemId.Convert(cartItemIdGuidResult.Value);
+    var cartItem = user.Cart.GetItem(CartItemId.Convert(cartItemId));
+
+    if (cartItem is null)
+      return NotFoundError.GetResult(nameof(cartItem), "Cart item not found");
+    user.Cart.RemoveItem(cartItem);
+
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    var cart = await _userRepository.GetCartAsync(userId.Value, null);
+
+    if (cart is null)
     {
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return Result.Ok();
+      return NotFoundError.GetResult("cart", "Cart not found");
     }
 
-    return InternalError.GetResult("Couldn't remove items from cart");
+    return Result.Ok(cart);
   }
 }
