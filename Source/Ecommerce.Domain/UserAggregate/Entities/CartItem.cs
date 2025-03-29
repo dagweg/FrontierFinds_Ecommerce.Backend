@@ -11,6 +11,8 @@ public sealed class CartItem : Entity<CartItemId>
 
   public ProductId ProductId { get; set; }
 
+  public bool Seen { get; set; } = false;
+
   private CartItem(CartItemId id, ProductId productId, int quantity)
     : base(id)
   {
@@ -23,19 +25,33 @@ public sealed class CartItem : Entity<CartItemId>
     return new CartItem(CartItemId.CreateUnique(), productId, quantity);
   }
 
-  public void IncreaseQuantity(int quantity)
+  public void IncreaseQuantity(int quantity, int availableStock)
   {
     Quantity += quantity;
+    if (Quantity > availableStock)
+      Quantity = availableStock;
   }
 
   public void DecreaseQuantity(int quantity)
   {
     Quantity -= quantity;
+    if (Quantity < 0)
+      Quantity = 0;
   }
 
-  public void SetQuantity(int quantity)
+  public void SetQuantity(int quantity, int availableStock)
   {
-    Quantity = quantity;
+    if (quantity > availableStock)
+      Quantity = availableStock;
+    else if (quantity < 0)
+      Quantity = 0;
+    else
+      Quantity = quantity;
+  }
+
+  public void SetSeen(bool seen)
+  {
+    Seen = seen;
   }
 
   public override IEnumerable<object> GetEqualityComponents()
