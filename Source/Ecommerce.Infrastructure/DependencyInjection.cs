@@ -97,6 +97,8 @@ public static class DependencyInjection
       throw new InvalidOperationException("Database options are null!");
     }
 
+    Console.WriteLine($"dbOptions.Provider value: {dbOptions.Provider}");
+
     if (dbOptions.Provider == DatabaseOptions.Providers.SqlServer)
     {
       services.AddDbContext<EfCoreContext>(
@@ -238,6 +240,7 @@ public static class DependencyInjection
   public static IServiceCollection AddInterceptors(this IServiceCollection services)
   {
     services.AddScoped<PublishDomainEventsInterceptor>();
+    services.AddScoped<UpdateAuditableEntitiesInterceptor>();
     return services;
   }
 
