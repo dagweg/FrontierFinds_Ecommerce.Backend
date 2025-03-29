@@ -26,12 +26,17 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging; // **ADD THIS using**
 using Microsoft.Extensions.Options;
 
 public class Program
 {
   public static async Task Main(string[] args)
   {
+    // Get a logger instance here for initial startup logging
+    var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole()); // Or use your configured logger factory
+    var logger = loggerFactory.CreateLogger<Program>();
+
     try
     {
       var builder = WebApplication.CreateBuilder(args);
@@ -84,20 +89,21 @@ public class Program
 
         app.MapControllers();
 
-        await MigrateDatabase(app);
+        await MigrateDatabase(app, logger); // **Pass logger**
 
-        await SeedDatabase(app);
+        await SeedDatabase(app, logger); // **Pass logger**
 
         app.Run();
       }
     }
     catch (Exception ex)
     {
-      Console.WriteLine($"Server terminated unexpectedly. {ex}");
+      logger.LogError(ex, "Server terminated unexpectedly."); // **Use logger.LogError with exception**
+      // Console.WriteLine($"Server terminated unexpectedly. {ex}"); // Removed Console.WriteLine
     }
   }
 
-  public static async Task SeedDatabase(WebApplication app)
+  public static async Task SeedDatabase(WebApplication app, ILogger logger) // **Add ILogger parameter**
   {
     using var scope = app.Services.CreateScope();
     {
@@ -107,41 +113,48 @@ public class Program
 
       try
       {
-        await SeedCategories(db, dbOptions);
+        logger.LogInformation("Starting database seeding..."); // Log start of seeding
+        await SeedCategories(db, dbOptions, logger); // **Pass logger**
 
         if (app.Environment.IsDevelopment())
         {
-          await SeedUsers(db);
-          await SeedProducts(db);
+          await SeedUsers(db, logger); // **Pass logger**
+          await SeedProducts(db, logger); // **Pass logger**
         }
+        logger.LogInformation("Database seeding completed successfully."); // Log success
       }
       catch (Exception ex)
       {
-        Console.WriteLine($"An error occurred while seeding the database.");
-        System.Console.WriteLine(ex);
+        logger.LogError(ex, "An error occurred while seeding the database."); // **Use logger.LogError with exception**
+        // Console.WriteLine($"An error occurred while seeding the database."); // Removed Console.WriteLine
+        // System.Console.WriteLine(ex); // Removed System.Console.WriteLine
         throw;
       }
     }
   }
 
-  public static async Task MigrateDatabase(WebApplication app)
+  public static async Task MigrateDatabase(WebApplication app, ILogger logger) // **Add ILogger parameter**
   {
+    logger.LogInformation("Starting database migrations..."); // Log start of migrations
     try
     {
-      Console.WriteLine("Performing Migrations");
       using var scope = app.Services.CreateScope();
       var db = scope.ServiceProvider.GetRequiredService<EfCoreContext>();
       await db.Database.MigrateAsync();
+      logger.LogInformation("Database migrations completed successfully."); // Log success
     }
     catch (Exception ex)
     {
-      Console.WriteLine(ex);
+      logger.LogError(ex, "Error during database migrations."); // **Use logger.LogError with exception**
+      // Console.WriteLine(ex); // Removed Console.WriteLine
+      throw; // Re-throw to fail startup
     }
   }
 
-  public static async Task SeedUsers(EfCoreContext db)
+  public static async Task SeedUsers(EfCoreContext db, ILogger logger) // **Add ILogger parameter**
   {
-    Console.WriteLine("Seeding Users");
+    logger.LogInformation("Seeding Users..."); // Log start of user seeding
+    // Console.WriteLine("Seeding Users"); // Removed Console.WriteLine
     var seed = Seeding.User.GetSeed();
 
     List<User> users = new();
@@ -163,12 +176,14 @@ public class Program
 
     await db.Users.AddRangeAsync(users);
     int i = await db.SaveChangesAsync();
-    Console.WriteLine($"User seeding finished. Changes {i}");
+    logger.LogInformation($"User seeding finished. Changes {i}"); // Log success with changes count
+    // Console.WriteLine($"User seeding finished. Changes {i}"); // Removed Console.WriteLine
   }
 
-  public static async Task SeedProducts(EfCoreContext db)
+  public static async Task SeedProducts(EfCoreContext db, ILogger logger) // **Add ILogger parameter**
   {
-    Console.WriteLine("Seeding Products");
+    logger.LogInformation("Seeding Products..."); // Log start of product seeding
+    // Console.WriteLine("Seeding Products"); // Removed Console.WriteLine
     var seed = Seeding.Product.GetSeed();
 
     List<Product> products = new();
@@ -192,17 +207,23 @@ public class Program
 
     await db.Products.AddRangeAsync(products);
     int i = await db.SaveChangesAsync();
-    Console.WriteLine($"Product seeding finished. Changes: {i}");
+    logger.LogInformation($"Product seeding finished. Changes: {i}"); // Log success with changes count
+    // Console.WriteLine($"Product seeding finished. Changes: {i}"); // Removed Console.WriteLine
   }
 
-  public static async Task SeedCategories(EfCoreContext db, IOptions<DatabaseOptions> dbOptions)
+  public static async Task SeedCategories(
+    EfCoreContext db,
+    IOptions<DatabaseOptions> dbOptions,
+    ILogger logger
+  ) // **Add ILogger parameter**
   {
-    Console.WriteLine("Seeding Categories");
+    logger.LogInformation("Seeding Categories..."); // Log start of category seeding
+    // Console.WriteLine("Seeding Categories"); // Removed Console.WriteLine
     var seed = Seeding.Categories.GetSeed();
 
     try
     {
-      var uow = new UnitOfWork(db, new Logger<UnitOfWork>(new LoggerFactory()));
+      var uow = new UnitOfWork(db, new Logger<UnitOfWork>(new LoggerFactory())); // Consider getting ILoggerFactory injected if possible
 
       // Ensure IDENTITY_INSERT is set within the same transaction as SaveChanges
       await uow.ExecuteTransactionAsync(async () =>
@@ -238,10 +259,12 @@ public class Program
 
         return 1;
       });
+      logger.LogInformation("Category seeding completed successfully."); // Log success
     }
     catch (Exception ex)
     {
-      Console.WriteLine($"Error seeding categories: {ex.Message}");
+      logger.LogError(ex, "Error seeding categories."); // **Use logger.LogError with exception**
+      // Console.WriteLine($"Error seeding categories: {ex.Message}"); // Removed Console.WriteLine
       throw; // Re-throw to handle upstream
     }
     finally
@@ -249,7 +272,8 @@ public class Program
       // Ensure IDENTITY_INSERT is turned off (for sql server)
       if (dbOptions.Value.Provider == DatabaseOptions.Providers.SqlServer)
       {
-        Console.WriteLine("how is it here?");
+        logger.LogInformation("Turning IDENTITY_INSERT Categories OFF (SQL Server)."); // Log IDENTITY_INSERT OFF action
+        // Console.WriteLine("how is it here?"); // Removed Console.WriteLine
         await db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Categories OFF;");
       }
     }
