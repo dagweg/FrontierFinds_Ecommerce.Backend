@@ -3,8 +3,8 @@ using System;
 using Ecommerce.Infrastructure.Persistence.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -18,34 +18,37 @@ namespace Ecommerce.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.0")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Ecommerce.Domain.Common.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("IsActive")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasDefaultValue("True");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int?>("ParentId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -57,37 +60,40 @@ namespace Ecommerce.Infrastructure.Migrations
             modelBuilder.Entity("Ecommerce.Domain.NotificationAggregate.Notification", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("uuid")
                         .HasColumnName("NotificationId");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)")
+                        .HasColumnType("character varying(1000)")
                         .HasColumnName("Description");
 
                     b.Property<string>("NotificationStatus")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("NotificationStatus");
 
                     b.Property<string>("NotificationType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("NotificationType");
 
                     b.Property<DateTime>("ReadAt")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("ReadAt");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("Title");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("uuid")
                         .HasColumnName("UserId");
 
                     b.HasKey("Id");
@@ -100,20 +106,23 @@ namespace Ecommerce.Infrastructure.Migrations
             modelBuilder.Entity("Ecommerce.Domain.OrderAggregate.Order", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("uuid")
                         .HasColumnName("OrderId");
 
                     b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("OrderDate");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("Status");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -125,31 +134,34 @@ namespace Ecommerce.Infrastructure.Migrations
             modelBuilder.Entity("Ecommerce.Domain.PaymentAggregate.Payment", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("FailureReason")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("OrderItemId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("PaidAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("PayerId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("TransactionId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -159,13 +171,16 @@ namespace Ecommerce.Infrastructure.Migrations
             modelBuilder.Entity("Ecommerce.Domain.ProductAggregate.Entities.ProductCategory", b =>
                 {
                     b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("CategoryId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ProductId", "CategoryId");
 
@@ -178,11 +193,14 @@ namespace Ecommerce.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -195,15 +213,18 @@ namespace Ecommerce.Infrastructure.Migrations
             modelBuilder.Entity("Ecommerce.Domain.ProductAggregate.Product", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("SellerId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("uuid")
                         .HasColumnName("SellerId");
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -218,35 +239,38 @@ namespace Ecommerce.Infrastructure.Migrations
             modelBuilder.Entity("Ecommerce.Domain.UserAggregate.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("AccountVerified")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -256,10 +280,10 @@ namespace Ecommerce.Infrastructure.Migrations
             modelBuilder.Entity("ProductTagLink", b =>
                 {
                     b.Property<Guid>("ProductsId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("TagsId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("ProductsId", "TagsId");
 
@@ -298,19 +322,22 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsMany("Ecommerce.Domain.OrderAggregate.Entities.OrderItem", "OrderItems", b1 =>
                         {
                             b1.Property<Guid>("Id")
-                                .HasColumnType("uniqueidentifier")
+                                .HasColumnType("uuid")
                                 .HasColumnName("OrderItemId");
 
                             b1.Property<Guid>("OrderId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<Guid>("ProductId")
-                                .HasColumnType("uniqueidentifier")
+                                .HasColumnType("uuid")
                                 .HasColumnName("ProductId");
 
                             b1.Property<int>("Quantity")
-                                .HasColumnType("int")
+                                .HasColumnType("integer")
                                 .HasColumnName("Quantity");
+
+                            b1.Property<DateTime>("UpdatedAt")
+                                .HasColumnType("timestamp with time zone");
 
                             b1.HasKey("Id", "OrderId");
 
@@ -332,10 +359,10 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.OwnsOne("Ecommerce.Domain.Common.ValueObjects.Price", "Price", b2 =>
                                 {
                                     b2.Property<Guid>("OrderItemId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid>("OrderItemOrderId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<long>("ValueInCents")
                                         .HasColumnType("bigint")
@@ -356,36 +383,36 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.OrderAggregate.ValueObjects.BillingAddress", "BillingAddress", b1 =>
                         {
                             b1.Property<Guid>("OrderId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("City")
                                 .IsRequired()
                                 .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasColumnType("character varying(100)")
                                 .HasColumnName("BillingCity");
 
                             b1.Property<string>("Country")
                                 .IsRequired()
                                 .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasColumnType("character varying(100)")
                                 .HasColumnName("BillingCountry");
 
                             b1.Property<string>("State")
                                 .IsRequired()
                                 .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasColumnType("character varying(100)")
                                 .HasColumnName("BillingState");
 
                             b1.Property<string>("Street")
                                 .IsRequired()
                                 .HasMaxLength(255)
-                                .HasColumnType("nvarchar(255)")
+                                .HasColumnType("character varying(255)")
                                 .HasColumnName("BillingStreet");
 
                             b1.Property<string>("ZipCode")
                                 .IsRequired()
                                 .HasMaxLength(10)
-                                .HasColumnType("nvarchar(10)")
+                                .HasColumnType("character varying(10)")
                                 .HasColumnName("BillingZipCode");
 
                             b1.HasKey("OrderId");
@@ -399,15 +426,15 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.OrderAggregate.ValueObjects.OrderTotal", "Total", b1 =>
                         {
                             b1.Property<Guid>("OrderId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("text")
                                 .HasColumnName("Currency");
 
                             b1.Property<decimal>("Value")
-                                .HasColumnType("decimal(18,2)")
+                                .HasColumnType("numeric")
                                 .HasColumnName("TotalPrice");
 
                             b1.HasKey("OrderId");
@@ -421,36 +448,36 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.OrderAggregate.ValueObjects.ShippingAddress", "ShippingAddress", b1 =>
                         {
                             b1.Property<Guid>("OrderId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("City")
                                 .IsRequired()
                                 .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasColumnType("character varying(100)")
                                 .HasColumnName("ShippingCity");
 
                             b1.Property<string>("Country")
                                 .IsRequired()
                                 .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasColumnType("character varying(100)")
                                 .HasColumnName("ShippingCountry");
 
                             b1.Property<string>("State")
                                 .IsRequired()
                                 .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasColumnType("character varying(100)")
                                 .HasColumnName("ShippingState");
 
                             b1.Property<string>("Street")
                                 .IsRequired()
                                 .HasMaxLength(255)
-                                .HasColumnType("nvarchar(255)")
+                                .HasColumnType("character varying(255)")
                                 .HasColumnName("ShippingStreet");
 
                             b1.Property<string>("ZipCode")
                                 .IsRequired()
                                 .HasMaxLength(10)
-                                .HasColumnType("nvarchar(10)")
+                                .HasColumnType("character varying(10)")
                                 .HasColumnName("ShippingZipCode");
 
                             b1.HasKey("OrderId");
@@ -478,7 +505,7 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.Common.ValueObjects.Price", "Price", b1 =>
                         {
                             b1.Property<Guid>("PaymentId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<long>("ValueInCents")
                                 .HasColumnType("bigint");
@@ -526,11 +553,14 @@ namespace Ecommerce.Infrastructure.Migrations
                         {
                             b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uniqueidentifier")
+                                .HasColumnType("uuid")
                                 .HasColumnName("ProductImageId");
 
                             b1.Property<Guid>("ProductId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
+
+                            b1.Property<DateTime>("UpdatedAt")
+                                .HasColumnType("timestamp with time zone");
 
                             b1.HasKey("Id", "ProductId");
 
@@ -545,24 +575,23 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "BackImage", b2 =>
                                 {
                                     b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<string>("ObjectIdentifier")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
+                                        .HasColumnType("text");
 
                                     b2.Property<string>("Url")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.HasKey("ProductImagesId", "ProductImagesProductId");
 
                                     b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique()
-                                        .HasFilter("[BackImage_ObjectIdentifier] IS NOT NULL");
+                                        .IsUnique();
 
                                     b2.ToTable("ProductImages");
 
@@ -573,24 +602,23 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "BottomImage", b2 =>
                                 {
                                     b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<string>("ObjectIdentifier")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
+                                        .HasColumnType("text");
 
                                     b2.Property<string>("Url")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.HasKey("ProductImagesId", "ProductImagesProductId");
 
                                     b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique()
-                                        .HasFilter("[BottomImage_ObjectIdentifier] IS NOT NULL");
+                                        .IsUnique();
 
                                     b2.ToTable("ProductImages");
 
@@ -601,24 +629,23 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "FrontImage", b2 =>
                                 {
                                     b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<string>("ObjectIdentifier")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
+                                        .HasColumnType("text");
 
                                     b2.Property<string>("Url")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.HasKey("ProductImagesId", "ProductImagesProductId");
 
                                     b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique()
-                                        .HasFilter("[FrontImage_ObjectIdentifier] IS NOT NULL");
+                                        .IsUnique();
 
                                     b2.ToTable("ProductImages");
 
@@ -629,24 +656,23 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "LeftImage", b2 =>
                                 {
                                     b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<string>("ObjectIdentifier")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
+                                        .HasColumnType("text");
 
                                     b2.Property<string>("Url")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.HasKey("ProductImagesId", "ProductImagesProductId");
 
                                     b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique()
-                                        .HasFilter("[LeftImage_ObjectIdentifier] IS NOT NULL");
+                                        .IsUnique();
 
                                     b2.ToTable("ProductImages");
 
@@ -657,24 +683,23 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "RightImage", b2 =>
                                 {
                                     b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<string>("ObjectIdentifier")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
+                                        .HasColumnType("text");
 
                                     b2.Property<string>("Url")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.HasKey("ProductImagesId", "ProductImagesProductId");
 
                                     b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique()
-                                        .HasFilter("[RightImage_ObjectIdentifier] IS NOT NULL");
+                                        .IsUnique();
 
                                     b2.ToTable("ProductImages");
 
@@ -685,18 +710,18 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "Thumbnail", b2 =>
                                 {
                                     b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<string>("ObjectIdentifier")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
+                                        .HasColumnType("text");
 
                                     b2.Property<string>("Url")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.HasKey("ProductImagesId", "ProductImagesProductId");
 
@@ -712,24 +737,23 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.OwnsOne("Ecommerce.Domain.ProductAggregate.Entities.ProductImage", "TopImage", b2 =>
                                 {
                                     b2.Property<Guid>("ProductImagesId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid>("ProductImagesProductId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<string>("ObjectIdentifier")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(450)");
+                                        .HasColumnType("text");
 
                                     b2.Property<string>("Url")
                                         .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
+                                        .HasColumnType("text");
 
                                     b2.HasKey("ProductImagesId", "ProductImagesProductId");
 
                                     b2.HasIndex("ObjectIdentifier")
-                                        .IsUnique()
-                                        .HasFilter("[TopImage_ObjectIdentifier] IS NOT NULL");
+                                        .IsUnique();
 
                                     b2.ToTable("ProductImages");
 
@@ -756,16 +780,19 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsMany("Ecommerce.Domain.ProductAggregate.Entities.ProductReview", "Reviews", b1 =>
                         {
                             b1.Property<Guid>("Id")
-                                .HasColumnType("uniqueidentifier")
+                                .HasColumnType("uuid")
                                 .HasColumnName("ReviewId");
 
                             b1.Property<Guid>("ProductId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("Description")
                                 .IsRequired()
                                 .HasMaxLength(1000)
-                                .HasColumnType("nvarchar(1000)");
+                                .HasColumnType("character varying(1000)");
+
+                            b1.Property<DateTime>("UpdatedAt")
+                                .HasColumnType("timestamp with time zone");
 
                             b1.HasKey("Id", "ProductId");
 
@@ -779,13 +806,13 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.OwnsOne("Ecommerce.Domain.ProductAggregate.ValueObjects.Rating", "Rating", b2 =>
                                 {
                                     b2.Property<Guid>("ProductReviewId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid>("ProductReviewProductId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<decimal>("Value")
-                                        .HasColumnType("decimal(18,2)")
+                                        .HasColumnType("numeric")
                                         .HasColumnName("Rating");
 
                                     b2.HasKey("ProductReviewId", "ProductReviewProductId");
@@ -799,13 +826,13 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.OwnsOne("Ecommerce.Domain.UserAggregate.ValueObjects.UserId", "ReviewerId", b2 =>
                                 {
                                     b2.Property<Guid>("ProductReviewId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid>("ProductReviewProductId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid>("Value")
-                                        .HasColumnType("uniqueidentifier")
+                                        .HasColumnType("uuid")
                                         .HasColumnName("ReviewerId");
 
                                     b2.HasKey("ProductReviewId", "ProductReviewProductId");
@@ -827,20 +854,23 @@ namespace Ecommerce.Infrastructure.Migrations
                         {
                             b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uniqueidentifier")
+                                .HasColumnType("uuid")
                                 .HasColumnName("ProductPromotionId");
 
                             b1.Property<Guid>("ProductId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<int>("DiscountPercentage")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<DateTime>("EndDate")
-                                .HasColumnType("datetime2");
+                                .HasColumnType("timestamp with time zone");
 
                             b1.Property<DateTime>("StartDate")
-                                .HasColumnType("datetime2");
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<DateTime>("UpdatedAt")
+                                .HasColumnType("timestamp with time zone");
 
                             b1.HasKey("Id", "ProductId");
 
@@ -856,11 +886,11 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.ProductAggregate.ValueObjects.Rating", "AverageRating", b1 =>
                         {
                             b1.Property<Guid>("ProductId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Value")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("decimal(18,2)")
+                                .HasColumnType("numeric")
                                 .HasDefaultValue(0m)
                                 .HasColumnName("AverageRating");
 
@@ -875,7 +905,7 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.Common.ValueObjects.Price", "Price", b1 =>
                         {
                             b1.Property<Guid>("ProductId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<long>("ValueInCents")
                                 .HasColumnType("bigint");
@@ -891,12 +921,12 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.ProductAggregate.ValueObjects.ProductDescription", "Description", b1 =>
                         {
                             b1.Property<Guid>("ProductId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasMaxLength(1000)
-                                .HasColumnType("nvarchar(1000)")
+                                .HasMaxLength(2000)
+                                .HasColumnType("character varying(2000)")
                                 .HasColumnName("Description");
 
                             b1.HasKey("ProductId");
@@ -910,12 +940,12 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.ProductAggregate.ValueObjects.ProductName", "Name", b1 =>
                         {
                             b1.Property<Guid>("ProductId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasMaxLength(255)
-                                .HasColumnType("nvarchar(255)")
+                                .HasMaxLength(500)
+                                .HasColumnType("character varying(500)")
                                 .HasColumnName("Name");
 
                             b1.HasKey("ProductId");
@@ -929,7 +959,7 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.ProductAggregate.ValueObjects.Stock", "Stock", b1 =>
                         {
                             b1.Property<Guid>("ProductId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.HasKey("ProductId");
 
@@ -941,10 +971,10 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.OwnsOne("Ecommerce.Domain.ProductAggregate.ValueObjects.Quantity", "Quantity", b2 =>
                                 {
                                     b2.Property<Guid>("StockProductId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<int>("Value")
-                                        .HasColumnType("int")
+                                        .HasColumnType("integer")
                                         .HasColumnName("StockQuantity");
 
                                     b2.HasKey("StockProductId");
@@ -988,21 +1018,20 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.Common.Entities.Image", "ProfileImage", b1 =>
                         {
                             b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("ObjectIdentifier")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("text");
 
                             b1.Property<string>("Url")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("text");
 
                             b1.HasKey("UserId");
 
                             b1.HasIndex("ObjectIdentifier")
-                                .IsUnique()
-                                .HasFilter("[ProfileImage_ObjectIdentifier] IS NOT NULL");
+                                .IsUnique();
 
                             b1.ToTable("Users");
 
@@ -1013,11 +1042,14 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.UserAggregate.Entities.Cart", "Cart", b1 =>
                         {
                             b1.Property<Guid>("Id")
-                                .HasColumnType("uniqueidentifier")
+                                .HasColumnType("uuid")
                                 .HasColumnName("CartId");
 
+                            b1.Property<DateTime>("UpdatedAt")
+                                .HasColumnType("timestamp with time zone");
+
                             b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.HasKey("Id");
 
@@ -1032,19 +1064,25 @@ namespace Ecommerce.Infrastructure.Migrations
                             b1.OwnsMany("Ecommerce.Domain.UserAggregate.Entities.CartItem", "Items", b2 =>
                                 {
                                     b2.Property<Guid>("Id")
-                                        .HasColumnType("uniqueidentifier")
+                                        .HasColumnType("uuid")
                                         .HasColumnName("CartItemId");
 
                                     b2.Property<Guid>("CartId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid>("ProductId")
-                                        .HasColumnType("uniqueidentifier")
+                                        .HasColumnType("uuid")
                                         .HasColumnName("ProductId");
 
                                     b2.Property<int>("Quantity")
-                                        .HasColumnType("int")
+                                        .HasColumnType("integer")
                                         .HasColumnName("Quantity");
+
+                                    b2.Property<bool>("Seen")
+                                        .HasColumnType("boolean");
+
+                                    b2.Property<DateTime>("UpdatedAt")
+                                        .HasColumnType("timestamp with time zone");
 
                                     b2.HasKey("Id", "CartId");
 
@@ -1071,11 +1109,14 @@ namespace Ecommerce.Infrastructure.Migrations
                         {
                             b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uniqueidentifier")
+                                .HasColumnType("uuid")
                                 .HasColumnName("WishlistId");
 
+                            b1.Property<DateTime>("UpdatedAt")
+                                .HasColumnType("timestamp with time zone");
+
                             b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.HasKey("Id");
 
@@ -1091,14 +1132,14 @@ namespace Ecommerce.Infrastructure.Migrations
                                 {
                                     b2.Property<Guid>("Value")
                                         .ValueGeneratedOnAdd()
-                                        .HasColumnType("uniqueidentifier")
+                                        .HasColumnType("uuid")
                                         .HasColumnName("ProductId");
 
                                     b2.Property<Guid>("WishlistId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<Guid?>("ProductId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.HasKey("Value", "WishlistId");
 
@@ -1127,31 +1168,31 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.OrderAggregate.ValueObjects.BillingAddress", "BillingAddress", b1 =>
                         {
                             b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("City")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("text")
                                 .HasColumnName("BillingAddress_City");
 
                             b1.Property<string>("Country")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("text")
                                 .HasColumnName("BillingAddress_Country");
 
                             b1.Property<string>("State")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("text")
                                 .HasColumnName("BillingAddress_State");
 
                             b1.Property<string>("Street")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("text")
                                 .HasColumnName("BillingAddress_Street");
 
                             b1.Property<string>("ZipCode")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("text")
                                 .HasColumnName("BillingAddress_ZipCode");
 
                             b1.HasKey("UserId");
@@ -1165,21 +1206,21 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.Common.ValueObjects.OneTimePassword", "EmailVerificationOtp", b1 =>
                         {
                             b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<DateTime>("Expiry")
-                                .HasColumnType("datetime2");
+                                .HasColumnType("timestamp with time zone");
 
                             b1.Property<DateTime>("NextResendValidAt")
-                                .HasColumnType("datetime2")
+                                .HasColumnType("timestamp with time zone")
                                 .HasColumnName("EmailVerificationOtpNextResendValidAt");
 
                             b1.Property<int>("ResendFailStreak")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("text");
 
                             b1.HasKey("UserId");
 
@@ -1192,21 +1233,21 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.Common.ValueObjects.OneTimePassword", "PasswordResetOtp", b1 =>
                         {
                             b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<DateTime>("Expiry")
-                                .HasColumnType("datetime2");
+                                .HasColumnType("timestamp with time zone");
 
                             b1.Property<DateTime>("NextResendValidAt")
-                                .HasColumnType("datetime2")
+                                .HasColumnType("timestamp with time zone")
                                 .HasColumnName("PasswordResetOtpNextResendValidAt");
 
                             b1.Property<int>("ResendFailStreak")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("text");
 
                             b1.HasKey("UserId");
 
@@ -1219,31 +1260,31 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.OwnsOne("Ecommerce.Domain.UserAggregate.ValueObjects.UserAddress", "Address", b1 =>
                         {
                             b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("City")
                                 .IsRequired()
                                 .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)");
+                                .HasColumnType("character varying(100)");
 
                             b1.Property<string>("Country")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("text");
 
                             b1.Property<string>("State")
                                 .IsRequired()
                                 .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)");
+                                .HasColumnType("character varying(100)");
 
                             b1.Property<string>("Street")
                                 .IsRequired()
                                 .HasMaxLength(255)
-                                .HasColumnType("nvarchar(255)");
+                                .HasColumnType("character varying(255)");
 
                             b1.Property<string>("ZipCode")
                                 .IsRequired()
                                 .HasMaxLength(10)
-                                .HasColumnType("nvarchar(10)");
+                                .HasColumnType("character varying(10)");
 
                             b1.HasKey("UserId");
 
