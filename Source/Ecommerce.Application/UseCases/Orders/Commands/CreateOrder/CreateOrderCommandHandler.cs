@@ -95,6 +95,6 @@ public class CreateOrderCommandHandler(
 
     await unitOfWork.SaveChangesAsync();
 
-    return Result.Ok();
+    return Result.Ok(result).ToResult();
   }
 }
