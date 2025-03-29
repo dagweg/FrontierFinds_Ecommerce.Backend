@@ -9,6 +9,7 @@ namespace Ecommerce.Api.Controllers;
 [Route("orders")]
 public class OrderController(ISender sender) : ControllerBase
 {
+  [HttpPost]
   public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest createOrderRequest)
   {
     var result = await sender.Send(

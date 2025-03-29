@@ -1,6 +1,7 @@
 namespace Ecommerce.Api.Controllers;
 
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using AutoMapper;
 using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.UseCases.Users.Commands.RegisterUser;
@@ -114,7 +115,25 @@ public class AuthenticationController : ControllerBase
   [HttpGet("authorize")]
   public IActionResult Authorize()
   {
-    return Ok(new { });
+    // 1. Get User Claims (The Correct Way)
+    //    Crucially, *don't* try to parse the token yourself. The [Authorize] attribute
+    //    has already validated it, and the user's claims are available.
+
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Standard claim for user ID
+    var emailClaim = User.FindFirst(ClaimTypes.Email)?.Value;
+    var firstNameClaim = User.FindFirst(ClaimTypes.GivenName)?.Value; // Assuming you have custom claims
+    var lastNameClaim = User.FindFirst(ClaimTypes.Surname)?.Value; //  for firstName and lastName
+
+    // 3. Create and Return the Response
+    var response = new
+    {
+      userId = userIdClaim,
+      email = emailClaim,
+      firstName = firstNameClaim, // Can be null
+      lastName = lastNameClaim, // Can be null
+    };
+
+    return Ok(response);
   }
 
   [Authorize]

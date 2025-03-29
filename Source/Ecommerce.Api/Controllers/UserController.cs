@@ -2,7 +2,9 @@ namespace Ecommerce.Api.Controllers;
 
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.InteropServices;
 using AutoMapper;
+using Ecommerce.Api.Attributes;
 using Ecommerce.Api.Utilities;
 using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.UseCases.Products.Queries.GetAllProducts;
@@ -16,8 +18,10 @@ using Ecommerce.Application.UseCases.Users.Commands.ResetPassword;
 using Ecommerce.Application.UseCases.Users.Commands.ResetPasswordVerify;
 using Ecommerce.Application.UseCases.Users.Commands.UpdateCart;
 using Ecommerce.Application.UseCases.Users.Commands.WishlistProducts;
+using Ecommerce.Application.UseCases.Users.Queries.GetAllUsers;
 using Ecommerce.Application.UseCases.Users.Queries.GetCartItems;
 using Ecommerce.Application.UseCases.Users.Queries.GetMyProducts;
+using Ecommerce.Application.UseCases.Users.Queries.GetUser;
 using Ecommerce.Application.UseCases.Users.Queries.LoginUser;
 using Ecommerce.Contracts.Authentication;
 using Ecommerce.Contracts.Cart;
@@ -34,7 +38,7 @@ using Microsoft.Extensions.Options;
 
 [Authorize]
 [ApiController]
-[Route("me")]
+[Route("users")]
 public class UserController : ControllerBase
 {
   private readonly ISender _mediator;
@@ -58,236 +62,29 @@ public class UserController : ControllerBase
     _logger = logger;
   }
 
-  [HttpPost("cart")]
-  public async Task<IActionResult> AddToCart(
-    [FromBody, MinLength(1)] List<AddCartItemRequest> addCartItemRequest
-  )
+  [HttpGet("{id}")]
+  public async Task<IActionResult> GetUserById([FromRoute] [Attributes.Guid] string id)
   {
-    var result = await _mediator.Send(
-      new AddToCartCommand()
-      {
-        createCartItemCommands = addCartItemRequest
-          .Select(cir => new CreateCartItemCommand
-          {
-            ProductId = cir.ProductId,
-            Quantity = cir.Quantity,
-          })
-          .ToList(),
-      }
-    );
+    var res = await _mediator.Send(new GetUserQuery(id));
 
-    if (result.IsFailed)
+    if (res.IsFailed)
     {
-      _logger.LogError("Failed to add product to cart: {@result}", result);
-      return new ObjectResult(result);
+      return new ObjectResult(res);
     }
-    return Ok(result.Value);
+
+    return Ok(res.Value);
   }
 
-  [HttpDelete("cart")]
-  public async Task<IActionResult> RemoveFromCart(
-    [FromBody, MinLength(1)] List<RemoveCartItemRequest> removeCartItemRequest
-  )
+  [HttpGet]
+  public async Task<IActionResult> GetAllUsers()
   {
-    var result = await _mediator.Send(
-      new RemoveFromCartCommand()
-      {
-        CartItemIds = removeCartItemRequest.Select(rcir => rcir.CartItemId).ToList(),
-      }
-    );
+    var res = await _mediator.Send(new GetAllUsersQuery());
 
-    if (result.IsFailed)
+    if (res.IsFailed)
     {
-      _logger.LogError("Failed to add product to cart: {@result}", result);
-      return new ObjectResult(result);
-    }
-    return NoContent();
-  }
-
-  [HttpPatch("cart")]
-  public async Task<IActionResult> UpdateCart(
-    [FromBody, MinLength(1)] List<UpdateCartItemRequest> updateCartItemRequest
-  )
-  {
-    var result = await _mediator.Send(
-      new UpdateCartCommand()
-      {
-        CartItems = updateCartItemRequest
-          .Select(rcir => new UpdateCartItemCommand
-          {
-            CartItemId = rcir.CartItemId,
-            Quantity = rcir.Quantity,
-          })
-          .ToList(),
-      }
-    );
-
-    if (result.IsFailed)
-    {
-      _logger.LogError("Failed to add product to cart: {@result}", result);
-      return new ObjectResult(result);
-    }
-    return Ok();
-  }
-
-  [HttpGet("cart")]
-  public async Task<IActionResult> GetCartItems([FromQuery] PaginationParams paginationParams)
-  {
-    var result = await _mediator.Send(
-      new GetCartQuery(paginationParams.PageNumber, paginationParams.PageSize)
-    );
-
-    if (result.IsFailed)
-    {
-      _logger.LogError("Failed to get cart items : {@result}", result);
-      return new ObjectResult(result);
+      return new ObjectResult(res);
     }
 
-    return Ok(result.Value);
-  }
-
-  [HttpPost("password/change")]
-  public async Task<IActionResult> ChangePassword(
-    [FromBody] ChangePasswordRequest changePasswordRequest
-  )
-  {
-    var result = await _mediator.Send(
-      new ChangePasswordCommand
-      {
-        CurrentPassword = changePasswordRequest.CurrentPassword,
-        NewPassword = changePasswordRequest.NewPassword,
-      }
-    );
-
-    if (result.IsFailed)
-    {
-      _logger.LogError("Failed to reset password: {@result}", result);
-      return new ObjectResult(result);
-    }
-
-    return Created();
-  }
-
-  [HttpPost("password/reset")]
-  public async Task<IActionResult> ResetPassword()
-  {
-    var result = await _mediator.Send(new ResetPasswordCommand());
-
-    if (result.IsFailed)
-    {
-      _logger.LogError("Failed to reset password: {@result}", result);
-      return new ObjectResult(result);
-    }
-
-    return Accepted();
-  }
-
-  [HttpPost("password/reset/verify")]
-  public async Task<IActionResult> ResetPasswordVerify(
-    [FromBody] ResetPasswordVerifyRequest resetPassword
-  )
-  {
-    var result = await _mediator.Send(
-      new ResetPasswordVerifyCommand
-      {
-        Otp = resetPassword.Otp,
-        NewPassword = resetPassword.NewPassword,
-        ConfirmNewPassword = resetPassword.ConfirmNewPassword,
-      }
-    );
-
-    if (result.IsFailed)
-    {
-      _logger.LogError("Failed to reset password: {@result}", result);
-      return new ObjectResult(result);
-    }
-
-    return Ok();
-  }
-
-  [HttpGet("products")]
-  public async Task<IActionResult> GetMyProducts(
-    [FromQuery] PaginationParams paginationParams,
-    [FromQuery] FilterProductsQuery? filterBy = null
-  )
-  {
-    var result = await _mediator.Send(
-      new GetMyProductsQuery
-      {
-        PageNumber = paginationParams.PageNumber,
-        PageSize = paginationParams.PageSize,
-        FilterQuery = filterBy,
-      }
-    );
-
-    if (result.IsFailed)
-    {
-      _logger.LogError("Failed to get user products: {@result}", result);
-      return new ObjectResult(result);
-    }
-
-    return Ok(result.Value);
-  }
-
-  [HttpPost("wishlist")]
-  public async Task<IActionResult> WishlistProduct(
-    [FromBody] WishlistProductsRequest wishlistRequest
-  )
-  {
-    var result = await _mediator.Send(
-      new WishlistProductsCommand
-      {
-        ProductIds = wishlistRequest.ProductIds.Select(p => p.ProductId).ToList(),
-      }
-    );
-
-    if (result.IsFailed)
-    {
-      _logger.LogError("Failed to add product to wishlist: {@result}", result);
-      return new ObjectResult(result);
-    }
-
-    return Created();
-  }
-
-  [HttpGet("wishlists")]
-  public async Task<IActionResult> GetWishlists([FromQuery] PaginationParams paginationParams)
-  {
-    var result = await _mediator.Send(
-      new GetWishlistsQuery
-      {
-        PageNumber = paginationParams.PageNumber,
-        PageSize = paginationParams.PageSize,
-      }
-    );
-
-    if (result.IsFailed)
-    {
-      _logger.LogError("Failed to get wishlist items: {@result}", result);
-      return new ObjectResult(result);
-    }
-
-    return Ok(result.Value);
-  }
-
-  [HttpDelete("wishlist")]
-  public async Task<IActionResult> RemoveWishlistProducts(
-    [FromBody] WishlistProductsRequest wishlistRequest
-  )
-  {
-    var result = await _mediator.Send(
-      new RemoveWishlistProductsCommand
-      {
-        ProductIds = wishlistRequest.ProductIds.Select(p => p.ProductId).ToList(),
-      }
-    );
-
-    if (result.IsFailed)
-    {
-      _logger.LogError("Failed to remove products from wishlist: {@result}", result);
-      return new ObjectResult(result);
-    }
-
-    return NoContent();
+    return Ok(res.Value);
   }
 }
