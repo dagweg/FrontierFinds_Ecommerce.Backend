@@ -32,13 +32,13 @@ namespace Ecommerce.Application.UseCases.Users.Commands.ResendEmailOtp
         user.SetEmailVerificationOtp(OneTimePassword.CreateNew().Value);
 
       int waitSeconds = Math.Clamp(
-        (int)(user.EmailVerificationOtp!.NextResendValidAt - DateTime.Now).TotalSeconds,
+        (int)(user.EmailVerificationOtp!.NextResendValidAt - DateTime.UtcNow).TotalSeconds,
         0,
         int.MaxValue
       );
 
       // Check if the time to resend the otp has reached
-      if (DateTime.Now < user.EmailVerificationOtp?.NextResendValidAt)
+      if (DateTime.UtcNow < user.EmailVerificationOtp?.NextResendValidAt)
       {
         return new ResendEmailOtpResult { WaitSeconds = waitSeconds, IsSuccess = false };
       }
