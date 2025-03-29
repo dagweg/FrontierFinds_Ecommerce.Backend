@@ -147,6 +147,7 @@ public partial class Utils
         },
         Tags = Utils.Product.Tag.CreateTagResults(3),
         Categories = [],
+        TotalReviews = 0,
       };
     }
 

@@ -58,6 +58,7 @@ public partial class Utils
             Id = Utils.Cart.CartItem.ProductId.Value.ToString(),
             Quantity = Utils.Cart.CartItem.Quantity,
             Product = Utils.Product.CreateProductResult(Utils.Product.CreateProduct()),
+            Seen = false,
           })
           .ToList();
       }
