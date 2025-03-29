@@ -10,6 +10,9 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IHasDomainEvent
 {
   public TId Id { get; set; }
 
+  public DateTime CreatedAt { get; } = DateTime.UtcNow;
+  public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
   private readonly List<IDomainEvent> _domainEvents = [];
 
   public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();

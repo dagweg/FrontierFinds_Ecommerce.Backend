@@ -16,7 +16,7 @@ public sealed record Year
 
   public static Result<Year> Create(int year)
   {
-    if (year < DateTime.Now.Year || year > DateTime.Now.Year + MAX_YEARS_AHEAD)
+    if (year < DateTime.UtcNow.Year || year > DateTime.UtcNow.Year + MAX_YEARS_AHEAD)
       return FormatError.GetResult(nameof(Year), "Year must be within a valid range.");
 
     return Result.Ok(new Year(year));

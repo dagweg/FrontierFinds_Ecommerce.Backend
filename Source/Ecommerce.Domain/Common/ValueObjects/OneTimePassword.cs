@@ -49,7 +49,7 @@ public class OneTimePassword : ValueObject
     {
       otp[i] = (char)random.Next(0, 10);
     }
-    return new OneTimePassword(otp, DateTime.Now.AddMinutes(EXPIRY_MINUTES));
+    return new OneTimePassword(otp, DateTime.UtcNow.AddMinutes(EXPIRY_MINUTES));
   }
 
   public static Result<OneTimePassword> Convert(int[] value, DateTime? expiry = null)
@@ -59,11 +59,11 @@ public class OneTimePassword : ValueObject
       return InvalidOtpError.GetResult(nameof(value), "The OTP is not valid.");
     }
 
-    if (expiry.HasValue && expiry.Value < DateTime.Now)
+    if (expiry.HasValue && expiry.Value < DateTime.UtcNow)
     {
       return ExpiryError.GetResult(nameof(expiry), "The expiry date is not valid.");
     }
-    return new OneTimePassword(value, expiry ?? DateTime.Now.AddMinutes(EXPIRY_MINUTES));
+    return new OneTimePassword(value, expiry ?? DateTime.UtcNow.AddMinutes(EXPIRY_MINUTES));
   }
 
   public OneTimePassword WithExpiry(DateTime expiry)
@@ -75,7 +75,7 @@ public class OneTimePassword : ValueObject
   public void SetValue(int[]? value, DateTime? expiry = null)
   {
     Value = value ?? Value;
-    Expiry = expiry ?? DateTime.Now.AddMinutes(EXPIRY_MINUTES);
+    Expiry = expiry ?? DateTime.UtcNow.AddMinutes(EXPIRY_MINUTES);
   }
 
   public void Revoke()
@@ -86,7 +86,7 @@ public class OneTimePassword : ValueObject
 
   public Result AddResendDelay(int mul = 1)
   {
-    NextResendValidAt = DateTime.Now.AddMinutes(
+    NextResendValidAt = DateTime.UtcNow.AddMinutes(
       0.1 * mul * (ResendFailStreak + 1) * RESEND_DELAY_MULTIPLIER
     );
     ResendFailStreak++;
@@ -108,7 +108,7 @@ public class OneTimePassword : ValueObject
       }
     }
 
-    if (DateTime.Now > Expiry)
+    if (DateTime.UtcNow > Expiry)
     {
       return ExpiryError.GetResult(nameof(otp), "The OTP has expired.");
     }
