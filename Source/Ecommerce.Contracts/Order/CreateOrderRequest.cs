@@ -5,6 +5,7 @@ namespace Ecommerce.Contracts.Order;
 public class CreateOrderRequest
 {
   [Required]
+  [MinLength(1)]
   public IEnumerable<OrderProductRequest> Products = null!;
 
   [Required]
