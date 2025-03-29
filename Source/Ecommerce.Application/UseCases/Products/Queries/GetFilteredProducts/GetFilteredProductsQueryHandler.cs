@@ -31,6 +31,8 @@ public class GetFilteredProductsQueryHandler
 
     return new ProductsResult
     {
+      MinPriceValueInCents = products.MinPriceValueInCents,
+      MaxPriceValueInCents = products.MaxPriceValueInCents,
       Products = products.Items.Select(p => _mapper.Map<ProductResult>(p)),
       TotalCount = products.TotalItems,
       TotalFetchedCount = products.TotalItemsFetched,

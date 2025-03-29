@@ -36,16 +36,29 @@ public class GetAllProductsQueryHandler
   {
     var userId = _userContextService.GetValidUserId();
 
-    if (userId.IsFailed)
-      return userId.ToResult();
+    GetProductsResult products;
+    var pagination = new PaginationParameters
+    {
+      PageNumber = request.PageNumber,
+      PageSize = request.PageSize,
+    };
 
-    var products = await _productRepository.GetAllProductsSellerNotListedAsync(
-      userId.Value, // unnecessary in our scenario ()
-      new PaginationParameters { PageNumber = request.PageNumber, PageSize = request.PageSize }
-    );
+    if (userId.IsFailed)
+    {
+      products = await _productRepository.GetAllAsync(pagination);
+    }
+    else
+    {
+      products = await _productRepository.GetAllProductsSellerNotListedAsync(
+        userId.Value,
+        pagination
+      );
+    }
 
     var result = new ProductsResult
     {
+      MaxPriceValueInCents = products.MaxPriceValueInCents,
+      MinPriceValueInCents = products.MinPriceValueInCents,
       Products = products.Items.Select(p => _mapper.Map<ProductResult>(p)),
       TotalCount = products.TotalItems,
       TotalFetchedCount = products.TotalItemsFetched,
