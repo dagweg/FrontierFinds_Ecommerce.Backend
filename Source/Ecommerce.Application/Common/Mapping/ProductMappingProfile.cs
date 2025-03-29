@@ -39,7 +39,9 @@ public class ProductMappingProfile : Profile
       .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags))
       .ForMember(dest => dest.Categories, opt => opt.MapFrom(src => src.Categories))
       .ForMember(dest => dest.SellerId, opt => opt.MapFrom(src => src.SellerId))
-      .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
+      .ForMember(dest => dest.TotalReviews, opt => opt.MapFrom(src => src.TotalReviews))
+      .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images))
+      .ForMember(dest => dest.AverageRating, opt => opt.MapFrom(src => src.AverageRatingValue));
 
     CreateMap<GetResult<ProductReview>, ProductReviewsResult>()
       .ForMember(dest => dest.ProductReviews, opt => opt.MapFrom(src => src.Items))
