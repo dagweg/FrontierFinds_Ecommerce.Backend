@@ -24,6 +24,31 @@ public class Product : AggregateRoot<ProductId>
   public IReadOnlyList<ProductTag> Tags => _tags.AsReadOnly();
   public IReadOnlyList<ProductReview> Reviews => _reviews.AsReadOnly();
 
+  private int? _totalReviews;
+  public int TotalReviews
+  {
+    get
+    {
+      if (!_totalReviews.HasValue)
+      {
+        _totalReviews = Reviews.Count;
+      }
+      return _totalReviews.Value;
+    }
+  }
+
+  private decimal? _averageRatingValue; // nullable for caching
+  public decimal AverageRatingValue
+  {
+    get
+    {
+      if (!_averageRatingValue.HasValue)
+      {
+        _averageRatingValue = Reviews.Any() ? Reviews.Select(x => x.Rating.Value).Average() : 0;
+      }
+      return _averageRatingValue.Value;
+    }
+  }
   public ProductImages Images { get; private set; }
   public Rating AverageRating { get; private set; }
   public Promotion Promotion { get; private set; }
@@ -132,7 +157,14 @@ public class Product : AggregateRoot<ProductId>
 
   public void UpdateStock(Stock stock) => Stock = stock;
 
-  public void AddReview(ProductReview review) => _reviews.Add(review);
+  public void AddReview(ProductReview review)
+  {
+    _reviews.Add(review);
+
+    // invalidate the cache
+    _averageRatingValue = null;
+    _totalReviews = null;
+  }
 
   public void AddRating(Rating rating)
   {
@@ -147,7 +179,7 @@ public class Product : AggregateRoot<ProductId>
   }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-  private Product()
+  protected Product()
     : base(ProductId.Empty) { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 }

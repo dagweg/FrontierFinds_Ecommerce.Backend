@@ -8,6 +8,9 @@ public sealed class ProductDescription : ValueObject
 
   public static ProductDescription Empty => new(string.Empty);
 
+  public const int MIN_LENGTH = 100;
+  public const int MAX_LENGTH = 2000;
+
   private ProductDescription(string value)
   {
     Value = value;
