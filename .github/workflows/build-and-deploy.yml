@@ -13,7 +13,6 @@ env:
   SOLUTION_PATH: "FrontierFinds.sln"
   API_PROJECT_PATH: "./Source/Ecommerce.Api"
   PUBLISH_DIR: "./publish"
-  INFRASTRUCTURE_PROJECT_PATH: "./Source/Ecommerce.Infrastructure"
 
 jobs:
   build-and-test:
@@ -34,6 +33,11 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
 
+      - name: Install Tools
+        run: dotnet tool install --tool-path .tools dotnet-ef --version 9.0.0
+
+      - name: Run Database Migrations
+        run: dotnet tool run dotnet-ef database update --project ./Source/Ecommerce.Infrastructure --configuration Release --no-build
       # - name: Test
       #   run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-restore --no-build --verbosity normal
 
@@ -57,11 +61,6 @@ jobs:
         with:
           name: webapp
           path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-
-      - name: Run Database Migrations
-        run: |
-          dotnet tool install --global  dotnet-ef --version 9.0.0 # Install dotnet ef globally
-          dotnet ef database update --project ${{ env.INFRASTRUCTURE_PROJECT_PATH }} --configuration Release --no-build
 
       - name: Deploy
         uses: azure/webapps-deploy@v2
