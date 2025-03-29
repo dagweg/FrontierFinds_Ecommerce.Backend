@@ -33,11 +33,11 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
 
-      - name: Install Tools
-        run: dotnet tool install --tool-path .tools dotnet-ef --version 9.0.0
+      # - name: Run Database Migrations
+      #   run: |
+      #     dotnet tool install --global  dotnet-ef --version 9.0.0 # Install dotnet ef globally
+      #     dotnet ef database update --project ./Source/Ecommerce.Infrastructure --configuration Release --no-build
 
-      - name: Run Database Migrations
-        run: dotnet tool run dotnet-ef database update --project ./Source/Ecommerce.Infrastructure --configuration Release --no-build
       # - name: Test
       #   run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-restore --no-build --verbosity normal
 
