@@ -47,9 +47,16 @@ public static partial class Seeding
             thumbnail: ProductImage.Create("https://imgur.com/5OvyHwi.jpg", "Dell XPS 13 Thumbnail")
           )
           .WithProductId(productIds[0]) // Index 0
-          .WithAverageRating(Rating.Create(3).Value)
+          .WithAverageRating(Rating.Create(0).Value)
           .WithPromotion(Domain.ProductAggregate.Entities.Promotion.CreateEmpty())
-          .WithCategories([Seeding.Categories.Electronics_Laptops]),
+          .WithCategories([Seeding.Categories.Electronics_Laptops])
+          .WithImages(
+            ProductImages
+              .Create(ProductImage.Create("https://imgur.com/5OvyHwi.jpg", "Dell XPS 13 Thumbnail"))
+              .WithLeftImage(
+                ProductImage.Create("https://imgur.com/SZJqNJn.jpg", "Dell XPS 13 Thumbnail")
+              )
+          ),
         Domain
           .ProductAggregate.Product.Create(
             name: ProductName.Create("MacBook Pro 14"),
