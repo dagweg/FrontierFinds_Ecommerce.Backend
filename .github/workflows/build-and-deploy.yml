@@ -13,7 +13,7 @@ env:
   SOLUTION_PATH: "FrontierFinds.sln"
   API_PROJECT_PATH: "./Source/Ecommerce.Api"
   PUBLISH_DIR: "./publish"
-  INFRASTRUCTURE_PROJECT_PATH:
+  INFRASTRUCTURE_PROJECT_PATH: "./Source/Ecommerce.Infrastructure"
 
 jobs:
   build-and-test:
