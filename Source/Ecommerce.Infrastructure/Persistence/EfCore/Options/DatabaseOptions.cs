@@ -9,7 +9,7 @@ public class DatabaseOptions
   public static class Providers
   {
     public const string SqlServer = "sqlserver";
-    public const string PgSql = "postgresql";
+    public const string PgSql = "pgsql";
   }
 
   public required PgSqlOptions PgSqlOptions { get; set; }

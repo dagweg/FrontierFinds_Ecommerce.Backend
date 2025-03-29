@@ -32,7 +32,7 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
       .HasConversion(v => v, v => ProductName.Create(v))
       .HasColumnName("Name")
       .IsRequired()
-      .HasMaxLength(255);
+      .HasMaxLength(Name.MAX_LENGTH);
 
     builder
       .OwnsOne(p => p.Description)
@@ -40,7 +40,8 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
       .HasConversion(v => v, v => ProductDescription.Create(v))
       .HasColumnName("Description")
       .IsRequired()
-      .HasMaxLength(1000);
+      .HasMaxLength(ProductDescription.MAX_LENGTH);
+
     builder.OwnsOne(
       p => p.Price,
       pb =>

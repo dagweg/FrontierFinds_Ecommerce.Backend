@@ -1,4 +1,5 @@
 using Ecommerce.Domain.Common.Entities;
+using Ecommerce.Domain.Common.Models;
 using Ecommerce.Domain.Common.ValueObjects;
 using Ecommerce.Domain.NotificationAggregate;
 using Ecommerce.Domain.OrderAggregate;
@@ -49,5 +50,15 @@ public class EfCoreContext : DbContext
   protected override void OnModelCreating(ModelBuilder builder)
   {
     builder.ApplyConfigurationsFromAssembly(InfrastructureAssembly.Assembly);
+  }
+
+  public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+  {
+    return base.SaveChangesAsync(cancellationToken);
+  }
+
+  public override int SaveChanges()
+  {
+    return base.SaveChanges();
   }
 }

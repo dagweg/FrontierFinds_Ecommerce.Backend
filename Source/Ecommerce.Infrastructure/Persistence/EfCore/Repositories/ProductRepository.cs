@@ -29,6 +29,35 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
     _logger = logger;
   }
 
+  public new async Task<GetProductsResult> GetAllAsync(PaginationParameters paginationParameters)
+  {
+    return await GetFilteredProductsAsync(new FilterProductsQuery(), paginationParameters);
+  }
+
+  public (long, long) GetMinMaxPrices(IQueryable<Product> product)
+  {
+    // (long minPrice, long maxPrice) minMax = product
+    //   .Select(p => p.Price.ValueInCents)
+    //   .AsEnumerable()
+    //   .Aggregate(
+    //     (long.MaxValue, 0), // Unnamed tuple as seed
+    //     (acc, current) =>
+    //       (
+    //         Math.Min(acc.Item1, current), // Use Item1, Item2 for unnamed tuple
+    //         Math.Max(acc.Item2, current)
+    //       )
+    //   );
+
+    if (product == null || !product.Any())
+    {
+      return (0, 1000); // Return default values if the collection is empty
+    }
+    return (
+      product.Select(p => p.Price.ValueInCents).Min(),
+      product.Select(p => p.Price.ValueInCents).Max()
+    );
+  }
+
   public static Expression<Func<Product, bool>> GetFilterByCriteria(
     FilterProductsQuery filterProductsQuery
   )
@@ -107,7 +136,7 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
     return products;
   }
 
-  public async Task<GetResult<Product>> GetAllProductsSellerNotListedAsync(
+  public async Task<GetProductsResult> GetAllProductsSellerNotListedAsync(
     UserId sellerId,
     PaginationParameters paginationParameters,
     FilterProductsQuery? filterQuery = null
@@ -116,21 +145,25 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
     var criteria = filterQuery != null ? GetFilterByCriteria(filterQuery) : p => true; // Default filter: always true
     var totalItems = _context.Products.Where(p => p.SellerId != sellerId).Where(criteria);
 
+    var (minPrice, maxPrice) = GetMinMaxPrices(totalItems);
+
     var items = await totalItems
       .AsQueryable()
       .Paginate(paginationParameters)
       .IncludeEverything()
       .ToListAsync();
 
-    return new GetResult<Product>
+    return new GetProductsResult
     {
+      MinPriceValueInCents = minPrice,
+      MaxPriceValueInCents = maxPrice,
       Items = items,
       TotalItems = totalItems.Count(),
       TotalItemsFetched = items.Count(),
     };
   }
 
-  public async Task<GetResult<Product>> GetBySellerAsync(
+  public async Task<GetProductsResult> GetBySellerAsync(
     UserId sellerId,
     PaginationParameters paginationParameters,
     FilterProductsQuery? filterQuery = null
@@ -140,8 +173,11 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
     var result = _context.Products.Where(p => p.SellerId == sellerId).Where(criteria);
     var paginated = await result.Paginate(paginationParameters).IncludeEverything().ToListAsync();
 
-    return new GetResult<Product>
+    var (minPrice, maxPrice) = GetMinMaxPrices(result);
+    return new GetProductsResult
     {
+      MinPriceValueInCents = minPrice,
+      MaxPriceValueInCents = maxPrice,
       Items = paginated,
       TotalItems = result.Count(),
       TotalItemsFetched = paginated.Count(),
@@ -188,7 +224,7 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
     };
   }
 
-  public async Task<GetResult<Product>> GetFilteredProductsAsync(
+  public async Task<GetProductsResult> GetFilteredProductsAsync(
     FilterProductsQuery filterProductsQuery,
     PaginationParameters paginationParameters
   )
@@ -196,11 +232,19 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
     var criteria = GetFilterByCriteria(filterProductsQuery);
     var result = _context.Products.IncludeEverything().Where(criteria);
 
-    var paginated = await result.Paginate(paginationParameters).ToListAsync();
-
-    return new GetResult<Product>
+    var (minPrice, maxPrice) = (0L, 1000L);
+    var paginated = new List<Product>();
+    if (result != null)
     {
-      TotalItems = result.Count(),
+      (minPrice, maxPrice) = GetMinMaxPrices(result);
+      paginated = await result.Paginate(paginationParameters).ToListAsync();
+    }
+
+    return new GetProductsResult
+    {
+      MinPriceValueInCents = minPrice,
+      MaxPriceValueInCents = maxPrice,
+      TotalItems = result == null ? 0 : result.Count(),
       TotalItemsFetched = paginated.Count(),
       Items = paginated,
     };

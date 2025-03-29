@@ -12,10 +12,12 @@ using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Application.UseCases.Users.Common;
 using Ecommerce.Domain.Common.ValueObjects;
+using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate;
 using Ecommerce.Domain.UserAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using Ecommerce.Infrastructure.Common.Extensions;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +30,14 @@ public class UserRepository(
   private readonly EfCoreContext context = context;
   private readonly IProductRepository productRepository = productRepository;
 
+  public override async Task<User?> GetByIdAsync(UserId id)
+  {
+    return await context
+      .Users.Where(u => u.Id == id)
+      .Include(u => u.ProfileImage)
+      .FirstOrDefaultAsync();
+  }
+
   public async Task<User?> GetByEmailAsync(Email email)
   {
     return await context.Users.FirstOrDefaultAsync(u => u.Email == email);
@@ -38,7 +48,7 @@ public class UserRepository(
     return await context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
   }
 
-  public async Task<CartResult?> GetCartAsync(UserId userId, PaginationParameters pagination)
+  public async Task<CartResult?> GetCartAsync(UserId userId, PaginationParameters? pagination)
   {
     var userWithCartItems = await context
       .Users.Include(u => u.Cart)
@@ -65,11 +75,13 @@ public class UserRepository(
         .AsQueryable()
         .Paginate(pagination)
         .Where(ci => productBulk.ContainsKey(ci.ProductId))
+        .OrderBy(x => x.CreatedAt)
         .Select(ci => new CartItemResult
         {
           Id = ci.Id,
           Product = mapper.Map<ProductResult>(productBulk[ci.ProductId]),
           Quantity = ci.Quantity,
+          Seen = ci.Seen,
         }),
     };
   }
@@ -140,24 +152,34 @@ public class UserRepository(
     return true;
   }
 
-  public async Task<bool> UpdateCartAsync(UserId userId, Dictionary<CartItemId, int> cartItems)
-  {
-    var user = await GetByIdAsync(userId);
-    if (user is null)
-      return false;
+  // public async Task<bool> UpdateCartAsync(
+  //   UserId userId,
+  //   Dictionary<CartItemId, int> cartItems,
+  //   Dictionary<ProductId, Product> productBulk
+  // )
+  // {
+  //   var user = await GetByIdAsync(userId);
+  //   if (user is null)
+  //     return false;
 
-    foreach (var cartItem in user.Cart.Items)
-    {
-      if (cartItems.ContainsKey(cartItem.Id))
-      {
-        cartItem.SetQuantity(cartItems[cartItem.Id]);
-      }
-    }
+  //   foreach (var cartItem in user.Cart.Items)
+  //   {
+  //     if (cartItems.ContainsKey(cartItem.Id))
+  //     {
+  //       if (cartItems[cartItem.Id] <= 0)
+  //       {
+  //         user.Cart.RemoveItems([cartItem.Id]);
+  //         continue;
+  //       }
+  //       if (cartItem[cartItem.Id])
+  //         cartItem.SetQuantity(cartItems[cartItem.Id]);
+  //     }
+  //   }
 
-    Update(user);
+  //   Update(user);
 
-    return true;
-  }
+  //   return true;
+  // }
 
   public async Task<bool> AddToWishlistRangeAsync(UserId userId, List<ProductId> productIds)
   {
