@@ -15,8 +15,7 @@ using MediatR;
 
 namespace Ecommerce.Application.UseCases.Users.Commands.AddToCart;
 
-public class AddToCartCommandHandler
-  : IRequestHandler<AddToCartCommand, Result<List<CartItemResult>>>
+public class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, Result<CartResult>>
 {
   private readonly IUserRepository _userRepository;
   private readonly IUserContextService _userContextService;
@@ -39,7 +38,7 @@ public class AddToCartCommandHandler
     _mapper = mapper;
   }
 
-  public async Task<Result<List<CartItemResult>>> Handle(
+  public async Task<Result<CartResult>> Handle(
     AddToCartCommand command,
     CancellationToken cancellationToken
   )
@@ -86,6 +85,13 @@ public class AddToCartCommandHandler
     // persist to db
     await _unitOfWork.SaveChangesAsync();
 
-    return cartItems.Select(ci => _mapper.Map<CartItemResult>(ci)).ToList();
+    var cart = await _userRepository.GetCartAsync(userIdResult.Value, null);
+
+    if (cart is null)
+    {
+      return NotFoundError.GetResult("cart", "Cart not found");
+    }
+
+    return Result.Ok(cart);
   }
 }
