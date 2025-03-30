@@ -7,6 +7,7 @@ using Ecommerce.Application.Common.Interfaces.Validation;
 using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Application.UseCases.Users.Commands.AddToCart;
+using Ecommerce.Domain.Common.Errors;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate.Entities;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
@@ -63,9 +64,19 @@ public class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, Result<
 
       var productId = ProductId.Convert(productIdGuidResult.Value);
 
-      if (!await _productRepository.AnyAsync(productId))
+      var product = await _productRepository.GetByIdAsync(productId);
+
+      if (product == null)
       {
         return NotFoundError.GetResult(nameof(productId), "Product not found");
+      }
+
+      if (product.SellerId == userIdResult.Value)
+      {
+        return InvalidOperationError.GetResult(
+          nameof(CartItem),
+          "You cannot add you own product to cart."
+        );
       }
 
       var cartItem = CartItem.Create(productId, cartItemCommand.Quantity);

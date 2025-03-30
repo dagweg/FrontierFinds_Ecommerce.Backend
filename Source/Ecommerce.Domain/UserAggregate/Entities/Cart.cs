@@ -82,8 +82,14 @@ public class Cart : Entity<CartId>
       }
       else
       {
-        // Item does not exist in cart, add it
         _items.Add(cartItem);
+        // // Add the item if its not the users own item
+        // if (productBulk[cartItem.ProductId].SellerId != userId)
+        // else
+        //   return InvalidOperationError.GetResult(
+        //     nameof(cartItem.ProductId),
+        //     "You cannot add your own product to cart"
+        //   );
       }
     }
 
