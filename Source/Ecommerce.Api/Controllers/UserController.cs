@@ -62,6 +62,7 @@ public class UserController : ControllerBase
     _logger = logger;
   }
 
+  [AllowAnonymous]
   [HttpGet("{id}")]
   public async Task<IActionResult> GetUserById([FromRoute] [Attributes.Guid] string id)
   {
@@ -75,6 +76,7 @@ public class UserController : ControllerBase
     return Ok(res.Value);
   }
 
+  [AllowAnonymous]
   [HttpGet]
   public async Task<IActionResult> GetAllUsers()
   {

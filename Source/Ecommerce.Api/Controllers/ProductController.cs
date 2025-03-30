@@ -122,6 +122,7 @@ public class ProductController : ControllerBase
     return Ok(result.Value);
   }
 
+  [AllowAnonymous]
   [HttpGet("slug/{slug}")]
   public async Task<IActionResult> GetProductBySlug([FromRoute] string slug)
   {
@@ -134,6 +135,7 @@ public class ProductController : ControllerBase
     return Ok(result.Value);
   }
 
+  [AllowAnonymous]
   [HttpGet("slug/{slug}/reviews")]
   public async Task<IActionResult> GetProductReviews(
     [FromRoute] string slug,
