@@ -35,7 +35,6 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
       o => o.Total,
       tb =>
       {
-        tb.Property(t => t.Value).HasColumnName("TotalPrice").IsRequired();
         tb.Property(p => p.Currency)
           .HasColumnName("Currency")
           .IsRequired()

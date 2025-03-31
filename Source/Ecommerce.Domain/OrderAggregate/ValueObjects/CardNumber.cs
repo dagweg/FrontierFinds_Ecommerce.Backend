@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Ecommerce.Domain.Common.Errors;
@@ -6,10 +7,13 @@ using FluentResults;
 
 public sealed record CardNumber
 {
+  [NotMapped]
+  private string _last4Digits = string.Empty;
+
   public string Last4Digits
   {
-    get => this.ToString();
-    init => Last4Digits = value;
+    get => _last4Digits;
+    init => _last4Digits = value;
   }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.

@@ -6,27 +6,28 @@ namespace Ecommerce.Domain.OrderAggregate.ValueObjects;
 
 public sealed class OrderTotal : ValueObject
 {
-  public decimal Value { get; set; }
+  public long ValueTotalInCents { get; set; }
   public Currency Currency { get; set; }
 
   public static OrderTotal Empty => new(0, Price.BASE_CURRENCY);
 
-  private OrderTotal(decimal value, Currency currency)
+  private OrderTotal(long valueTotalInCents, Currency currency)
   {
-    Value = value;
+    ValueTotalInCents = valueTotalInCents;
     Currency = currency;
   }
 
-  public static OrderTotal Create(decimal value, Currency currency)
+  public static OrderTotal Create(long valueTotalInCents, Currency currency)
   {
-    return new(value, currency);
+    return new(valueTotalInCents, currency);
   }
 
-  public static implicit operator decimal(OrderTotal total) => total.Value;
+  public static implicit operator decimal(OrderTotal total) => total.ValueTotalInCents;
 
   public override IEnumerable<object> GetEqualityComponents()
   {
-    yield return Value;
+    yield return ValueTotalInCents;
+    yield return Currency;
   }
 
   private OrderTotal() { }

@@ -9,7 +9,7 @@ namespace Ecommerce.Domain.OrderAggregate;
 
 public sealed class Order : AggregateRoot<OrderId>
 {
-  public UserId UserId { get; set; } = UserId.Empty;
+  public UserId UserId { get; set; }
   public OrderTotal Total { get; set; }
   public ShippingAddress ShippingAddress { get; set; }
   public BillingAddress BillingAddress { get; set; }
@@ -20,6 +20,7 @@ public sealed class Order : AggregateRoot<OrderId>
   public DateTime OrderDate { get; set; }
 
   private Order(
+    UserId ordererId,
     OrderId orderId,
     List<OrderItem> orderItems,
     OrderTotal total,
@@ -29,6 +30,7 @@ public sealed class Order : AggregateRoot<OrderId>
   )
     : base(orderId)
   {
+    UserId = ordererId;
     Total = total;
     ShippingAddress = shippingAddress;
     BillingAddress = billingAddress;
@@ -38,6 +40,7 @@ public sealed class Order : AggregateRoot<OrderId>
   }
 
   public static Order Create(
+    UserId ordererId,
     List<OrderItem> orderItems,
     OrderTotal total,
     ShippingAddress shippingAddress,
@@ -45,6 +48,7 @@ public sealed class Order : AggregateRoot<OrderId>
   )
   {
     Order order = new(
+      ordererId,
       OrderId.CreateUnique(),
       orderItems,
       total,

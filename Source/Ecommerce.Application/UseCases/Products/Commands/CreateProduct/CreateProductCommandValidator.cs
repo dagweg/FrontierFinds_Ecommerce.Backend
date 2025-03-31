@@ -1,5 +1,6 @@
 using Ecommerce.Application.Common.Interfaces.Processors;
 using Ecommerce.Application.UseCases.Images.CreateImage;
+using Ecommerce.Domain.Common.Enums;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
 using FluentValidation;
@@ -29,7 +30,13 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
 
     RuleFor(x => x.PriceValueInCents).NotEmpty().GreaterThan(0);
 
-    RuleFor(x => x.PriceCurrency).NotEmpty().MaximumLength(3);
+    RuleFor(x => x.PriceCurrency)
+      .NotEmpty()
+      .MaximumLength(3)
+      .Must(x => Enum.TryParse<Currency>(x, out _))
+      .WithMessage(
+        $"Invalid currency, supported currencies are: {string.Join(", ", Enum.GetNames<Currency>().Skip(1))}"
+      );
 
     RuleFor(x => x.Thumbnail)
       .SetValidator(x => CreateImageCommandValidator.GetValidator(imageProcessor));

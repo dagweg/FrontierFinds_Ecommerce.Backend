@@ -69,6 +69,7 @@ public class FluentResultsActionFilter : IActionFilter
           problemDetails.Status = status;
         }
 
+        LogPretty.Log(problemDetails);
         context.Result = new ObjectResult(problemDetails) { StatusCode = problemDetails.Status };
       }
       else

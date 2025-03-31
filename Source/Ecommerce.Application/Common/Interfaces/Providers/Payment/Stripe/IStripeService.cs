@@ -19,6 +19,12 @@ public record CheckoutSessionRequest
   public required PaymentMode paymentMode { get; init; }
 }
 
-public record OrderItemCheckout(string productName, int quantity, long amountInCents);
+public record OrderItemCheckout(
+  string productName,
+  string productDescription,
+  IEnumerable<string> productImages,
+  int quantity,
+  long amountInCents
+);
 
 public record CreateCheckoutSessionResult(string sessionId, string redirectUrl);

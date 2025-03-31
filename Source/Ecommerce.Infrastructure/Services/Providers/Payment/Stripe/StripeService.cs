@@ -1,4 +1,5 @@
 using Ecommerce.Application.Common.Interfaces.Providers.Payment.Stripe;
+using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Domain.PaymentAggregate.Enums;
 using Ecommerce.Infrastructure.Common;
 using FluentResults;
@@ -18,10 +19,10 @@ public class StripeService(
     CheckoutSessionRequest request
   )
   {
-    var successUrl = clientSettings.Value.ClientBaseUrl + "/payment/checkout/success";
-    var cancelUrl = clientSettings.Value.ClientBaseUrl + "/payment/checkout/cancel";
+    var successUrl = clientSettings.Value.ClientBaseUrl + "/checkout/success";
+    var cancelUrl = clientSettings.Value.ClientBaseUrl + "/checkout/cancel";
 
-    StripeConfiguration.ApiKey = paymentOptions.Value.StripeOptions.SecretKey;
+    StripeConfiguration.ApiKey = paymentOptions.Value.StripeSettings.SecretKey;
 
     var paymentMethodTypes = new HashSet<string> { "card" };
 
@@ -39,6 +40,8 @@ public class StripeService(
             ProductData = new SessionLineItemPriceDataProductDataOptions
             {
               Name = item.productName,
+              Description = $"{item.productDescription.Substring(0, 50)}...",
+              Images = item.productImages.ToList(),
             },
             UnitAmount = item.amountInCents, // TODO: get from request (the currecy) and use exchange rate to evaluate the price
           },
@@ -52,6 +55,9 @@ public class StripeService(
 
     var service = new SessionService();
     var session = await service.CreateAsync(options);
+
+    Console.WriteLine("Stripe Session");
+    // LogPretty.Log(session);
 
     return new CreateCheckoutSessionResult(session.Id, session.Url);
   }

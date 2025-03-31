@@ -12,7 +12,7 @@ public sealed class Price : ValueObject
 
   public static Price Empty => new(0);
 
-  public const Currency BASE_CURRENCY = Currency.ETB;
+  public const Currency BASE_CURRENCY = Currency.USD;
 
   private Price() { }
 

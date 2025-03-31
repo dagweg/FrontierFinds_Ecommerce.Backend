@@ -4,5 +4,4 @@ public enum Currency
 {
   None,
   USD,
-  ETB,
 }

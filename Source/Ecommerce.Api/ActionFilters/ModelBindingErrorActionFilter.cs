@@ -1,3 +1,4 @@
+using Ecommerce.Application.Common.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -28,6 +29,7 @@ public class ModelBindingErrorActionFilter : IActionFilter
         Extensions = { ["errors"] = errors },
       };
 
+      LogPretty.Log(errors);
       context.Result = new JsonResult(response) { StatusCode = StatusCodes.Status400BadRequest };
     }
   }
