@@ -40,7 +40,7 @@ public class StripeService(
             ProductData = new SessionLineItemPriceDataProductDataOptions
             {
               Name = item.productName,
-              Description = $"{item.productDescription.Substring(0, 50)}...",
+              Description = $"{string.Join("", item.productDescription.Take(50))}...",
               Images = item.productImages.ToList(),
             },
             UnitAmount = item.amountInCents, // TODO: get from request (the currecy) and use exchange rate to evaluate the price
