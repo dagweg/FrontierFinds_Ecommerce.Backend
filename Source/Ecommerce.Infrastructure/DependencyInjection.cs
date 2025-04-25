@@ -13,6 +13,7 @@ using Ecommerce.Application.Common.Interfaces.Providers.Date;
 using Ecommerce.Application.Common.Interfaces.Providers.Forex;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
 using Ecommerce.Application.Common.Interfaces.Providers.Payment.Stripe;
+using Ecommerce.Application.Common.Interfaces.Providers.Search.Elastic;
 using Ecommerce.Application.Common.Interfaces.Storage;
 using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.Services.Storage;
@@ -30,8 +31,10 @@ using Ecommerce.Infrastructure.Services.Processors;
 using Ecommerce.Infrastructure.Services.Providers.Forex;
 using Ecommerce.Infrastructure.Services.Providers.Payment;
 using Ecommerce.Infrastructure.Services.Providers.Payment.Stripe;
+using Ecommerce.Infrastructure.Services.Providers.Search.Elastic;
 using Ecommerce.Infrastructure.Services.Providers.Smtp;
 using Ecommerce.Infrastructure.Services.Storage;
+using Elastic.Clients.Elasticsearch;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -79,6 +82,8 @@ public static class DependencyInjection
 
     // stripe, paypal .. etc
     services.AddPaymentGateways();
+
+    services.AddElastic(configuration);
 
     return services;
   }
@@ -249,6 +254,8 @@ public static class DependencyInjection
     IConfigurationManager configuration
   )
   {
+    services.Configure<ElasticSettings>(configuration.GetSection(ElasticSettings.SectionName));
+
     services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SectionName));
 
     services.Configure<PaymentOptions>(configuration.GetSection(PaymentOptions.SectionName));
@@ -300,7 +307,7 @@ public static class DependencyInjection
   {
     services.AddScoped<ISmtpClientWrapper>(sp =>
     {
-      string? host = configuration.GetConnectionString($"{EmailSettings.SectionName}:Host");
+      string? host = configuration[$"{EmailSettings.SectionName}:Host"];
 
       if (host is null)
       {
@@ -315,6 +322,25 @@ public static class DependencyInjection
   public static IServiceCollection AddPaymentGateways(this IServiceCollection services)
   {
     services.AddTransient<IStripeService, StripeService>();
+    return services;
+  }
+
+  public static IServiceCollection AddElastic(
+    this IServiceCollection services,
+    IConfigurationManager configuration
+  )
+  {
+    var elasticUri = configuration[$"{ElasticSettings.SectionName}:ConnectionString"];
+    if (elasticUri == null)
+    {
+      throw new Exception("Elastic Connection String is null.");
+    }
+
+    var elasticClient = new ElasticsearchClient(new Uri(elasticUri));
+
+    services.AddSingleton(elasticClient);
+    services.AddScoped(typeof(IElasticSearch<>), typeof(ElasticSearch<>));
+
     return services;
   }
 }
