@@ -78,6 +78,19 @@ Incase you get unexpected errors like `codeananlysis error` please use the scrip
 .\Scripts\cbf # Clean Build Files
 ```
 
-## License
 
-MIT
+# License
+
+This repository is licensed under the **Creative Commons Attribution-NonCommercial 4.0 International License**.
+
+You are free to:
+- Share: Copy and redistribute the material in any medium or format.
+- Adapt: Remix, transform, and build upon the material for non-commercial purposes.
+
+Under the following terms:
+- Attribution: You must give appropriate credit, provide a link to the license, and indicate if changes were made.
+- Non-Commercial: You may not use the material for commercial purposes.
+- No additional restrictions: You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+Full text: https://creativecommons.org/licenses/by-nc/4.0/
+
