@@ -3,8 +3,10 @@ using Ecommerce.Application.Common.Errors;
 using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Providers.Context;
+using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.Services.Workers;
+using Ecommerce.Application.Services.Workers.Cloudinary;
 using Ecommerce.Application.UseCases.Products.Commands.DeleteProduct;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using FluentResults;
@@ -55,26 +57,33 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand,
         return productIdsR.ToResult();
 
       // Use ExecuteTransactionAsync to wrap the entire operation
+      Result<DeleteResult>? deleteResult = null;
       await _unitOfWork.ExecuteTransactionAsync(
         async () =>
         {
-          var deleteResult = await _productRepository.BulkDeleteByIdAsync(productIdsR.Value);
+          deleteResult = await _productRepository.BulkDeleteByIdAsync(productIdsR.Value);
 
-          if (deleteResult.CleanupObjectIds.Any())
+          if (deleteResult.IsFailed)
+            return 1;
+
+          if (deleteResult.Value.CleanupObjectIds.Any())
           {
             await _publisher.Publish(
               new CloudinaryTaskNotification
               {
                 CloudinaryAction = CloudinaryAction.Delete,
-                ObjectIds = deleteResult.CleanupObjectIds.ToList(),
+                ObjectIds = deleteResult.Value.CleanupObjectIds.ToList(),
               },
               cancellationToken
             );
           }
-          return 1; // Return a dummy value, as we are interested in Result.Ok()
+          return 0; // Return a dummy value, as we are interested in Result.Ok()
         },
         cancellationToken
       );
+
+      if (deleteResult != null && deleteResult.IsFailed)
+        return deleteResult.ToResult();
 
       return Result.Ok(); // Operation successful
     }
