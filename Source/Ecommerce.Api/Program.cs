@@ -59,10 +59,9 @@ public class Program
         builder.Services.AddSwaggerGen();
 
         builder
-          .Services.ConfigureAutomapper()
-          .AddApi()
+          .Services.AddInfrastructure(builder.Configuration)
           .AddApplication(builder.Configuration)
-          .AddInfrastructure(builder.Configuration);
+          .AddApi();
       }
 
       var app = builder.Build();
@@ -86,9 +85,9 @@ public class Program
 
         app.MapControllers();
 
-        await MigrateDatabase(app, logger); // **Pass logger**
+        // await MigrateDatabase(app, logger); // **Pass logger**
 
-        await SeedDatabase(app, logger); // **Pass logger**
+        // await SeedDatabase(app, logger); // **Pass logger**
 
         app.Run();
       }

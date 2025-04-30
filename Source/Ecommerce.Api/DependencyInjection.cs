@@ -15,6 +15,13 @@ public static class DependencyInjection
   {
     services.AddExceptionHandlers();
 
+    services.AddAutoMapper(
+      (cfg) =>
+      {
+        cfg.AddMaps(typeof(Api.DependencyInjection).Assembly);
+      }
+    );
+
     services.AddControllers(options =>
     {
       // Register global action filters
