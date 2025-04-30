@@ -1,15 +1,16 @@
 using Ecommerce.Application.Common.Models.Search.Elastic;
+using Ecommerce.Application.Common.Models.Search.Elastic.Documents;
 
 namespace Ecommerce.Application.Common.Interfaces.Providers.Search.Elastic;
 
-public interface IElasticSearch<TDocument>
-  where TDocument : class
+public interface IElasticSearch
 {
-  Task<bool> IndexAsync(
+  Task<bool> IndexAsync<TDocument>(
     string indexName,
     TDocument document,
     CancellationToken cancellationToken = default
-  );
+  )
+    where TDocument : ElasticDocumentBase;
   Task<bool> DeleteAsync(
     string indexName,
     string id,
@@ -18,16 +19,17 @@ public interface IElasticSearch<TDocument>
   Task<bool> UpdateAsync(
     string indexName,
     string id,
-    TDocument document,
+    ElasticDocumentBase document,
     CancellationToken cancellationToken = default
   );
-  Task<TDocument?> GetAsync(
+  Task<ElasticDocumentBase?> GetAsync(
     string indexName,
     string id,
     CancellationToken cancellationToken = default
   );
-  Task<IEnumerable<TDocument>> SearchAsync(
+  Task<IEnumerable<TDocument>> SearchAsync<TDocument>(
     ElasticSearchFilterParams searchParams,
     CancellationToken cancellationToken = default
-  );
+  )
+    where TDocument : ElasticDocumentBase;
 }
