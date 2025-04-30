@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using Ecommerce.Application.Common.Models;
+using Ecommerce.Application.Common.Models.Enums;
 using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.UseCases.Images.Queries.GetSupportedImageMimes;
 using Ecommerce.Application.UseCases.Products.Commands.CreateReview;
@@ -15,6 +16,7 @@ using Ecommerce.Application.UseCases.Users.Commands.AddToCart;
 using Ecommerce.Contracts.Cart;
 using Ecommerce.Contracts.Common;
 using Ecommerce.Contracts.Product;
+using Elastic.Clients.Elasticsearch.Nodes;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -106,7 +108,7 @@ public class ProductController : ControllerBase
     LogPretty.Log(filterBy);
     var result = await _mediator.Send(
       filterBy == null
-        ? new FilterProductsQuery { PaginationParameters = paginationParams }
+        ? new FilterProductsQuery() { PaginationParameters = paginationParams }
         : filterBy with
         {
           PaginationParameters = paginationParams,
@@ -119,6 +121,8 @@ public class ProductController : ControllerBase
       return new ObjectResult(result);
     }
     LogPretty.Log(result.Value);
+    Response.Headers.Add("X-Data-Source", result.Value.DataSourceType.ToString());
+    Response.Headers.Add("X-Data-SourceId", result.Value.DataSourceId.ToString());
     return Ok(result.Value);
   }
 
