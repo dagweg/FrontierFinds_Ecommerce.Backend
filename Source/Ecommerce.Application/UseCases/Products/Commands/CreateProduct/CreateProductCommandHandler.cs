@@ -1,14 +1,18 @@
 using AutoMapper;
 using Ecommerce.Application.Behaviors.Strategies.ProductImageStrategies;
+using Ecommerce.Application.Common.Defaults;
 using Ecommerce.Application.Common.Errors;
 using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Providers.Context;
 using Ecommerce.Application.Common.Interfaces.Providers.Forex;
+using Ecommerce.Application.Common.Interfaces.Providers.Search.Elastic;
 using Ecommerce.Application.Common.Interfaces.Storage;
+using Ecommerce.Application.Common.Models.Search.Elastic.Documents;
 using Ecommerce.Application.Common.Models.Storage;
 using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.Services.Utilities;
+using Ecommerce.Application.Services.Workers.Elastic;
 using Ecommerce.Application.UseCases.Images.Common;
 using Ecommerce.Application.UseCases.Images.CreateImage;
 using Ecommerce.Application.UseCases.Products.Common;
@@ -32,11 +36,13 @@ public class CreateProductCommandHandler
   private readonly IProductRepository _productRepository;
   private readonly IUnitOfWork _unitOfWork;
   private readonly IUserContextService _userContextService;
-  private readonly IMediator _sender;
+  private readonly ISender _sender;
+  private readonly IPublisher _publisher;
   private readonly ILogger<CreateProductCommandHandler> _logger;
   private readonly IForexSerivce _forexService;
   private readonly ISlugService<ProductId> _slugService;
   private readonly IProductImageStrategyResolver _productImageStrategyResolver;
+  private readonly IElasticSearch _elastic;
 
   public CreateProductCommandHandler(
     IMapper mapper,
@@ -44,10 +50,12 @@ public class CreateProductCommandHandler
     ISlugService<ProductId> slugService,
     IUnitOfWork unitOfWork,
     IUserContextService userContextService,
-    IMediator sender,
+    ISender sender,
+    IPublisher publisher,
     ILogger<CreateProductCommandHandler> logger,
     IForexSerivce forexService,
-    IProductImageStrategyResolver productImageStrategyResolver
+    IProductImageStrategyResolver productImageStrategyResolver,
+    IElasticSearch elastic
   )
   {
     _mapper = mapper;
@@ -56,9 +64,11 @@ public class CreateProductCommandHandler
     _slugService = slugService;
     _userContextService = userContextService;
     _sender = sender;
+    _publisher = publisher;
     _logger = logger;
     _forexService = forexService;
     _productImageStrategyResolver = productImageStrategyResolver;
+    _elastic = elastic;
   }
 
   public async Task<Result<ProductResult>> Handle(
@@ -156,9 +166,22 @@ public class CreateProductCommandHandler
       .WithCategories(categories.ToList())
       .WithTags(tags.ToList());
 
+    // Add the product to the repository
     await _productRepository.AddAsync(product);
 
     await _unitOfWork.SaveChangesAsync();
+
+    // publish elastic search indexing task to background task queue
+    await _publisher.Publish(
+      new ElasticTaskNotification()
+      {
+        ElasticAction = ElasticAction.Index,
+        IndexDocs = new Dictionary<string, ElasticDocumentBase>
+        {
+          { ElasticIndices.ProductIndex, _mapper.Map<ProductDocument>(product) },
+        },
+      }
+    );
 
     return Result.Ok(_mapper.Map<ProductResult>(product));
   }
