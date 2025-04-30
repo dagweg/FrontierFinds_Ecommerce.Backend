@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Ecommerce.Application.Common.Errors;
 using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Models;
@@ -11,9 +12,12 @@ using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
 using Ecommerce.Infrastructure.Common.Extensions;
+using Elastic.Clients.Elasticsearch;
+using FluentResults;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace Ecommerce.Infrastructure.Persistence.EfCore.Repositories;
 
@@ -31,7 +35,9 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
 
   public new async Task<GetProductsResult> GetAllAsync(PaginationParameters paginationParameters)
   {
-    return await GetFilteredProductsAsync(new FilterProductsQuery(), paginationParameters);
+    return await GetFilteredProductsAsync(
+      new FilterProductsQuery { PaginationParameters = paginationParameters }
+    );
   }
 
   public (long, long) GetMinMaxPrices(IQueryable<Product> product)
@@ -64,8 +70,8 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
   {
     return prod =>
       (
-        filterProductsQuery.Name == null
-        || prod.Name.Value.ToLower().Contains(filterProductsQuery.Name.ToLower().Trim())
+        filterProductsQuery.SearchTerm == null
+        || prod.Name.Value.ToLower().Contains(filterProductsQuery.SearchTerm.ToLower().Trim())
       )
       && (
         filterProductsQuery.MinPriceValueInCents == null
@@ -82,41 +88,63 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
       );
   }
 
-  public async Task<DeleteResult> BulkDeleteByIdAsync(IEnumerable<ProductId> productIds)
+  public async Task<FluentResults.Result<DeleteResult>> BulkDeleteByIdAsync(
+    IEnumerable<ProductId> productIds
+  )
   {
-    var products = await _context
-      .Products.Where(p => productIds.Contains(p.Id))
-      .IncludeEverything()
-      .ToListAsync(); //Important to await and get the list.
-
-    List<string> cleanupObjectIds = new List<string>();
-
-    // to delegate the task of external resource deletion to the providers later
-    foreach (var product in products)
+    try
     {
-      cleanupObjectIds.AddRange(
-        new[]
-        {
-          product.Images?.Thumbnail?.ObjectIdentifier,
-          product.Images?.LeftImage?.ObjectIdentifier,
-          product.Images?.RightImage?.ObjectIdentifier,
-          product.Images?.TopImage?.ObjectIdentifier,
-          product.Images?.BackImage?.ObjectIdentifier,
-          product.Images?.BottomImage?.ObjectIdentifier,
-          product.Images?.FrontImage?.ObjectIdentifier,
-        }.Where(objectId => objectId != null)!
+      var products = await _context
+        .Products.Where(p => productIds.Contains(p.Id))
+        .IncludeEverything()
+        .ToListAsync(); //Important to await and get the list.
+
+      if (!products.Any())
+        return new DeleteResult { CleanupObjectIds = [], TotalItemsDeleted = 0 };
+
+      List<string> cleanupObjectIds = new List<string>();
+
+      // to delegate the task of external resource deletion to the providers later
+      foreach (var product in products)
+      {
+        cleanupObjectIds.AddRange(
+          new[]
+          {
+            product.Images?.Thumbnail?.ObjectIdentifier,
+            product.Images?.LeftImage?.ObjectIdentifier,
+            product.Images?.RightImage?.ObjectIdentifier,
+            product.Images?.TopImage?.ObjectIdentifier,
+            product.Images?.BackImage?.ObjectIdentifier,
+            product.Images?.BottomImage?.ObjectIdentifier,
+            product.Images?.FrontImage?.ObjectIdentifier,
+          }.Where(objectId => objectId != null)!
+        );
+      }
+
+      var deletionResult = await _context
+        .Products.Where(p => productIds.Contains(p.Id))
+        .ExecuteDeleteAsync();
+
+      return FluentResults.Result.Ok(
+        new DeleteResult { CleanupObjectIds = cleanupObjectIds, TotalItemsDeleted = deletionResult }
       );
     }
-
-    var deletionResult = await _context
-      .Products.Where(p => productIds.Contains(p.Id))
-      .ExecuteDeleteAsync();
-
-    return new DeleteResult
+    catch (PostgresException pgEx)
+      when (pgEx.SqlState == PostgresErrorCodes.ForeignKeyViolation
+        && pgEx.ConstraintName == "FK_OrderItems_Products_ProductId"
+      )
     {
-      CleanupObjectIds = cleanupObjectIds,
-      TotalItemsDeleted = deletionResult,
-    };
+      pgEx.ToString().Dump();
+      return ForbiddenError.GetResult(
+        "Products.Delete",
+        "There are orders made for this product and for that reason you are not allowed to delete it at the moment."
+      );
+    }
+    catch (Exception e)
+    {
+      e.Message.Dump();
+      return InternalError.GetResult("An internal server error occured trying to delete a product");
+    }
   }
 
   public async Task<IDictionary<ProductId, Product>> BulkGetByIdAsync(
@@ -225,8 +253,7 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
   }
 
   public async Task<GetProductsResult> GetFilteredProductsAsync(
-    FilterProductsQuery filterProductsQuery,
-    PaginationParameters paginationParameters
+    FilterProductsQuery filterProductsQuery
   )
   {
     var criteria = GetFilterByCriteria(filterProductsQuery);
@@ -237,7 +264,7 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
     if (result != null)
     {
       (minPrice, maxPrice) = GetMinMaxPrices(result);
-      paginated = await result.Paginate(paginationParameters).ToListAsync();
+      paginated = await result.Paginate(filterProductsQuery.PaginationParameters).ToListAsync();
     }
 
     return new GetProductsResult
@@ -351,5 +378,10 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
     }
 
     return Task.CompletedTask;
+  }
+
+  public async Task<int> CountProducts()
+  {
+    return await _context.Products.CountAsync();
   }
 }
