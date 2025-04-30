@@ -1,15 +1,18 @@
+using System.Runtime.CompilerServices;
 using AutoMapper;
 using Ecommerce.Application.Common.Defaults;
 using Ecommerce.Application.Common.Errors;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Providers.Search.Elastic;
 using Ecommerce.Application.Common.Models;
+using Ecommerce.Application.Common.Models.Enums;
 using Ecommerce.Application.Common.Models.Search.Elastic;
 using Ecommerce.Application.Common.Models.Search.Elastic.Documents;
 using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using FluentResults;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Ecommerce.Application.UseCases.Products.Queries.GetFilteredProducts;
 
@@ -17,18 +20,21 @@ public class GetFilteredProductsQueryHandler
   : IRequestHandler<FilterProductsQuery, Result<ProductsResult>>
 {
   private readonly IProductRepository _productRepository;
-  private readonly IElasticSearch<ProductDocument> _elasticSearch;
+  private readonly IElasticSearch _elasticSearch;
   private readonly IMapper _mapper;
+  private readonly ILogger<GetFilteredProductsQueryHandler> _logger;
 
   public GetFilteredProductsQueryHandler(
     IProductRepository productRepository,
     IMapper mapper,
-    IElasticSearch<ProductDocument> elasticSearch
+    IElasticSearch elasticSearch,
+    ILogger<GetFilteredProductsQueryHandler> logger
   )
   {
     _elasticSearch = elasticSearch;
     _productRepository = productRepository;
     _mapper = mapper;
+    _logger = logger;
   }
 
   public async Task<Result<ProductsResult>> Handle(
@@ -36,39 +42,38 @@ public class GetFilteredProductsQueryHandler
     CancellationToken cancellationToken
   )
   {
-    var productsFromElastic = await _elasticSearch.SearchAsync(
-      new ElasticSearchFilterParams() { Index = ElasticIndices.ProductIndex }
+    var productsFromElastic = await _elasticSearch.SearchAsync<ProductDocument>(
+      new ElasticSearchFilterParams()
+      {
+        Index = ElasticIndices.ProductIndex,
+        SearchTerm = request.SearchTerm,
+        MaxPriceValueInCents = request.MaxPriceValueInCents,
+        MinPriceValueInCents = request.MinPriceValueInCents,
+        Pagination = request.PaginationParameters,
+        SortBy = request.SortBy,
+      }
     );
 
-    GetProductsResult products;
-
-    if (productsFromElastic is null || !productsFromElastic.Any()) // If nothing found in elastic search fallback to db search
+    if (productsFromElastic.Any()) // If elastic returns indexed items, return those
     {
-      Console.WriteLine("No products found in ElasticSearch, falling back to DB search.");
-      products = await _productRepository.GetFilteredProductsAsync(
-        request,
-        request.PaginationParameters ?? new PaginationParameters()
-      );
-    }
-    else // If found in elastic search, use that data
-    {
-      Console.WriteLine("Products found in ElasticSearch, using that data.");
-      var productsFromDb = await _productRepository.BulkGetByIdAsync(
-        productsFromElastic.Select(p => ProductId.Convert(Guid.Parse(p.Id))).ToList()
-      );
-
-      products = new GetProductsResult()
+      return new ProductsResult
       {
+        DataSourceId = Guid.NewGuid().ToString(), // TODO: replace with acutal id of the data source
+        DataSourceType = DataSourceType_Debug.Elastic,
         MinPriceValueInCents = productsFromElastic.Min(p => p.PriceValueInCents),
         MaxPriceValueInCents = productsFromElastic.Max(p => p.PriceValueInCents),
-        Items = productsFromDb.Values,
-        TotalItems = productsFromElastic.Count(),
-        TotalItemsFetched = productsFromElastic.Count(),
+        Products = productsFromElastic.Select(p => _mapper.Map<ProductResult>(p)),
+        TotalCount = await _productRepository.CountProducts(),
+        TotalFetchedCount = productsFromElastic.Count(),
       };
     }
 
+    _logger.LogInformation("No products found in ElasticSearch, falling back to DB search.");
+    GetProductsResult products = await _productRepository.GetFilteredProductsAsync(request);
+
     return new ProductsResult
     {
+      DataSourceType = DataSourceType_Debug.Db,
       MinPriceValueInCents = products.MinPriceValueInCents,
       MaxPriceValueInCents = products.MaxPriceValueInCents,
       Products = products.Items.Select(p => _mapper.Map<ProductResult>(p)),
