@@ -201,17 +201,47 @@ public class ElasticSearch : IElasticSearch
 
   private Query BuildElasticQuery(ElasticSearchFilterParams filterParams)
   {
-    List<Query> mustQueries = [];
+    var mustQueries = new List<Query>();
 
-    if (filterParams.SearchTerm is not null)
+    if (!string.IsNullOrWhiteSpace(filterParams.SearchTerm))
+    {
+      var searchTerm = filterParams.SearchTerm.ToLowerInvariant(); // Normalize to lowercase
+
+      // Multi-match query for robust text search
       mustQueries.Add(
-        new MatchQuery(new Field(nameof(ProductDocument.Name).PascalToCamelCase()))
+        new MultiMatchQuery
         {
-          Query = filterParams.SearchTerm,
+          Fields = new[]
+          {
+            $"{nameof(ProductDocument.Name).PascalToCamelCase()}^2", // Boost Name
+            nameof(ProductDocument.Description).PascalToCamelCase(),
+          },
+          Query = searchTerm,
+          Type = TextQueryType.BestFields,
+          Fuzziness = new Fuzziness(1),
+          Operator = Operator.Or, // Match any term
+          Analyzer = "standard", // Ensure tokenization and lowercase
         }
       );
 
-    return mustQueries.Any() ? new BoolQuery { Must = mustQueries } : new MatchAllQuery();
+      // Wildcard query for partial matches
+      mustQueries.Add(
+        new WildcardQuery(new Field(nameof(ProductDocument.Name).PascalToCamelCase()))
+        {
+          Wildcard = $"*{searchTerm.Replace(" ", "*")}*",
+          CaseInsensitive = true,
+        }
+      );
+    }
+
+    // Combine queries with BoolQuery
+    return mustQueries.Any()
+      ? new BoolQuery
+      {
+        Should = mustQueries,
+        MinimumShouldMatch = 1, // At least one condition must match
+      }
+      : new MatchAllQuery();
   }
 
   public async Task<bool> UpdateAsync(

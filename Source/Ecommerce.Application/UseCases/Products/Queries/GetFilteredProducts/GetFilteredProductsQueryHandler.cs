@@ -8,6 +8,7 @@ using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.Common.Models.Enums;
 using Ecommerce.Application.Common.Models.Search.Elastic;
 using Ecommerce.Application.Common.Models.Search.Elastic.Documents;
+using Ecommerce.Application.Services.Workers.Elastic;
 using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using FluentResults;
@@ -23,18 +24,21 @@ public class GetFilteredProductsQueryHandler
   private readonly IElasticSearch _elasticSearch;
   private readonly IMapper _mapper;
   private readonly ILogger<GetFilteredProductsQueryHandler> _logger;
+  private readonly IPublisher _publisher;
 
   public GetFilteredProductsQueryHandler(
     IProductRepository productRepository,
     IMapper mapper,
     IElasticSearch elasticSearch,
-    ILogger<GetFilteredProductsQueryHandler> logger
+    ILogger<GetFilteredProductsQueryHandler> logger,
+    IPublisher publisher
   )
   {
     _elasticSearch = elasticSearch;
     _productRepository = productRepository;
     _mapper = mapper;
     _logger = logger;
+    _publisher = publisher;
   }
 
   public async Task<Result<ProductsResult>> Handle(
@@ -70,6 +74,18 @@ public class GetFilteredProductsQueryHandler
 
     _logger.LogInformation("No products found in ElasticSearch, falling back to DB search.");
     GetProductsResult products = await _productRepository.GetFilteredProductsAsync(request);
+
+    // Index the products in ElasticSearch for future searches
+    await _publisher.Publish(
+      new ElasticTaskNotification()
+      {
+        ElasticAction = ElasticAction.Index,
+        IndexDocs = products.Items.ToDictionary(
+          k => ElasticIndices.ProductIndex,
+          v => (ElasticDocumentBase)_mapper.Map<ProductDocument>(v)
+        ),
+      }
+    );
 
     return new ProductsResult
     {
