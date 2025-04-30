@@ -79,11 +79,11 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
         b.HasOne(x => x.Product)
           .WithMany()
           .HasForeignKey(pc => pc.ProductId)
-          .OnDelete(DeleteBehavior.ClientCascade);
+          .OnDelete(DeleteBehavior.Cascade);
         b.HasOne(x => x.Category)
           .WithMany()
           .HasForeignKey(pc => pc.CategoryId)
-          .OnDelete(DeleteBehavior.Cascade);
+          .OnDelete(DeleteBehavior.ClientCascade);
       });
 
     // configure tags one-to-many owned relationship

@@ -167,7 +167,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
               cib.HasOne<Product>()
                 .WithMany()
                 .HasForeignKey("ProductId")
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
             }
           );
 
