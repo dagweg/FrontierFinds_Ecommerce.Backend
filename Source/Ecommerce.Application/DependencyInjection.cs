@@ -23,12 +23,18 @@ public static class DependencyInjection
     IConfiguration configuration
   )
   {
+    services.AddAutoMapper(cfg =>
+    {
+      cfg.AddMaps(ApplicationAssembly.Assembly);
+    });
+
+    services.AddHostedService<QueuedHostedService>(); // background service that continually runs background tasks pushed into the backgroundtaskqueue
+    services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>(); // used by notification handlers to queue tasks
+
     // Load EmailSettings Configuration from appsettings.json
     services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
 
     services.AddTransient<ISlugService<ProductId>, ProductSlugService>();
-
-    services.AddMediatR(ApplicationAssembly.Assembly);
 
     services.AddBehaviors();
 
@@ -38,17 +44,7 @@ public static class DependencyInjection
     services.AddScoped<IUserValidationService, UserValidationService>();
     services.AddScoped<IProductValidationService, ProductValidationService>();
 
-    services.AddHostedService<QueuedHostedService>();
-    services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-
-    return services;
-  }
-
-  private static IServiceCollection AddMediatRBehaviors(this IServiceCollection services)
-  {
-    // Register MediatR Pipeline Behaviors
-    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CompensationBehavior<,>));
+    services.AddMediatR(ApplicationAssembly.Assembly);
 
     return services;
   }
@@ -58,6 +54,15 @@ public static class DependencyInjection
     services.AddMediatRBehaviors();
 
     services.AddSingleton<IProductImageStrategyResolver, ProductImageStrategyResolver>();
+
+    return services;
+  }
+
+  private static IServiceCollection AddMediatRBehaviors(this IServiceCollection services)
+  {
+    // Register MediatR Pipeline Behaviors
+    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CompensationBehavior<,>));
 
     return services;
   }
