@@ -9,7 +9,7 @@ public sealed class Promotion : Entity<Guid>
   public int DiscountPercentage { get; init; }
   public DateTime StartDate { get; init; }
   public DateTime EndDate { get; init; }
-
+  public bool IsActive => StartDate <= DateTime.UtcNow && EndDate >= DateTime.UtcNow;
   private const int MIN_DISCOUNT_PERCENTAGE = 0;
   private const int MAX_DISCOUNT_PERCENTAGE = 100;
 
