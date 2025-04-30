@@ -8,6 +8,7 @@ using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Providers.Context;
 using Ecommerce.Application.Common.Interfaces.Providers.Forex;
 using Ecommerce.Application.Common.Interfaces.Providers.Localization;
+using Ecommerce.Application.Common.Interfaces.Providers.Search.Elastic;
 using Ecommerce.Application.Common.Interfaces.Strategies;
 using Ecommerce.Application.Common.Interfaces.Validation;
 using Ecommerce.Application.Services.Utilities;
@@ -43,11 +44,13 @@ namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProdu
     private readonly Mock<IProductRepository> _productRepositoryMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IUserContextService> _userContextServiceMock;
-    private readonly Mock<IMediator> _senderMock;
+    private readonly Mock<ISender> _senderMock;
+    private readonly Mock<IPublisher> _publisherMock;
     private readonly Mock<ILogger<CreateProductCommandHandler>> _loggerMock;
     private readonly Mock<IForexSerivce> _forexServiceMock;
     private readonly Mock<IProductImageStrategyResolver> _productImageStrategyResolver;
     private readonly Mock<ISlugService<ProductId>> _slugServiceMock;
+    private readonly Mock<IElasticSearch> _elasticSearch;
 
     public CreateProductCommandHandlerTests()
     {
@@ -55,11 +58,13 @@ namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProdu
       _productRepositoryMock = new Mock<IProductRepository>();
       _unitOfWorkMock = new Mock<IUnitOfWork>();
       _userContextServiceMock = new Mock<IUserContextService>();
-      _senderMock = new Mock<IMediator>();
+      _senderMock = new Mock<ISender>();
+      _publisherMock = new Mock<IPublisher>();
       _loggerMock = new Mock<ILogger<CreateProductCommandHandler>>();
       _forexServiceMock = new Mock<IForexSerivce>();
       _productImageStrategyResolver = new Mock<IProductImageStrategyResolver>();
       _slugServiceMock = new Mock<ISlugService<ProductId>>();
+      _elasticSearch = new Mock<IElasticSearch>();
 
       _createProductCommandHandler = new(
         _mapperMock.Object,
@@ -68,9 +73,11 @@ namespace Ecommerce.Application.UnitTests.UseCases.Products.Commands.CreateProdu
         _unitOfWorkMock.Object,
         _userContextServiceMock.Object,
         _senderMock.Object,
+        _publisherMock.Object,
         _loggerMock.Object,
         _forexServiceMock.Object,
-        _productImageStrategyResolver.Object
+        _productImageStrategyResolver.Object,
+        _elasticSearch.Object
       );
     }
 
