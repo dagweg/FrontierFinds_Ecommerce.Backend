@@ -1,11 +1,6 @@
-namespace Ecommerce.Application.Common.Models.Search.Elastic;
+using Ecommerce.Application.Common.Models.Enums;
 
-// Define a simple enum for sorting direction
-public enum SortDirection
-{
-  Asc,
-  Desc,
-}
+namespace Ecommerce.Application.Common.Models.Search.Elastic;
 
 public record ElasticSearchFilterParams
 {
@@ -15,9 +10,8 @@ public record ElasticSearchFilterParams
   // Optional: Full-text search term
   public string? SearchTerm { get; init; }
 
-  // Optional: Filtering parameters (using nullable types for optional values)
-  public decimal? MinPrice { get; init; }
-  public decimal? MaxPrice { get; init; }
+  public long? MinPriceValueInCents { get; init; }
+  public long? MaxPriceValueInCents { get; init; }
 
   public List<string>? Categories { get; init; } // List of category names/slugs to filter by
   public List<string>? Tags { get; init; } // List of tag names to filter by
@@ -27,14 +21,10 @@ public record ElasticSearchFilterParams
 
   public string? SellerId { get; init; } // Filter by seller ID
 
-  // Optional: Pagination
-  public int Page { get; init; } = 1; // Default to first page
-  public int PageSize { get; init; } = 10; // Default page size
+  public PaginationParameters Pagination { get; init; } = default!;
 
   // Optional: Sorting
-  public string? SortBy { get; init; } // Field name to sort by (e.g., "name", "price", "averageRating")
-  public SortDirection SortDirection { get; init; } = SortDirection.Asc; // Default sort direction
-
+  public SortBy? SortBy { get; init; } // Field name to sort by (e.g., "name", "price", "averageRating")
   // Add any other parameters you might need for filtering, e.g.:
   // public bool? IsOnPromotion { get; init; }
   // public int? MinStock { get; init; }
