@@ -55,6 +55,9 @@ public class FluentResultsActionFilter : IActionFilter
             case FormatError:
               status = StatusCodes.Status400BadRequest;
               break;
+            case ForbiddenError:
+              status = StatusCodes.Status403Forbidden;
+              break;
             case AlreadyExistsError:
               status = StatusCodes.Status409Conflict;
               break;
