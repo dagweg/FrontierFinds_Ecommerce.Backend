@@ -6,6 +6,7 @@ using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
+using FluentResults;
 
 namespace Ecommerce.Application.Common.Interfaces.Persistence;
 
@@ -25,7 +26,7 @@ public interface IProductRepository : IRepository<Product, ProductId>
   /// </summary>
   /// <param name="productIds"></param>
   /// <returns>  </returns>
-  Task<DeleteResult> BulkDeleteByIdAsync(IEnumerable<ProductId> productIds);
+  Task<Result<DeleteResult>> BulkDeleteByIdAsync(IEnumerable<ProductId> productIds);
 
   /// <summary>
   /// Gets all the products the seller has listed.
@@ -84,12 +85,8 @@ public interface IProductRepository : IRepository<Product, ProductId>
   /// Gets all products that pass filter parameter criteria
   /// </summary>
   /// <param name="filterProductsQuery"></param>
-  /// <param name="paginationParameters"></param>
   /// <returns></returns>
-  Task<GetProductsResult> GetFilteredProductsAsync(
-    FilterProductsQuery filterProductsQuery,
-    PaginationParameters paginationParameters
-  );
+  Task<GetProductsResult> GetFilteredProductsAsync(FilterProductsQuery filterProductsQuery);
 
   /// <summary>
   /// Gets a product by its slug
@@ -97,4 +94,10 @@ public interface IProductRepository : IRepository<Product, ProductId>
   /// <param name="slug"></param>
   /// <returns></returns>
   Task<Product?> GetProductBySlugAsync(string slug);
+
+  /// <summary>
+  /// Returns the total number of products in the db
+  /// </summary>
+  /// <returns></returns>
+  Task<int> CountProducts();
 }
