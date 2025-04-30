@@ -49,9 +49,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using Serilog.Core;
 
 public static class DependencyInjection
 {
+  static Logger Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+
   // Extension method for configuring dependency injection
   public static IServiceCollection AddInfrastructure(
     this IServiceCollection services,
@@ -60,6 +63,8 @@ public static class DependencyInjection
   {
     // Load settings from appsettings.json
     services.AddAppSettings(configuration);
+
+    services.AddSingleton<IElasticSearch, ElasticSearch>();
 
     // configure authentication and authorization
     services.AddAuth(configuration);
@@ -82,8 +87,6 @@ public static class DependencyInjection
 
     // stripe, paypal .. etc
     services.AddPaymentGateways();
-
-    services.AddElastic(configuration);
 
     return services;
   }
@@ -322,25 +325,6 @@ public static class DependencyInjection
   public static IServiceCollection AddPaymentGateways(this IServiceCollection services)
   {
     services.AddTransient<IStripeService, StripeService>();
-    return services;
-  }
-
-  public static IServiceCollection AddElastic(
-    this IServiceCollection services,
-    IConfigurationManager configuration
-  )
-  {
-    var elasticUri = configuration[$"{ElasticSettings.SectionName}:ConnectionString"];
-    if (elasticUri == null)
-    {
-      throw new Exception("Elastic Connection String is null.");
-    }
-
-    var elasticClient = new ElasticsearchClient(new Uri(elasticUri));
-
-    services.AddSingleton(elasticClient);
-    services.AddScoped(typeof(IElasticSearch<>), typeof(ElasticSearch<>));
-
     return services;
   }
 }
