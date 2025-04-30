@@ -11,14 +11,5 @@ public class GetMyProductsQuery : PaginationParameters, IRequest<Result<Products
 {
   public FilterProductsQuery? FilterQuery { get; init; }
 
-  public GetMyProductsQuery()
-  {
-    FilterQuery = new FilterProductsQuery(
-      null,
-      null,
-      null,
-      null,
-      new PaginationParameters { PageNumber = PageNumber, PageSize = PageSize }
-    );
-  }
+  public GetMyProductsQuery() { }
 }
