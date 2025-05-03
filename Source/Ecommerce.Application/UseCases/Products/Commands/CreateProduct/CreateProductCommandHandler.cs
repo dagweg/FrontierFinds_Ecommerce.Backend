@@ -176,9 +176,9 @@ public class CreateProductCommandHandler
       new ElasticTaskNotification()
       {
         ElasticAction = ElasticAction.Index,
-        IndexDocs = new Dictionary<string, ElasticDocumentBase>
+        IndexDocs = new Dictionary<string, ElasticDocumentBase[]>
         {
-          { ElasticIndices.ProductIndex, _mapper.Map<ProductDocument>(product) },
+          { ElasticIndices.ProductIndex, [_mapper.Map<ProductDocument>(product)] },
         },
       }
     );

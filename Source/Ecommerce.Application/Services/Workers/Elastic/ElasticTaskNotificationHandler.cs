@@ -1,4 +1,5 @@
 using System.Reflection.Metadata;
+using Ecommerce.Application.Common.Defaults;
 using Ecommerce.Application.Common.Interfaces.Providers.Search.Elastic;
 using Ecommerce.Application.Common.Models.Search.Elastic.Documents;
 using MediatR;
@@ -17,6 +18,9 @@ public class ElasticTaskNotificationHandler(
     CancellationToken cancellationToken
   )
   {
+    if (!await elasticSearch.IsReachableAsync())
+      return;
+
     taskQueue.QueueBackgroundWorkItem(async x =>
     {
       try
@@ -24,30 +28,36 @@ public class ElasticTaskNotificationHandler(
         if (notification.ElasticAction == ElasticAction.Index)
         {
           logger.LogInformation("Indexing documents to ElasticSearch.");
-          List<ProductDocument> failed = [];
+          List<ElasticDocumentBase> failed = [];
           foreach (var kvp in notification.IndexDocs)
           {
             var indexName = kvp.Key;
-            var document = (ProductDocument)kvp.Value;
-            var success = await elasticSearch.IndexAsync(indexName, document, cancellationToken);
-            if (!success)
-            {
-              failed.Add(document);
-              logger.LogError(
-                "Failed to index document {DocumentId} in index {IndexName}.",
-                document.Id,
-                indexName
-              );
-            }
+
+            if (indexName == ElasticIndices.ProductIndex)
+              foreach (var doc in kvp.Value)
+              {
+                var document = (ProductDocument)doc;
+                var success = await elasticSearch.IndexAsync(
+                  indexName,
+                  document,
+                  cancellationToken
+                );
+                if (!success)
+                {
+                  failed.Add(document);
+                  logger.LogError(
+                    "Failed to index document \nDocumentId: {DocumentId} \nProductName: {ProductName}\n in index {IndexName}.",
+                    document.Id,
+                    document.Name,
+                    indexName
+                  );
+                }
+              }
           }
 
           if (failed.Count > 0)
           {
-            logger.LogError(
-              "Failed to index {Count} documents in ElasticSearch. \n{@DocumentNames}",
-              failed.Count,
-              string.Join(",\n", failed.Select(x => x.Name))
-            );
+            logger.LogError("Failed to index {Count} documents in ElasticSearch.", failed.Count);
           }
           else
           {

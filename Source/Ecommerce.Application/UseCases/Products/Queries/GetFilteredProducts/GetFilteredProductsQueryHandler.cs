@@ -75,15 +75,20 @@ public class GetFilteredProductsQueryHandler
     _logger.LogInformation("No products found in ElasticSearch, falling back to DB search.");
     GetProductsResult products = await _productRepository.GetFilteredProductsAsync(request);
 
-    // Index the products in ElasticSearch for future searches
+    // Schedule an indexing job for the non-indexed products for future searches
     await _publisher.Publish(
       new ElasticTaskNotification()
       {
         ElasticAction = ElasticAction.Index,
-        IndexDocs = products.Items.ToDictionary(
-          k => ElasticIndices.ProductIndex,
-          v => (ElasticDocumentBase)_mapper.Map<ProductDocument>(v)
-        ),
+        IndexDocs = new Dictionary<string, ElasticDocumentBase[]>
+        {
+          {
+            ElasticIndices.ProductIndex,
+            products
+              .Items.Select(v => (ElasticDocumentBase)_mapper.Map<ProductDocument>(v))
+              .ToArray()
+          },
+        },
       }
     );
 
