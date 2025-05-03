@@ -2,6 +2,7 @@ using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Application.UseCases.Products.Queries.GetFilteredProducts;
 using Ecommerce.Domain.Common.Entities;
+using Ecommerce.Domain.OrderAggregate.ValueObjects;
 using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
@@ -100,4 +101,8 @@ public interface IProductRepository : IRepository<Product, ProductId>
   /// </summary>
   /// <returns></returns>
   Task<int> CountProducts();
+
+  IDictionary<OrderId, IEnumerable<Product>> GetMappedOrderIdWithProducts(
+    IDictionary<OrderId, IEnumerable<ProductId>> dict
+  );
 }

@@ -1,4 +1,6 @@
 using Ecommerce.Application.Common.Models.Enums;
+using Ecommerce.Application.UseCases.Products.Queries.GetFilteredProducts;
+using Ecommerce.Domain.UserAggregate.ValueObjects;
 
 namespace Ecommerce.Application.Common.Models.Search.Elastic;
 
@@ -6,6 +8,9 @@ public record ElasticSearchFilterParams
 {
   // Required: The index or indices to search
   public required string Index { get; init; }
+
+  public UserId? SellerId { get; init; }
+  public SubjectFilter SubjectFilter { get; init; } = SubjectFilter.AllProducts; // Fetch all products by default
 
   // Optional: Full-text search term
   public string? SearchTerm { get; init; }
@@ -18,8 +23,6 @@ public record ElasticSearchFilterParams
 
   public decimal? MinRating { get; init; }
   public decimal? MaxRating { get; init; } // Less common, usually just minRating
-
-  public string? SellerId { get; init; } // Filter by seller ID
 
   public PaginationParameters Pagination { get; init; } = default!;
 

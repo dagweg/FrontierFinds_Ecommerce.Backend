@@ -1,5 +1,4 @@
 using AutoMapper;
-using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Application.Common.Interfaces.Persistence;
 using Ecommerce.Application.Common.Interfaces.Providers.Context;
 using Ecommerce.Application.Common.Models;
@@ -9,39 +8,38 @@ using Ecommerce.Application.UseCases.Products.Queries.GetFilteredProducts;
 using Ecommerce.Domain.UserAggregate.ValueObjects;
 using FluentResults;
 using MediatR;
-using Microsoft.CodeAnalysis.CSharp;
 
-namespace Ecommerce.Application.UseCases.Users.Queries.GetMyProducts;
+namespace Ecommerce.Application.UseCases.Products.Queries.GetAllProductsWithoutSellerListing;
 
-public class GetMyProductsQueryHandler : IRequestHandler<GetMyProductsQuery, Result<ProductsResult>>
+public class GetAllProductsWithoutSellerListingQueryHandler
+  : IRequestHandler<GetAllProductsWithoutSellerListingQuery, Result<ProductsResult>>
 {
   private readonly IProductRepository _productRepository;
-  private readonly IMapper _mapper;
-  private readonly IUserContextService _userContext;
+  private readonly IUserContextService _userContextService;
   private readonly ISender _sender;
+  private readonly IMapper _mapper;
 
-  public GetMyProductsQueryHandler(
+  public GetAllProductsWithoutSellerListingQueryHandler(
     IProductRepository productRepository,
     IMapper mapper,
-    IUserContextService userContext,
+    IUserContextService contextService,
     ISender sender
   )
   {
     _productRepository = productRepository;
+    _userContextService = contextService;
     _mapper = mapper;
-    _userContext = userContext;
     _sender = sender;
   }
 
   public async Task<Result<ProductsResult>> Handle(
-    GetMyProductsQuery request,
+    GetAllProductsWithoutSellerListingQuery request,
     CancellationToken cancellationToken
   )
   {
-    // get seller id
-    var sellerId = _userContext.GetValidUserId();
-    if (sellerId.IsFailed)
-      return sellerId.ToResult();
+    var userId = _userContextService.GetValidUserId();
+    if (userId.IsFailed)
+      return userId.ToResult();
 
     var result = await _sender.Send(
       new FilterProductsQuery()
@@ -51,19 +49,14 @@ public class GetMyProductsQueryHandler : IRequestHandler<GetMyProductsQuery, Res
         MaxPriceValueInCents = request.FilterQuery?.MaxPriceValueInCents,
         MinPriceValueInCents = request.FilterQuery?.MinPriceValueInCents,
         SortBy = request.FilterQuery?.SortBy,
-        SellerId = sellerId.Value,
-        SubjectFilter = SubjectFilter.SellerProductsOnly,
-        PaginationParameters = new PaginationParameters()
-        {
-          PageNumber = request.PageNumber,
-          PageSize = request.PageSize,
-        },
+        SellerId = userId.Value,
+        SubjectFilter = SubjectFilter.AllProductsWithoutSeller,
+        PaginationParameters = request.FilterQuery is null
+          ? new PaginationParameters()
+          : request.FilterQuery.PaginationParameters,
       }
     );
 
-    if (result.IsFailed)
-      return result.ToResult();
-
-    return result.Value;
+    return result;
   }
 }

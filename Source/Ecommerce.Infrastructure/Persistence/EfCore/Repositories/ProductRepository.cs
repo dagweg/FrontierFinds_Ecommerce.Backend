@@ -7,6 +7,7 @@ using Ecommerce.Application.Common.Utilities;
 using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Application.UseCases.Products.Queries.GetFilteredProducts;
 using Ecommerce.Domain.Common.Entities;
+using Ecommerce.Domain.OrderAggregate.ValueObjects;
 using Ecommerce.Domain.ProductAggregate;
 using Ecommerce.Domain.ProductAggregate.Entities;
 using Ecommerce.Domain.ProductAggregate.ValueObjects;
@@ -70,6 +71,13 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
   {
     return prod =>
       (
+        filterProductsQuery.SubjectFilter == SubjectFilter.SellerProductsOnly // Seller Products only
+          ? prod.SellerId == filterProductsQuery.SellerId
+        : filterProductsQuery.SubjectFilter == SubjectFilter.AllProductsWithoutSeller // ALl products withoutseller
+          ? prod.SellerId != filterProductsQuery.SellerId
+        : true
+      )
+      && (
         filterProductsQuery.SearchTerm == null
         || prod.Name.Value.ToLower().Contains(filterProductsQuery.SearchTerm.ToLower().Trim())
       )
@@ -383,5 +391,22 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
   public async Task<int> CountProducts()
   {
     return await _context.Products.CountAsync();
+  }
+
+  public IDictionary<OrderId, IEnumerable<Product>> GetMappedOrderIdWithProducts(
+    IDictionary<OrderId, IEnumerable<ProductId>> dict
+  )
+  {
+    return (IDictionary<OrderId, IEnumerable<Product>>)
+      dict.Select(kvp =>
+        {
+          var orderId = kvp.Key;
+          var productIds = kvp.Value;
+
+          var mappedProducts = BulkGetByIdAsync(productIds).GetAwaiter().GetResult();
+
+          return (orderId, mappedProducts.Values.AsEnumerable());
+        })
+        .ToDictionary(tuple => tuple.orderId, tuple => tuple.Item2);
   }
 }

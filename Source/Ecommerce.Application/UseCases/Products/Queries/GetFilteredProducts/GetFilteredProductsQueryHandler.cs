@@ -49,6 +49,8 @@ public class GetFilteredProductsQueryHandler
     var productsFromElastic = await _elasticSearch.SearchAsync<ProductDocument>(
       new ElasticSearchFilterParams()
       {
+        SubjectFilter = request.SubjectFilter,
+        SellerId = request.SellerId,
         Index = ElasticIndices.ProductIndex,
         SearchTerm = request.SearchTerm,
         MaxPriceValueInCents = request.MaxPriceValueInCents,

@@ -1,3 +1,4 @@
+using Ecommerce.Application.UseCases.Products.Common;
 using Ecommerce.Domain.OrderAggregate.ValueObjects;
 
 namespace Ecommerce.Application.UseCases.Orders.Common;
@@ -6,7 +7,7 @@ public class OrdersResult
 {
   public int TotalItems { get; set; } = 0;
   public int TotalItemsFetched { get; set; } = 0;
-  public List<OrderResult> Items { get; set; } = new List<OrderResult>();
+  public required List<OrderResult> Items { get; set; }
 }
 
 public class OrderResult
@@ -17,7 +18,7 @@ public class OrderResult
   public required ShippingAddress ShippingAddress { get; set; }
   public required string Status { get; set; }
 
-  public List<OrderItemResult> OrderItems = [];
+  public required List<OrderItemResult> OrderItems;
   public required DateTime OrderDate { get; set; }
 }
 
@@ -29,7 +30,7 @@ public class OrderTotalResult
 
 public class OrderItemResult
 {
-  public required string ProductId { get; set; }
+  public required ProductResult Product { get; set; }
   public required int Quantity { get; set; }
-  public required long PriceValueInCents { get; set; }
+  public required long OrderItemTotalInCents { get; set; }
 }

@@ -5,9 +5,11 @@ using Ecommerce.Application.Common.Interfaces.Providers.Search.Elastic;
 using Ecommerce.Application.Common.Models.Search.Elastic;
 using Ecommerce.Application.Common.Models.Search.Elastic.Documents;
 using Ecommerce.Application.Common.Utilities;
+using Ecommerce.Application.UseCases.Products.Queries.GetFilteredProducts;
 using Ecommerce.Infrastructure.Services.Providers.Search.Elastic;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.QueryDsl;
+using Elastic.Clients.Elasticsearch.QueryRules;
 using Elastic.Transport;
 using Elastic.Transport.Products.Elasticsearch;
 using Microsoft.AspNetCore.Builder;
@@ -173,47 +175,62 @@ public class ElasticSearch : IElasticSearch
 
   private Query BuildElasticQuery(ElasticSearchFilterParams filterParams)
   {
-    var mustQueries = new List<Query>();
+    var queryContainer = new BoolQuery();
+    bool hasClauses = false;
 
+    // --- Search Term Handling ---
     if (!string.IsNullOrWhiteSpace(filterParams.SearchTerm))
     {
-      var searchTerm = filterParams.SearchTerm.ToLowerInvariant(); // Normalize to lowercase
+      var searchTerm = filterParams.SearchTerm.ToLowerInvariant(); // Normalize
 
-      // Multi-match query for robust text search
-      mustQueries.Add(
+      queryContainer.Must = queryContainer.Must ?? new List<Query>();
+      queryContainer.Must.Add(
         new MultiMatchQuery
         {
+          Query = searchTerm,
           Fields = new[]
           {
-            $"{nameof(ProductDocument.Name).PascalToCamelCase()}^2", // Boost Name
+            $"{nameof(ProductDocument.Name).PascalToCamelCase()}^2", // Boost name field
             nameof(ProductDocument.Description).PascalToCamelCase(),
           },
-          Query = searchTerm,
           Type = TextQueryType.BestFields,
-          Fuzziness = new Fuzziness(1),
-          Operator = Operator.Or, // Match any term
-          Analyzer = "standard", // Ensure tokenization and lowercase
+          Fuzziness = new Fuzziness("AUTO"),
+          Operator = Operator.Or, // Match any term within a field
+          Analyzer = "standard",
         }
       );
-
-      // Wildcard query for partial matches
-      mustQueries.Add(
-        new WildcardQuery(new Field(nameof(ProductDocument.Name).PascalToCamelCase()))
-        {
-          Wildcard = $"*{searchTerm.Replace(" ", "*")}*",
-          CaseInsensitive = true,
-        }
-      );
+      hasClauses = true;
     }
 
-    // Combine queries with BoolQuery
-    return mustQueries.Any()
-      ? new BoolQuery
+    // --- Seller ID Filtering ---
+    if (filterParams.SellerId != null)
+    {
+      // Use TermQuery for exact match on keyword/numeric fields
+      // Put it in the Filter context for non-scoring, performant filtering
+      var sellerIdQuery = new TermQuery(
+        new Field(nameof(ProductDocument.SellerId).PascalToCamelCase())
+      )
       {
-        Should = mustQueries,
-        MinimumShouldMatch = 1, // At least one condition must match
+        Value = FieldValue.String(filterParams.SellerId.Value.ToString()),
+      };
+
+      if (filterParams.SubjectFilter == SubjectFilter.SellerProductsOnly)
+      {
+        queryContainer.Filter = queryContainer.Filter ?? new List<Query>();
+        queryContainer.Filter.Add(sellerIdQuery);
+        hasClauses = true;
       }
-      : new MatchAllQuery();
+      else if (filterParams.SubjectFilter == SubjectFilter.AllProductsWithoutSeller)
+      {
+        queryContainer.MustNot = queryContainer.MustNot ?? new List<Query>();
+        queryContainer.MustNot.Add(sellerIdQuery);
+        hasClauses = true;
+      }
+      // Assuming SubjectFilter.AllProducts means no seller filter is applied
+    }
+
+    // If any clauses were added, return the BoolQuery, otherwise MatchAll
+    return hasClauses ? queryContainer : new MatchAllQuery();
   }
 
   public async Task<bool> UpdateAsync(
