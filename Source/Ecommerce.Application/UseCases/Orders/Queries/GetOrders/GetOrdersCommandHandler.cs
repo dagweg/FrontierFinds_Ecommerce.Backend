@@ -40,8 +40,6 @@ public class GetOrdersCommandHandler(
     if (orders is null)
       return NotFoundError.GetResult("user", "user is not found");
 
-    // LogPretty.Log(orders);
-
     var res = new OrdersResult
     {
       Items = orders
@@ -73,8 +71,6 @@ public class GetOrdersCommandHandler(
                 Product = mapper.Map<ProductResult>(p),
                 Quantity = oi is null ? 0 : oi.Quantity,
               };
-              // Console.WriteLine("Order Item Result\n:");
-              // LogPretty.Log(res); // Order Item is printing okay!!!
               return res;
             })
             .ToList(),
@@ -83,11 +79,6 @@ public class GetOrdersCommandHandler(
       TotalItems = orders.TotalItems,
       TotalItemsFetched = orders.TotalItemsFetched,
     };
-
-    // WHAT IN THE BLOODY HELL IS HAPPENING, Order Items are not being included in the 'res'??? Even though they're printed
-    // and are present when constructing the dto above
-
-    // LogPretty.Log(res.Items.Select(x => x.OrderItems)); // Order Item is not Present Here! In the result object
 
     return res;
   }

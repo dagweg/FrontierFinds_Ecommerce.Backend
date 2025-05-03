@@ -18,7 +18,7 @@ public class OrderResult
   public required ShippingAddress ShippingAddress { get; set; }
   public required string Status { get; set; }
 
-  public required List<OrderItemResult> OrderItems;
+  public required List<OrderItemResult> OrderItems { get; set; }
   public required DateTime OrderDate { get; set; }
 }
 
