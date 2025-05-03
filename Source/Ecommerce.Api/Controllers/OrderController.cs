@@ -34,8 +34,6 @@ public class OrderController(ISender sender) : ControllerBase
     if (result.IsFailed)
       return new ObjectResult(result);
 
-    LogPretty.Log(result);
-
     return Ok(result.Value);
   }
 }

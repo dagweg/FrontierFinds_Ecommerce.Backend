@@ -6,7 +6,7 @@ using AutoMapper;
 using Ecommerce.Api.Utilities;
 using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.Common.Utilities;
-using Ecommerce.Application.UseCases.Products.Queries.GetAllProducts;
+using Ecommerce.Application.UseCases.Products.Queries.GetAllProductsWithoutSellerListing;
 using Ecommerce.Application.UseCases.Products.Queries.GetFilteredProducts;
 using Ecommerce.Application.UseCases.Users.Commands.AddToCart;
 using Ecommerce.Application.UseCases.Users.Commands.ChangePassword;
@@ -235,6 +235,8 @@ public class MeController : ControllerBase
       return new ObjectResult(result);
     }
 
+    Response.Headers.Add("X-Data-Source", result.Value.DataSourceType.ToString());
+    Response.Headers.Add("X-Data-SourceId", result.Value.DataSourceId.ToString());
     return Ok(result.Value);
   }
 

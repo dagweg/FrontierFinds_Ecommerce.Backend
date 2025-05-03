@@ -7,7 +7,7 @@ using Ecommerce.Application.UseCases.Images.Queries.GetSupportedImageMimes;
 using Ecommerce.Application.UseCases.Products.Commands.CreateReview;
 using Ecommerce.Application.UseCases.Products.Commands.DeleteProduct;
 using Ecommerce.Application.UseCases.Products.CreateUser.Commands;
-using Ecommerce.Application.UseCases.Products.Queries.GetAllProducts;
+using Ecommerce.Application.UseCases.Products.Queries.GetAllProductsWithoutSellerListing;
 using Ecommerce.Application.UseCases.Products.Queries.GetCategories;
 using Ecommerce.Application.UseCases.Products.Queries.GetFilteredProducts;
 using Ecommerce.Application.UseCases.Products.Queries.GetProductBySlug;
@@ -57,10 +57,25 @@ public class ProductController : ControllerBase
 
   [AllowAnonymous]
   [HttpGet]
-  public async Task<IActionResult> GetProducts([FromQuery] PaginationParams paginationParams)
+  public async Task<IActionResult> GetProducts(
+    [FromQuery] PaginationParams paginationParams,
+    [FromQuery] FilterProductsQuery? filterBy = null
+  )
   {
     var result = await _mediator.Send(
-      new GetAllProductsQuery(paginationParams.PageNumber, paginationParams.PageSize)
+      new GetAllProductsWithoutSellerListingQuery()
+      {
+        FilterQuery = filterBy is null
+          ? filterBy
+          : filterBy with
+          {
+            PaginationParameters = new PaginationParameters
+            {
+              PageNumber = paginationParams.PageNumber,
+              PageSize = paginationParams.PageSize,
+            },
+          },
+      }
     );
 
     if (result.IsFailed)
@@ -68,7 +83,8 @@ public class ProductController : ControllerBase
       _logger.LogError("Failed to get all products: {@result}", result);
       return new ObjectResult(result);
     }
-
+    Response.Headers.Add("X-Data-Source", result.Value.DataSourceType.ToString());
+    Response.Headers.Add("X-Data-SourceId", result.Value.DataSourceId.ToString());
     return Ok(result.Value);
   }
 

@@ -7,7 +7,7 @@ using AutoMapper;
 using Ecommerce.Api.Attributes;
 using Ecommerce.Api.Utilities;
 using Ecommerce.Application.Common.Models;
-using Ecommerce.Application.UseCases.Products.Queries.GetAllProducts;
+using Ecommerce.Application.UseCases.Products.Queries.GetAllProductsWithoutSellerListing;
 using Ecommerce.Application.UseCases.Products.Queries.GetFilteredProducts;
 using Ecommerce.Application.UseCases.Users.Commands.AddToCart;
 using Ecommerce.Application.UseCases.Users.Commands.ChangePassword;
