@@ -51,35 +51,7 @@ public class ElasticSearch : IElasticSearch
       );
       _logger.LogInformation("ElasticsearchClient created successfully.");
 
-#pragma warning disable CS0618 // Type or member is obsolete
-      _logger.LogInformation("Attempting synchronous ping to Elasticsearch.");
-      var pingResponse = _elasticClient.Ping();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-      if (!pingResponse.IsValidResponse)
-      {
-        if (pingResponse.TryGetOriginalException(out var originalException))
-        {
-          _logger.LogError(originalException, "Elasticsearch ping original exception.");
-        }
-        if (!string.IsNullOrEmpty(pingResponse.DebugInformation))
-        {
-          _logger.LogError(
-            $"Elasticsearch ping debug information: {pingResponse.DebugInformation}"
-          );
-        }
-        _logger.LogError(
-          $"Failed to connect to Elastic Cluster with URI: {_elasticSettings.ConnectionString}. Ensure it is running and accessible."
-        );
-        // Consider throwing an exception here if connection is critical for startup
-        // throw new InvalidOperationException($"Failed to connect to Elasticsearch: {pingResponse.DebugInformation ?? pingResponse.OriginalException?.Message}");
-      }
-      else
-      {
-        _logger.LogInformation(
-          $"Successfully connected to Elastic Cluster with URI: {_elasticSettings.ConnectionString}."
-        );
-      }
+      Task.WaitAll(IsReachableAsync());
     }
     catch (UriFormatException uriEx)
     {
@@ -255,5 +227,38 @@ public class ElasticSearch : IElasticSearch
       new UpdateRequest<ElasticDocumentBase, ElasticDocumentBase>(indexName, id) { Doc = document }
     );
     return ur.IsSuccess();
+  }
+
+  public async Task<bool> IsReachableAsync()
+  {
+#pragma warning disable CS0618 // Type or member is obsolete
+    _logger.LogInformation("Attempting synchronous ping to Elasticsearch.");
+    var pingResponse = await _elasticClient.PingAsync();
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    if (!pingResponse.IsValidResponse)
+    {
+      if (pingResponse.TryGetOriginalException(out var originalException))
+      {
+        _logger.LogError(originalException, "Elasticsearch ping original exception.");
+      }
+      if (!string.IsNullOrEmpty(pingResponse.DebugInformation))
+      {
+        _logger.LogError($"Elasticsearch ping debug information: {pingResponse.DebugInformation}");
+      }
+      _logger.LogError(
+        $"Failed to connect to Elastic Cluster with URI: {_elasticSettings.ConnectionString}. Ensure it is running and accessible."
+      );
+      // Consider throwing an exception here if connection is critical for startup
+      // throw new InvalidOperationException($"Failed to connect to Elasticsearch: {pingResponse.DebugInformation ?? pingResponse.OriginalException?.Message}");
+      return false;
+    }
+    else
+    {
+      _logger.LogInformation(
+        $"Successfully connected to Elastic Cluster with URI: {_elasticSettings.ConnectionString}."
+      );
+      return true;
+    }
   }
 }

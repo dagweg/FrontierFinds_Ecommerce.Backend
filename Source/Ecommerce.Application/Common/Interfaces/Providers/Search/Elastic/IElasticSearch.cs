@@ -32,4 +32,6 @@ public interface IElasticSearch
     CancellationToken cancellationToken = default
   )
     where TDocument : ElasticDocumentBase;
+
+  Task<bool> IsReachableAsync();
 }
