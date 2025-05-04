@@ -18,11 +18,10 @@ public record ElasticSearchFilterParams
   public long? MinPriceValueInCents { get; init; }
   public long? MaxPriceValueInCents { get; init; }
 
-  public List<string>? Categories { get; init; } // List of category names/slugs to filter by
+  public List<int>? CategoryIds { get; init; }
   public List<string>? Tags { get; init; } // List of tag names to filter by
 
   public decimal? MinRating { get; init; }
-  public decimal? MaxRating { get; init; } // Less common, usually just minRating
 
   public PaginationParameters Pagination { get; init; } = default!;
 

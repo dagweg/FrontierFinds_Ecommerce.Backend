@@ -38,8 +38,6 @@ public class GetAllProductsWithoutSellerListingQueryHandler
   )
   {
     var userId = _userContextService.GetValidUserId();
-    if (userId.IsFailed)
-      return userId.ToResult();
 
     var result = await _sender.Send(
       new FilterProductsQuery()
@@ -49,7 +47,7 @@ public class GetAllProductsWithoutSellerListingQueryHandler
         MaxPriceValueInCents = request.FilterQuery?.MaxPriceValueInCents,
         MinPriceValueInCents = request.FilterQuery?.MinPriceValueInCents,
         SortBy = request.FilterQuery?.SortBy,
-        SellerId = userId.Value,
+        SellerId = userId is null ? null : userId.Value,
         SubjectFilter = SubjectFilter.AllProductsWithoutSeller,
         PaginationParameters = request.FilterQuery is null
           ? new PaginationParameters()

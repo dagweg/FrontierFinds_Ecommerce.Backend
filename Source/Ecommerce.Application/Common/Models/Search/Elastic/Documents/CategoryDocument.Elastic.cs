@@ -1,6 +1,6 @@
 namespace Ecommerce.Application.Common.Models.Search.Elastic.Documents;
 
-public class CategoryDocument : ElasticDocumentBase
+public class CategoryDocument : ElasticDocumentBase<int>
 {
   public string Name { get; set; } = default!;
   public string Slug { get; set; } = default!;

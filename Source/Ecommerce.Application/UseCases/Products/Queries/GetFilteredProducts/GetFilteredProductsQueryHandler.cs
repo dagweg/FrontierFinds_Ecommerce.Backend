@@ -60,6 +60,8 @@ public class GetFilteredProductsQueryHandler
       }
     );
 
+    int totalProducts = await _productRepository.CountProducts();
+
     if (productsFromElastic.Any()) // If elastic returns indexed items, return those
     {
       return new ProductsResult
@@ -69,7 +71,7 @@ public class GetFilteredProductsQueryHandler
         MinPriceValueInCents = productsFromElastic.Min(p => p.PriceValueInCents),
         MaxPriceValueInCents = productsFromElastic.Max(p => p.PriceValueInCents),
         Products = productsFromElastic.Select(p => _mapper.Map<ProductResult>(p)),
-        TotalCount = await _productRepository.CountProducts(),
+        TotalCount = totalProducts,
         TotalFetchedCount = productsFromElastic.Count(),
       };
     }
@@ -100,7 +102,7 @@ public class GetFilteredProductsQueryHandler
       MinPriceValueInCents = products.MinPriceValueInCents,
       MaxPriceValueInCents = products.MaxPriceValueInCents,
       Products = products.Items.Select(p => _mapper.Map<ProductResult>(p)),
-      TotalCount = products.TotalItems,
+      TotalCount = totalProducts,
       TotalFetchedCount = products.TotalItemsFetched,
     };
   }

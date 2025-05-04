@@ -71,11 +71,15 @@ public class ProductRepository : EfCoreRepository<Product, ProductId>, IProductR
   {
     return prod =>
       (
-        filterProductsQuery.SubjectFilter == SubjectFilter.SellerProductsOnly // Seller Products only
-          ? prod.SellerId == filterProductsQuery.SellerId
-        : filterProductsQuery.SubjectFilter == SubjectFilter.AllProductsWithoutSeller // ALl products withoutseller
-          ? prod.SellerId != filterProductsQuery.SellerId
-        : true
+        filterProductsQuery.SellerId == null
+        || (
+          filterProductsQuery.SubjectFilter == SubjectFilter.SellerProductsOnly
+          && prod.SellerId == filterProductsQuery.SellerId
+        )
+        || (
+          filterProductsQuery.SubjectFilter == SubjectFilter.AllProductsWithoutSeller
+          && prod.SellerId != filterProductsQuery.SellerId
+        )
       )
       && (
         filterProductsQuery.SearchTerm == null

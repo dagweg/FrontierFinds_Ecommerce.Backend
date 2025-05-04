@@ -39,6 +39,7 @@ public class FluentResultsActionFilter : IActionFilter
           switch (fluentError)
           {
             case AuthenticationError:
+            case AuthorizationError:
               status = StatusCodes.Status401Unauthorized;
               break;
             case ValidationError:
