@@ -47,7 +47,7 @@ public class GetAllProductsWithoutSellerListingQueryHandler
         MaxPriceValueInCents = request.FilterQuery?.MaxPriceValueInCents,
         MinPriceValueInCents = request.FilterQuery?.MinPriceValueInCents,
         SortBy = request.FilterQuery?.SortBy,
-        SellerId = userId is null ? null : userId.Value,
+        SellerId = userId.IsFailed ? null : userId.Value,
         SubjectFilter = SubjectFilter.AllProductsWithoutSeller,
         PaginationParameters = request.FilterQuery is null
           ? new PaginationParameters()
